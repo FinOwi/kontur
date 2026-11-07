@@ -3,7 +3,18 @@
 <html lang="id"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BK ADVENTURE // Technical Outdoor Equipment &amp; Depot</title>
+  <title>Sewa Alat Camping Medan — Rental Perlengkapan Outdoor &amp; Tenda | MEDAN OUTDOORS</title>
+  <meta name="description" content="MEDAN OUTDOORS — sewa alat camping & rental perlengkapan outdoor di Medan dan Sumatera Utara: tenda, carrier, sepatu gunung, jaket branded (Salomon, Arc'teryx, Osprey). Tarif per hari, booking mudah via WhatsApp, pengambilan di depot.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://bk-adventure.my.id/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MEDAN OUTDOORS">
+  <meta property="og:title" content="Sewa Alat Camping Medan — MEDAN OUTDOORS">
+  <meta property="og:description" content="Rental perlengkapan outdoor & alat camping di Medan: tenda, carrier, sepatu, jaket branded. Tarif per hari, booking via WhatsApp.">
+  <meta property="og:url" content="https://bk-adventure.my.id/">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=1200&q=80">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json" id="seoJsonLd">{"@context":"https://schema.org","@type":"Store","name":"MEDAN OUTDOORS","url":"https://bk-adventure.my.id/","description":"Sewa alat camping & rental perlengkapan outdoor di Medan dan Sumatera Utara: tenda, carrier, sepatu gunung, jaket branded. Tarif per hari, booking via WhatsApp.","priceRange":"Rp10.000 - Rp95.000 per hari","areaServed":["Kota Medan","Kabupaten Karo","Sumatera Utara"],"address":{"@type":"PostalAddress","streetAddress":"Jl. Jamin Ginting No. 88, Berastagi, Kab. Karo, Sumatera Utara","addressRegion":"Sumatera Utara","addressCountry":"ID"}}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com/">
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
   <link href="./BK ADVENTURE __ Technical Outdoor Equipment &amp; Depot_files/css2" rel="stylesheet">
@@ -2428,6 +2439,34 @@
         return true;
       } catch (e) { return false; }
     }
+    // SEO dinamis: judul tab, meta description & schema LocalBusiness mengikuti
+    // identitas toko dari konfigurasi server, dibingkai frasa kunci jasa ini.
+    function sbSeoApply() {
+      try {
+        const c = (typeof siteConfig !== 'undefined' && siteConfig) || {};
+        const brand = (c.brandName || 'MEDAN OUTDOORS').trim();
+        document.title = 'Sewa Alat Camping Medan — ' + brand + ' | Rental Perlengkapan Outdoor';
+        const desc = brand + ' — sewa alat camping & rental perlengkapan outdoor di Medan dan Sumatera Utara: tenda, carrier, sepatu gunung, jaket branded. Tarif per hari, booking via WhatsApp' + (c.depotPhone ? ' ' + c.depotPhone : '') + '. Pengambilan di depot' + (c.address ? ': ' + c.address : '.');
+        const m = document.querySelector('meta[name="description"]');
+        if (m) m.setAttribute('content', desc);
+        const ogt = document.querySelector('meta[property="og:title"]');
+        if (ogt) ogt.setAttribute('content', 'Sewa Alat Camping Medan — ' + brand);
+        const ogd = document.querySelector('meta[property="og:description"]');
+        if (ogd) ogd.setAttribute('content', desc);
+        const ld = {
+          '@context': 'https://schema.org', '@type': 'Store',
+          name: brand, url: 'https://bk-adventure.my.id/',
+          description: desc, priceRange: 'Rp10.000 - Rp95.000 per hari',
+          areaServed: ['Kota Medan', 'Kabupaten Karo', 'Sumatera Utara']
+        };
+        if (c.heroImage) ld.image = c.heroImage;
+        if (c.depotPhone) ld.telephone = c.depotPhone;
+        if (c.address) ld.address = { '@type': 'PostalAddress', streetAddress: c.address, addressRegion: 'Sumatera Utara', addressCountry: 'ID' };
+        if (c.mapsUrl) ld.hasMap = c.mapsUrl;
+        const s = document.getElementById('seoJsonLd');
+        if (s) s.textContent = JSON.stringify(ld);
+      } catch (e) {}
+    }
     async function sbBootStorefront() {
       if (await sbPullPublic()) {
         loadSiteConfig(); renderSiteContent(); loadData(); renderCatalog();
@@ -2492,7 +2531,7 @@
       setText('announceRight', siteConfig.announceRight);
       setText('brandName', siteConfig.brandName);
       setText('brandSubtitle', siteConfig.brandSubtitle);
-      document.title = (siteConfig.brandName || 'BK ADVENTURE') + ' // ' + (siteConfig.brandSubtitle || 'Technical Outdoor Equipment & Depot');
+      if (typeof sbSeoApply === 'function') sbSeoApply();
       
       // Apply logo
       const logoImg = document.getElementById('brandLogoImg');
