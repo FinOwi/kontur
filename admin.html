@@ -1774,7 +1774,10 @@
     // ===== LAPISAN DATA PRODUKSI — ADMIN (Supabase Auth + sinkron) =====
     let sbSession = null;
     let sbServerLogMax = 0;
-    let sbBaseCatalogIds = null;
+    // Basis sinkron: potret server terakhir yang diketahui panel ini.
+    // Semua penggabungan dua-admin dihitung terhadap basis ini.
+    let sbBase = null;
+    let sbLocalRev = 0;
     let sbSyncTimer = null;
     let sbSyncBusy = false;
     let sbLastFailToast = 0;
@@ -1844,26 +1847,62 @@
       const txt = await r.text();
       return txt ? JSON.parse(txt) : null;
     }
+    // Banding nilai secara kanonis: urutan kunci objek tidak berpengaruh
+    // (JSON dari server vs objek rakitan loadData bisa beda urutan kunci).
+    function sbCanon(v) {
+      if (v === null || typeof v !== 'object') return JSON.stringify(v === undefined ? null : v);
+      if (Array.isArray(v)) return '[' + v.map(sbCanon).join(',') + ']';
+      return '{' + Object.keys(v).sort().map(k => JSON.stringify(k) + ':' + sbCanon(v[k])).join(',') + '}';
+    }
+    function sbEq(a, b) { return sbCanon(a) === sbCanon(b); }
+    function sbNowISO() { return new Date().toISOString(); }
+    // Baca keadaan server sekali jalan (dengan cap waktu per baris).
+    async function sbFetchState(tid) {
+      const conf = await sbRest('site_config?tenant_id=eq.' + tid + '&select=config,updated_at');
+      const cat = await sbRest('catalog_items?tenant_id=eq.' + tid + '&select=item_id,data,updated_at&order=item_id');
+      const rent = await sbRest('rentals?tenant_id=eq.' + tid + '&select=contract_id,status,data,updated_at');
+      const logTop = await sbRest('movement_log?tenant_id=eq.' + tid + '&select=seq&order=seq.desc&limit=1');
+      const st = { cfg: null, cat: new Map(), ren: new Map(), logMax: 0 };
+      if (conf && conf.length) st.cfg = { d: conf[0].config, u: conf[0].updated_at };
+      (cat || []).forEach(r => st.cat.set(r.item_id, { d: r.data, u: r.updated_at }));
+      (rent || []).forEach(r => st.ren.set(r.contract_id, { d: r.data, u: r.updated_at, st: r.status }));
+      if (logTop && logTop.length) st.logMax = logTop[0].seq;
+      return st;
+    }
+    function sbSetBase(st) {
+      sbBase = { cat: st.cat, ren: st.ren, cfg: st.cfg };
+      sbServerLogMax = st.logMax;
+    }
+    function sbApplyMirrors(st) {
+      if (st.cfg && st.cfg.d) localStorage.setItem('kontur_siteconfig_v2', JSON.stringify(st.cfg.d));
+      localStorage.setItem('kontur_catalog_v2', JSON.stringify([...st.cat.values()].map(v => v.d)));
+      const act = [], done = [];
+      st.ren.forEach(v => (v.st === 'completed' ? done : act).push(v.d));
+      localStorage.setItem('kontur_rentals_v2', JSON.stringify(act));
+      localStorage.setItem('kontur_completed_v2', JSON.stringify(done));
+    }
     async function sbPullAll() {
       const tid = await sbResolveTenant();
       if (!tid) { toast('Tenant belum terdaftar di server — data tampil dari perangkat ini.'); return false; }
-      const conf = await sbRest('site_config?tenant_id=eq.' + tid + '&select=config');
-      if (conf && conf.length && conf[0].config) localStorage.setItem('kontur_siteconfig_v2', JSON.stringify(conf[0].config));
-      const cat = await sbRest('catalog_items?tenant_id=eq.' + tid + '&select=data&order=item_id');
-      if (cat) {
-        if (cat.length) localStorage.setItem('kontur_catalog_v2', JSON.stringify(cat.map(r => r.data)));
-        sbBaseCatalogIds = new Set(cat.map(r => r.data.id));
-      }
-      const rent = await sbRest('rentals?tenant_id=eq.' + tid + '&select=status,data');
-      if (rent) {
-        localStorage.setItem('kontur_rentals_v2', JSON.stringify(rent.filter(r => r.status === 'active').map(r => r.data)));
-        localStorage.setItem('kontur_completed_v2', JSON.stringify(rent.filter(r => r.status === 'completed').map(r => r.data)));
-      }
+      // Amankan entri riwayat lokal yang belum terkirim sebelum cermin ditimpa.
+      const localLogBefore = JSON.parse(localStorage.getItem('kontur_log_v2') || '[]');
+      const st = await sbFetchState(tid);
+      sbApplyMirrors(st);
       const log = await sbRest('movement_log?tenant_id=eq.' + tid + '&select=seq,entry&order=seq');
       if (log) {
-        localStorage.setItem('kontur_log_v2', JSON.stringify(log.map(r => r.entry)));
-        sbServerLogMax = log.length ? log[log.length - 1].seq : 0;
+        const serverLog = log.map(r => r.entry);
+        const pending = localLogBefore.filter(e => e.seq > st.logMax);
+        if (pending.length && localLogBefore.length) {
+          let prev = serverLog.length ? serverLog[serverLog.length - 1].hash : 'KONTUR-LOG';
+          pending.forEach(e => {
+            const ne = Object.assign({}, e, { seq: serverLog.length + 1 });
+            ne.hash = logHash(prev + '|' + ne.seq + '|' + ne.ts + '|' + ne.type + '|' + ne.itemId + '|' + ne.size + '|' + ne.qty + '|' + ne.ref + '|' + ne.note);
+            serverLog.push(ne); prev = ne.hash;
+          });
+        }
+        localStorage.setItem('kontur_log_v2', JSON.stringify(serverLog));
       }
+      sbSetBase(st);
       return true;
     }
     async function sbPullConfigOnly() {
@@ -1876,8 +1915,44 @@
     }
     function scheduleSyncUp() {
       if (!sbSession) return;
+      sbLocalRev++;
       if (sbSyncTimer) clearTimeout(sbSyncTimer);
       sbSyncTimer = setTimeout(sbSyncUp, 700);
+    }
+    // Gabung satu koleksi berkunci (katalog / sewa) tiga arah: basis, server, lokal.
+    // Aturan: perubahan pada baris BERBEDA selalu bergabung; baris yang sama-sama
+    // diubah dua admin -> versi server dipertahankan & dicatat sebagai konflik;
+    // penghapusan hanya berlaku untuk baris yang tidak diubah admin lain.
+    function sbMergeCollection(localEntries, baseMap, srvMap, conflicts, label) {
+      const localMap = new Map(localEntries.map(e => [e.key, e]));
+      const upserts = [], deletes = [], resolved = new Map();
+      localMap.forEach((e, key) => {
+        const b = baseMap.get(key), s = srvMap.get(key);
+        const localChanged = !b || !sbEq(e.d, b.d) || (e.st || null) !== (b.st || null);
+        if (!localChanged) { if (s) resolved.set(key, { d: s.d, st: s.st }); return; }
+        if (s && sbEq(s.d, e.d) && (s.st || null) === (e.st || null)) { resolved.set(key, { d: s.d, st: s.st }); return; }
+        if (b && s && s.u !== b.u && (!sbEq(s.d, b.d) || (s.st || null) !== (b.st || null))) {
+          conflicts.push(label + ' ' + key);
+          resolved.set(key, { d: s.d, st: s.st });
+          return;
+        }
+        upserts.push(e); resolved.set(key, { d: e.d, st: e.st });
+      });
+      baseMap.forEach((b, key) => {
+        if (localMap.has(key)) return;
+        const s = srvMap.get(key);
+        if (!s) return;
+        if (s.u !== b.u && (!sbEq(s.d, b.d) || (s.st || null) !== (b.st || null))) {
+          conflicts.push(label + ' ' + key);
+          resolved.set(key, { d: s.d, st: s.st });
+          return;
+        }
+        deletes.push(key);
+      });
+      srvMap.forEach((s, key) => {
+        if (!localMap.has(key) && !baseMap.has(key)) resolved.set(key, { d: s.d, st: s.st });
+      });
+      return { upserts, deletes, resolved };
     }
     async function sbSyncUp() {
       if (!sbSession || sbSyncBusy) return;
@@ -1885,64 +1960,74 @@
       const tid = await sbResolveTenant();
       if (!tid) return;
       sbSyncBusy = true;
+      const rev0 = sbLocalRev;
       try {
-        const cfg = JSON.parse(localStorage.getItem('kontur_siteconfig_v2') || 'null');
-        if (cfg) {
-          await sbRest('site_config?on_conflict=tenant_id', { method: 'POST', headers: { 'Prefer': 'resolution=merge-duplicates' }, body: [{ tenant_id: tid, config: cfg }] });
-        }
-        // PENJAGA TAB BASI: bila katalog server berubah sejak terakhir ditarik
-        // (perangkat/tab lain), JANGAN timpa — muat ulang & batalkan dorongan ini.
-        if (sbBaseCatalogIds) {
-          const srv = await sbRest('catalog_items?tenant_id=eq.' + tid + '&select=item_id');
-          const srvIds = new Set((srv || []).map(r => r.item_id));
-          const foreign = [...srvIds].some(id => !sbBaseCatalogIds.has(id));
-          const missing = [...sbBaseCatalogIds].some(id => !srvIds.has(id));
-          if (foreign || missing) {
-            // Amankan dulu entri riwayat lokal yang belum sempat terkirim,
-            // supaya muat ulang tidak menghapusnya; sesudah tarik, entri itu
-            // disambung ulang ke rantai server dengan seq & hash baru.
-            const pendingLog = (JSON.parse(localStorage.getItem('kontur_log_v2') || '[]')).filter(e => e.seq > sbServerLogMax);
-            await sbPullAll();
-            if (pendingLog.length) {
-              const merged = JSON.parse(localStorage.getItem('kontur_log_v2') || '[]');
-              let prev = merged.length ? merged[merged.length - 1].hash : 'KONTUR-LOG';
-              pendingLog.forEach(e => {
-                const ne = Object.assign({}, e, { seq: merged.length + 1 });
-                ne.hash = logHash(prev + '|' + ne.seq + '|' + ne.ts + '|' + ne.type + '|' + ne.itemId + '|' + ne.size + '|' + ne.qty + '|' + ne.ref + '|' + ne.note);
-                merged.push(ne); prev = ne.hash;
-              });
-              localStorage.setItem('kontur_log_v2', JSON.stringify(merged));
-            }
-            if (document.getElementById('appRoot').classList.contains('active')) { loadData(); renderAll(); }
-            toast('Data di server lebih baru — sudah dimuat ulang agar tidak tertimpa.');
-            return;
+        const st = await sbFetchState(tid);
+        if (!sbBase) sbBase = { cat: new Map(), ren: new Map(), cfg: null };
+        const conflicts = [];
+        const nowIso = sbNowISO();
+        // ---- Konfigurasi: gabung per kunci ----
+        const localCfg = JSON.parse(localStorage.getItem('kontur_siteconfig_v2') || 'null');
+        if (localCfg) {
+          const baseCfg = sbBase.cfg ? sbBase.cfg.d : null;
+          const srvCfg = st.cfg ? st.cfg.d : null;
+          let merged = localCfg;
+          if (srvCfg && baseCfg) {
+            merged = {};
+            const keys = new Set([].concat(Object.keys(baseCfg), Object.keys(srvCfg), Object.keys(localCfg)));
+            keys.forEach(k => {
+              const lc = !sbEq(localCfg[k], baseCfg[k]);
+              const sc = !sbEq(srvCfg[k], baseCfg[k]);
+              if (lc && sc && !sbEq(localCfg[k], srvCfg[k])) { conflicts.push('pengaturan "' + k + '"'); merged[k] = srvCfg[k]; }
+              else if (lc) merged[k] = localCfg[k];
+              else merged[k] = srvCfg[k] !== undefined ? srvCfg[k] : localCfg[k];
+            });
+          }
+          if (!srvCfg || !sbEq(merged, srvCfg)) {
+            await sbRest('site_config?on_conflict=tenant_id', { method: 'POST', headers: { 'Prefer': 'resolution=merge-duplicates' }, body: [{ tenant_id: tid, config: merged, updated_at: nowIso }] });
           }
         }
-        const inv = JSON.parse(localStorage.getItem('kontur_catalog_v2') || '[]');
-        if (inv.length) {
-          await sbRest('catalog_items?on_conflict=tenant_id,item_id', { method: 'POST', headers: { 'Prefer': 'resolution=merge-duplicates' }, body: inv.map(i => ({ tenant_id: tid, item_id: i.id, data: i })) });
-          const keep = inv.map(i => '"' + String(i.id).replace(/"/g, '') + '"').join(',');
-          await sbRest('catalog_items?tenant_id=eq.' + tid + '&item_id=not.in.(' + encodeURIComponent(keep) + ')', { method: 'DELETE' });
-        } else {
-          await sbRest('catalog_items?tenant_id=eq.' + tid, { method: 'DELETE' });
+        // ---- Katalog: hanya baris yang berubah yang ditulis ----
+        const localCat = JSON.parse(localStorage.getItem('kontur_catalog_v2') || '[]');
+        const catRes = sbMergeCollection(localCat.map(i => ({ key: i.id, d: i })), sbBase.cat, st.cat, conflicts, 'barang');
+        if (catRes.upserts.length) {
+          await sbRest('catalog_items?on_conflict=tenant_id,item_id', { method: 'POST', headers: { 'Prefer': 'resolution=merge-duplicates' }, body: catRes.upserts.map(e => ({ tenant_id: tid, item_id: e.key, data: e.d, updated_at: nowIso })) });
         }
-        sbBaseCatalogIds = new Set(inv.map(i => i.id));
-        const act = JSON.parse(localStorage.getItem('kontur_rentals_v2') || '[]');
-        const done = JSON.parse(localStorage.getItem('kontur_completed_v2') || '[]');
-        const all = act.map(c => ({ tenant_id: tid, contract_id: c.contractId, status: 'active', data: c }))
-          .concat(done.map(c => ({ tenant_id: tid, contract_id: c.contractId, status: 'completed', data: c })));
-        if (all.length) {
-          await sbRest('rentals?on_conflict=tenant_id,contract_id', { method: 'POST', headers: { 'Prefer': 'resolution=merge-duplicates' }, body: all });
-          const keep = all.map(c => '"' + String(c.contract_id).replace(/"/g, '') + '"').join(',');
-          await sbRest('rentals?tenant_id=eq.' + tid + '&contract_id=not.in.(' + encodeURIComponent(keep) + ')', { method: 'DELETE' });
-        } else {
-          await sbRest('rentals?tenant_id=eq.' + tid, { method: 'DELETE' });
+        if (catRes.deletes.length) {
+          const list = catRes.deletes.map(k => '"' + String(k).replace(/"/g, '') + '"').join(',');
+          await sbRest('catalog_items?tenant_id=eq.' + tid + '&item_id=in.(' + encodeURIComponent(list) + ')', { method: 'DELETE' });
         }
+        // ---- Sewa: sama, berkunci contractId + status ----
+        const localAct = JSON.parse(localStorage.getItem('kontur_rentals_v2') || '[]');
+        const localDone = JSON.parse(localStorage.getItem('kontur_completed_v2') || '[]');
+        const renEntries = localAct.map(c => ({ key: c.contractId, d: c, st: 'active' }))
+          .concat(localDone.map(c => ({ key: c.contractId, d: c, st: 'completed' })));
+        const renRes = sbMergeCollection(renEntries, sbBase.ren, st.ren, conflicts, 'sewa');
+        if (renRes.upserts.length) {
+          await sbRest('rentals?on_conflict=tenant_id,contract_id', { method: 'POST', headers: { 'Prefer': 'resolution=merge-duplicates' }, body: renRes.upserts.map(e => ({ tenant_id: tid, contract_id: e.key, status: e.st, data: e.d, updated_at: nowIso })) });
+        }
+        if (renRes.deletes.length) {
+          const list = renRes.deletes.map(k => '"' + String(k).replace(/"/g, '') + '"').join(',');
+          await sbRest('rentals?tenant_id=eq.' + tid + '&contract_id=in.(' + encodeURIComponent(list) + ')', { method: 'DELETE' });
+        }
+        // ---- Riwayat: append saja, tidak pernah ditimpa ----
         const logArr = JSON.parse(localStorage.getItem('kontur_log_v2') || '[]');
-        const fresh = logArr.filter(e => e.seq > sbServerLogMax);
+        const fresh = logArr.filter(e => e.seq > st.logMax);
         if (fresh.length) {
           await sbRest('movement_log', { method: 'POST', body: fresh.map(e => ({ tenant_id: tid, seq: e.seq, entry: e, hash: e.hash })) });
           sbServerLogMax = fresh[fresh.length - 1].seq;
+        }
+        // ---- Rebase: samakan cermin & basis dengan keadaan server terbaru ----
+        if (sbLocalRev === rev0) {
+          const before = [localStorage.getItem('kontur_catalog_v2'), localStorage.getItem('kontur_siteconfig_v2'), localStorage.getItem('kontur_rentals_v2')].join('|');
+          const st2 = await sbFetchState(tid);
+          sbApplyMirrors(st2);
+          sbSetBase(st2);
+          const after = [localStorage.getItem('kontur_catalog_v2'), localStorage.getItem('kontur_siteconfig_v2'), localStorage.getItem('kontur_rentals_v2')].join('|');
+          if (before !== after && document.getElementById('appRoot').classList.contains('active')) { loadData(); renderAll(); }
+        }
+        if (conflicts.length) {
+          toast('Data berikut juga diubah admin lain — versi server dipertahankan: ' + conflicts.slice(0, 3).join(', ') + (conflicts.length > 3 ? ', …' : ''));
         }
       } catch (e) {
         const now = Date.now();
@@ -1950,7 +2035,42 @@
         setTimeout(scheduleSyncUp, 15000);
       } finally { sbSyncBusy = false; }
     }
-    setInterval(function () { if (sbSession) scheduleSyncUp(); }, 45000);
+    // Apakah cermin lokal punya perubahan yang belum terkirim?
+    function sbIsDirty() {
+      if (!sbBase) return true;
+      try {
+        const cat = JSON.parse(localStorage.getItem('kontur_catalog_v2') || '[]');
+        if (cat.length !== sbBase.cat.size) return true;
+        for (const it of cat) { const b = sbBase.cat.get(it.id); if (!b || !sbEq(it, b.d)) return true; }
+        const act = JSON.parse(localStorage.getItem('kontur_rentals_v2') || '[]');
+        const done = JSON.parse(localStorage.getItem('kontur_completed_v2') || '[]');
+        if (act.length + done.length !== sbBase.ren.size) return true;
+        for (const c of act) { const b = sbBase.ren.get(c.contractId); if (!b || b.st !== 'active' || !sbEq(c, b.d)) return true; }
+        for (const c of done) { const b = sbBase.ren.get(c.contractId); if (!b || b.st !== 'completed' || !sbEq(c, b.d)) return true; }
+        const cfg = JSON.parse(localStorage.getItem('kontur_siteconfig_v2') || 'null');
+        if (cfg && sbBase.cfg && !sbEq(cfg, sbBase.cfg.d)) return true;
+        const log = JSON.parse(localStorage.getItem('kontur_log_v2') || '[]');
+        if (log.length && log[log.length - 1].seq > sbServerLogMax) return true;
+      } catch (e) { return true; }
+      return false;
+    }
+    // Tarik lembut berkala: panel yang bersih mengikuti server (termasuk update
+    // admin lain); panel yang kotor menyinkronkan gabungannya. Tidak mengganggu
+    // admin yang sedang mengetik / membuka modal.
+    async function sbSoftPull() {
+      if (!sbSession || sbSyncBusy) return;
+      const ae = document.activeElement;
+      if (ae && /INPUT|TEXTAREA|SELECT/.test(ae.tagName)) return;
+      if (document.querySelector('.modal-overlay.open, .modal-overlay.show, .modal-overlay.active')) return;
+      if (sbIsDirty()) { scheduleSyncUp(); return; }
+      try {
+        const ok = await sbPullAll();
+        if (ok && document.getElementById('appRoot').classList.contains('active')) { loadData(); renderAll(); }
+      } catch (e) {}
+    }
+    setInterval(sbSoftPull, 45000);
+    window.addEventListener('focus', sbSoftPull);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) sbSoftPull(); });
 
     function loadData() {
       let si = localStorage.getItem('kontur_catalog_v2');
