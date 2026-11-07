@@ -2554,6 +2554,66 @@
 
     let siteConfig = {};
 
+
+    // ===== KONFIG PRODUKSI (Supabase) =====
+    const KONFIG = {
+      SUPABASE_URL: 'https://nuowbpevzfwobedtgxzm.supabase.co',
+      SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51b3dicGV2emZ3b2JlZHRneHptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwNjk5MjYsImV4cCI6MjEwOTY0NTkyNn0.-kSflWBRXeKtr2idO8bmEIcoipUO9pbNN-uOWapiS2M',
+      TENANT_SLUG: 'kontur',
+      ADMIN_EMAIL_DOMAIN: 'kontur.finowi.id'
+    };
+    let sbTenantId = null;
+    async function sbResolveTenant() {
+      if (sbTenantId) return sbTenantId;
+      try {
+        const r = await fetch(KONFIG.SUPABASE_URL + '/rest/v1/rpc/resolve_tenant', {
+          method: 'POST',
+          headers: { 'apikey': KONFIG.SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + (window.sbAccessToken ? window.sbAccessToken() : KONFIG.SUPABASE_ANON_KEY), 'Content-Type': 'application/json' },
+          body: JSON.stringify({ s: KONFIG.TENANT_SLUG })
+        });
+        if (!r.ok) return null;
+        const rows = await r.json();
+        if (rows && rows.length) sbTenantId = rows[0].id;
+      } catch (e) { /* offline: pakai data lokal */ }
+      return sbTenantId;
+    }
+
+    // ===== LAPISAN DATA PRODUKSI — STOREFRONT (baca saja) =====
+    let sbLastPublicRaw = '';
+    async function sbPullPublic() {
+      const tid = await sbResolveTenant();
+      if (!tid) return false;
+      try {
+        const H = { 'apikey': KONFIG.SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + KONFIG.SUPABASE_ANON_KEY };
+        const [rc, rk] = await Promise.all([
+          fetch(KONFIG.SUPABASE_URL + '/rest/v1/site_config?tenant_id=eq.' + tid + '&select=config', { headers: H }),
+          fetch(KONFIG.SUPABASE_URL + '/rest/v1/catalog_items?tenant_id=eq.' + tid + '&select=data&order=item_id', { headers: H })
+        ]);
+        if (!rc.ok || !rk.ok) return false;
+        const confRows = await rc.json();
+        const catRows = await rk.json();
+        const raw = JSON.stringify([confRows, catRows]);
+        if (raw === sbLastPublicRaw) return false;
+        sbLastPublicRaw = raw;
+        if (confRows.length && confRows[0].config) {
+          localStorage.setItem('kontur_siteconfig_v2', JSON.stringify(confRows[0].config));
+          lastSiteConfigRaw = localStorage.getItem('kontur_siteconfig_v2');
+        }
+        if (catRows.length) {
+          localStorage.setItem('kontur_catalog_v2', JSON.stringify(catRows.map(r => r.data)));
+        }
+        return true;
+      } catch (e) { return false; }
+    }
+    async function sbBootStorefront() {
+      if (await sbPullPublic()) {
+        loadSiteConfig(); renderSiteContent(); loadData(); renderCatalog();
+      }
+    }
+    // Sinkron berkala: perubahan dari panel admin tampil tanpa refresh manual.
+    setInterval(sbBootStorefront, 60000);
+    window.addEventListener('focus', sbBootStorefront);
+
     function loadSiteConfig() {
       const stored = localStorage.getItem('kontur_siteconfig_v2');
       if (stored) {
@@ -3582,6 +3642,7 @@
       loadData();
       renderCatalog();
       setupMobileNav();
+      sbBootStorefront();
     });
   </script>
 
