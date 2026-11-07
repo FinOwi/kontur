@@ -1898,7 +1898,21 @@
           const foreign = [...srvIds].some(id => !sbBaseCatalogIds.has(id));
           const missing = [...sbBaseCatalogIds].some(id => !srvIds.has(id));
           if (foreign || missing) {
+            // Amankan dulu entri riwayat lokal yang belum sempat terkirim,
+            // supaya muat ulang tidak menghapusnya; sesudah tarik, entri itu
+            // disambung ulang ke rantai server dengan seq & hash baru.
+            const pendingLog = (JSON.parse(localStorage.getItem('kontur_log_v2') || '[]')).filter(e => e.seq > sbServerLogMax);
             await sbPullAll();
+            if (pendingLog.length) {
+              const merged = JSON.parse(localStorage.getItem('kontur_log_v2') || '[]');
+              let prev = merged.length ? merged[merged.length - 1].hash : 'KONTUR-LOG';
+              pendingLog.forEach(e => {
+                const ne = Object.assign({}, e, { seq: merged.length + 1 });
+                ne.hash = logHash(prev + '|' + ne.seq + '|' + ne.ts + '|' + ne.type + '|' + ne.itemId + '|' + ne.size + '|' + ne.qty + '|' + ne.ref + '|' + ne.note);
+                merged.push(ne); prev = ne.hash;
+              });
+              localStorage.setItem('kontur_log_v2', JSON.stringify(merged));
+            }
             if (document.getElementById('appRoot').classList.contains('active')) { loadData(); renderAll(); }
             toast('Data di server lebih baru — sudah dimuat ulang agar tidak tertimpa.');
             return;
