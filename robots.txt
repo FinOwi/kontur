@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://bk-adventure.my.id/sitemap.xml
