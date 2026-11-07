@@ -1774,6 +1774,7 @@
     // ===== LAPISAN DATA PRODUKSI — ADMIN (Supabase Auth + sinkron) =====
     let sbSession = null;
     let sbServerLogMax = 0;
+    let sbBaseCatalogIds = null;
     let sbSyncTimer = null;
     let sbSyncBusy = false;
     let sbLastFailToast = 0;
@@ -1849,7 +1850,10 @@
       const conf = await sbRest('site_config?tenant_id=eq.' + tid + '&select=config');
       if (conf && conf.length && conf[0].config) localStorage.setItem('kontur_siteconfig_v2', JSON.stringify(conf[0].config));
       const cat = await sbRest('catalog_items?tenant_id=eq.' + tid + '&select=data&order=item_id');
-      if (cat && cat.length) localStorage.setItem('kontur_catalog_v2', JSON.stringify(cat.map(r => r.data)));
+      if (cat) {
+        if (cat.length) localStorage.setItem('kontur_catalog_v2', JSON.stringify(cat.map(r => r.data)));
+        sbBaseCatalogIds = new Set(cat.map(r => r.data.id));
+      }
       const rent = await sbRest('rentals?tenant_id=eq.' + tid + '&select=status,data');
       if (rent) {
         localStorage.setItem('kontur_rentals_v2', JSON.stringify(rent.filter(r => r.status === 'active').map(r => r.data)));
@@ -1886,6 +1890,20 @@
         if (cfg) {
           await sbRest('site_config?on_conflict=tenant_id', { method: 'POST', headers: { 'Prefer': 'resolution=merge-duplicates' }, body: [{ tenant_id: tid, config: cfg }] });
         }
+        // PENJAGA TAB BASI: bila katalog server berubah sejak terakhir ditarik
+        // (perangkat/tab lain), JANGAN timpa — muat ulang & batalkan dorongan ini.
+        if (sbBaseCatalogIds) {
+          const srv = await sbRest('catalog_items?tenant_id=eq.' + tid + '&select=item_id');
+          const srvIds = new Set((srv || []).map(r => r.item_id));
+          const foreign = [...srvIds].some(id => !sbBaseCatalogIds.has(id));
+          const missing = [...sbBaseCatalogIds].some(id => !srvIds.has(id));
+          if (foreign || missing) {
+            await sbPullAll();
+            if (document.getElementById('appRoot').classList.contains('active')) { loadData(); renderAll(); }
+            toast('Data di server lebih baru — sudah dimuat ulang agar tidak tertimpa.');
+            return;
+          }
+        }
         const inv = JSON.parse(localStorage.getItem('kontur_catalog_v2') || '[]');
         if (inv.length) {
           await sbRest('catalog_items?on_conflict=tenant_id,item_id', { method: 'POST', headers: { 'Prefer': 'resolution=merge-duplicates' }, body: inv.map(i => ({ tenant_id: tid, item_id: i.id, data: i })) });
@@ -1894,6 +1912,7 @@
         } else {
           await sbRest('catalog_items?tenant_id=eq.' + tid, { method: 'DELETE' });
         }
+        sbBaseCatalogIds = new Set(inv.map(i => i.id));
         const act = JSON.parse(localStorage.getItem('kontur_rentals_v2') || '[]');
         const done = JSON.parse(localStorage.getItem('kontur_completed_v2') || '[]');
         const all = act.map(c => ({ tenant_id: tid, contract_id: c.contractId, status: 'active', data: c }))
