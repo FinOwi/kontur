@@ -2669,6 +2669,7 @@
       setText('announceRight', siteConfig.announceRight);
       setText('brandName', siteConfig.brandName);
       setText('brandSubtitle', siteConfig.brandSubtitle);
+      document.title = (siteConfig.brandName || 'BK ADVENTURE') + ' // ' + (siteConfig.brandSubtitle || 'Technical Outdoor Equipment & Depot');
       
       // Apply logo
       const logoImg = document.getElementById('brandLogoImg');
