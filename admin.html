@@ -472,10 +472,9 @@
 
       <button class="btn-login" onclick="doLogin()">MASUK KE CONSOLE</button>
 
-      <div class="mono" style="text-align:center; margin-top:14px; font-size:11px; color:var(--text-subtle);">AKSES DEMO &mdash; User: <strong style="color:var(--forest-dark);">zgalken</strong> &middot; Pass: <strong style="color:var(--forest-dark);">zgalken</strong></div>
 
       <div style="text-align:center; margin-top:16px;">
-        <a href="index.html" style="font-family:var(--mono); font-size:11px; color:var(--text-subtle); text-decoration:none;">&larr; Kembali ke storefront</a>
+        <a href="index-v25.html" style="font-family:var(--mono); font-size:11px; color:var(--text-subtle); text-decoration:none;">&larr; Kembali ke storefront</a>
       </div>
     </div>
   </div>
@@ -551,7 +550,7 @@
             <span class="dot-live"></span>
             <span>OPERATOR: ACTIVE</span>
           </div>
-          <a href="index.html" class="btn btn-secondary" style="font-size:11px; padding:7px 14px;">
+          <a href="index-v25.html" class="btn btn-secondary" style="font-size:11px; padding:7px 14px;">
             <svg class="icon" viewBox="0 0 24 24"><path d="M15 3h6v6M10 14L21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"></path></svg>
             LIHAT STOREFRONT
           </a>
@@ -849,7 +848,7 @@
                 <svg class="icon" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline></svg>
                 SIMPAN PERUBAHAN KE STOREFRONT
               </button>
-              <a href="index.html" target="_blank" rel="noopener" class="btn btn-secondary btn-full" style="margin-top:10px; text-decoration:none;">BUKA INDEX UNTUK CEK HASIL</a>
+              <a href="index-v25.html" target="_blank" rel="noopener" class="btn btn-secondary btn-full" style="margin-top:10px; text-decoration:none;">BUKA INDEX UNTUK CEK HASIL</a>
         </div>
       </form>
     </div>
@@ -882,7 +881,7 @@
                 <svg class="icon" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline></svg>
                 SIMPAN
               </button>
-              <a href="index.html" target="_blank" rel="noopener" class="btn btn-secondary btn-full" style="margin-top:10px; text-decoration:none;">BUKA INDEX UNTUK CEK HASIL</a>
+              <a href="index-v25.html" target="_blank" rel="noopener" class="btn btn-secondary btn-full" style="margin-top:10px; text-decoration:none;">BUKA INDEX UNTUK CEK HASIL</a>
             </form>
           </div>
         </div>
@@ -1386,8 +1385,7 @@
   </div>
 
   <script>
-    const ADMIN_USER = 'zgalken';
-    const ADMIN_PASS = 'zgalken';
+    // Login produksi: Supabase Auth (username dipetakan ke email teknis).
 
     // Seed data (shared with index.html via localStorage)
     const SEED_CATALOG = [
@@ -1532,6 +1530,7 @@
       e.hash = logHash(prev + '|' + e.seq + '|' + e.ts + '|' + e.type + '|' + e.itemId + '|' + e.size + '|' + e.qty + '|' + e.ref + '|' + e.note);
       movementLog.push(e);
       try { localStorage.setItem('kontur_log_v2', JSON.stringify(movementLog)); } catch (err) {}
+      scheduleSyncUp();
       return e;
     }
     function verifyLog() {
@@ -1760,6 +1759,178 @@
       window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(msg), '_blank');
     }
 
+
+    // ===== KONFIG PRODUKSI (Supabase) =====
+    const KONFIG = {
+      SUPABASE_URL: 'https://nuowbpevzfwobedtgxzm.supabase.co',
+      SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51b3dicGV2emZ3b2JlZHRneHptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwNjk5MjYsImV4cCI6MjEwOTY0NTkyNn0.-kSflWBRXeKtr2idO8bmEIcoipUO9pbNN-uOWapiS2M',
+      TENANT_SLUG: 'kontur',
+      ADMIN_EMAIL_DOMAIN: 'kontur.finowi.id'
+    };
+    let sbTenantId = null;
+    async function sbResolveTenant() {
+      if (sbTenantId) return sbTenantId;
+      try {
+        const r = await fetch(KONFIG.SUPABASE_URL + '/rest/v1/rpc/resolve_tenant', {
+          method: 'POST',
+          headers: { 'apikey': KONFIG.SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + (window.sbAccessToken ? window.sbAccessToken() : KONFIG.SUPABASE_ANON_KEY), 'Content-Type': 'application/json' },
+          body: JSON.stringify({ s: KONFIG.TENANT_SLUG })
+        });
+        if (!r.ok) return null;
+        const rows = await r.json();
+        if (rows && rows.length) sbTenantId = rows[0].id;
+      } catch (e) { /* offline: pakai data lokal */ }
+      return sbTenantId;
+    }
+
+    // ===== LAPISAN DATA PRODUKSI — ADMIN (Supabase Auth + sinkron) =====
+    let sbSession = null;
+    let sbServerLogMax = 0;
+    let sbSyncTimer = null;
+    let sbSyncBusy = false;
+    let sbLastFailToast = 0;
+    window.sbAccessToken = function () { return sbSession ? sbSession.access_token : null; };
+    function sbSaveSession() {
+      if (sbSession) localStorage.setItem('kontur_prod_session', JSON.stringify(sbSession));
+      else localStorage.removeItem('kontur_prod_session');
+    }
+    function sbLoadSession() {
+      try { sbSession = JSON.parse(localStorage.getItem('kontur_prod_session') || 'null'); } catch (e) { sbSession = null; }
+      return sbSession;
+    }
+    async function sbAuthCall(path, body) {
+      const r = await fetch(KONFIG.SUPABASE_URL + '/auth/v1/' + path, {
+        method: 'POST',
+        headers: { 'apikey': KONFIG.SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(data.error_description || data.msg || data.message || 'Login gagal');
+      return data;
+    }
+    async function sbLogin(username, password) {
+      const email = username.trim().toLowerCase() + '@' + KONFIG.ADMIN_EMAIL_DOMAIN;
+      const d = await sbAuthCall('token?grant_type=password', { email: email, password: password });
+      sbSession = { access_token: d.access_token, refresh_token: d.refresh_token, expires_at: Date.now() + (d.expires_in || 3600) * 1000 };
+      sbSaveSession();
+    }
+    async function sbRefresh() {
+      if (!sbSession || !sbSession.refresh_token) return false;
+      try {
+        const d = await sbAuthCall('token?grant_type=refresh_token', { refresh_token: sbSession.refresh_token });
+        sbSession = { access_token: d.access_token, refresh_token: d.refresh_token, expires_at: Date.now() + (d.expires_in || 3600) * 1000 };
+        sbSaveSession();
+        return true;
+      } catch (e) { sbSession = null; sbSaveSession(); return false; }
+    }
+    async function sbEnsureSession() {
+      if (!sbSession) return false;
+      if (Date.now() > (sbSession.expires_at || 0) - 60000) return await sbRefresh();
+      return true;
+    }
+    async function sbLogoutRemote() {
+      if (!sbSession) return;
+      try {
+        await fetch(KONFIG.SUPABASE_URL + '/auth/v1/logout', {
+          method: 'POST',
+          headers: { 'apikey': KONFIG.SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + sbSession.access_token }
+        });
+      } catch (e) {}
+      sbSession = null; sbSaveSession();
+    }
+    function sbHeaders(extra) {
+      const t = sbSession ? sbSession.access_token : KONFIG.SUPABASE_ANON_KEY;
+      return Object.assign({ 'apikey': KONFIG.SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + t }, extra || {});
+    }
+    async function sbRest(path, opts) {
+      opts = opts || {};
+      const r = await fetch(KONFIG.SUPABASE_URL + '/rest/v1/' + path, {
+        method: opts.method || 'GET',
+        headers: sbHeaders(Object.assign({ 'Content-Type': 'application/json' }, opts.headers || {})),
+        body: opts.body ? JSON.stringify(opts.body) : undefined
+      });
+      if (r.status === 401 && sbSession) { if (await sbRefresh()) return sbRest(path, opts); }
+      if (!r.ok) { const t = await r.text(); throw new Error('REST ' + r.status + ': ' + t.slice(0, 160)); }
+      if (r.status === 204) return null;
+      const txt = await r.text();
+      return txt ? JSON.parse(txt) : null;
+    }
+    async function sbPullAll() {
+      const tid = await sbResolveTenant();
+      if (!tid) { toast('Tenant belum terdaftar di server — data tampil dari perangkat ini.'); return false; }
+      const conf = await sbRest('site_config?tenant_id=eq.' + tid + '&select=config');
+      if (conf && conf.length && conf[0].config) localStorage.setItem('kontur_siteconfig_v2', JSON.stringify(conf[0].config));
+      const cat = await sbRest('catalog_items?tenant_id=eq.' + tid + '&select=data&order=item_id');
+      if (cat && cat.length) localStorage.setItem('kontur_catalog_v2', JSON.stringify(cat.map(r => r.data)));
+      const rent = await sbRest('rentals?tenant_id=eq.' + tid + '&select=status,data');
+      if (rent) {
+        localStorage.setItem('kontur_rentals_v2', JSON.stringify(rent.filter(r => r.status === 'active').map(r => r.data)));
+        localStorage.setItem('kontur_completed_v2', JSON.stringify(rent.filter(r => r.status === 'completed').map(r => r.data)));
+      }
+      const log = await sbRest('movement_log?tenant_id=eq.' + tid + '&select=seq,entry&order=seq');
+      if (log) {
+        localStorage.setItem('kontur_log_v2', JSON.stringify(log.map(r => r.entry)));
+        sbServerLogMax = log.length ? log[log.length - 1].seq : 0;
+      }
+      return true;
+    }
+    async function sbPullConfigOnly() {
+      const tid = await sbResolveTenant();
+      if (!tid) return;
+      try {
+        const conf = await sbRest('site_config?tenant_id=eq.' + tid + '&select=config');
+        if (conf && conf.length && conf[0].config) localStorage.setItem('kontur_siteconfig_v2', JSON.stringify(conf[0].config));
+      } catch (e) {}
+    }
+    function scheduleSyncUp() {
+      if (!sbSession) return;
+      if (sbSyncTimer) clearTimeout(sbSyncTimer);
+      sbSyncTimer = setTimeout(sbSyncUp, 700);
+    }
+    async function sbSyncUp() {
+      if (!sbSession || sbSyncBusy) return;
+      if (!(await sbEnsureSession())) return;
+      const tid = await sbResolveTenant();
+      if (!tid) return;
+      sbSyncBusy = true;
+      try {
+        const cfg = JSON.parse(localStorage.getItem('kontur_siteconfig_v2') || 'null');
+        if (cfg) {
+          await sbRest('site_config?on_conflict=tenant_id', { method: 'POST', headers: { 'Prefer': 'resolution=merge-duplicates' }, body: [{ tenant_id: tid, config: cfg }] });
+        }
+        const inv = JSON.parse(localStorage.getItem('kontur_catalog_v2') || '[]');
+        if (inv.length) {
+          await sbRest('catalog_items?on_conflict=tenant_id,item_id', { method: 'POST', headers: { 'Prefer': 'resolution=merge-duplicates' }, body: inv.map(i => ({ tenant_id: tid, item_id: i.id, data: i })) });
+          const keep = inv.map(i => '"' + String(i.id).replace(/"/g, '') + '"').join(',');
+          await sbRest('catalog_items?tenant_id=eq.' + tid + '&item_id=not.in.(' + encodeURIComponent(keep) + ')', { method: 'DELETE' });
+        } else {
+          await sbRest('catalog_items?tenant_id=eq.' + tid, { method: 'DELETE' });
+        }
+        const act = JSON.parse(localStorage.getItem('kontur_rentals_v2') || '[]');
+        const done = JSON.parse(localStorage.getItem('kontur_completed_v2') || '[]');
+        const all = act.map(c => ({ tenant_id: tid, contract_id: c.contractId, status: 'active', data: c }))
+          .concat(done.map(c => ({ tenant_id: tid, contract_id: c.contractId, status: 'completed', data: c })));
+        if (all.length) {
+          await sbRest('rentals?on_conflict=tenant_id,contract_id', { method: 'POST', headers: { 'Prefer': 'resolution=merge-duplicates' }, body: all });
+          const keep = all.map(c => '"' + String(c.contract_id).replace(/"/g, '') + '"').join(',');
+          await sbRest('rentals?tenant_id=eq.' + tid + '&contract_id=not.in.(' + encodeURIComponent(keep) + ')', { method: 'DELETE' });
+        } else {
+          await sbRest('rentals?tenant_id=eq.' + tid, { method: 'DELETE' });
+        }
+        const logArr = JSON.parse(localStorage.getItem('kontur_log_v2') || '[]');
+        const fresh = logArr.filter(e => e.seq > sbServerLogMax);
+        if (fresh.length) {
+          await sbRest('movement_log', { method: 'POST', body: fresh.map(e => ({ tenant_id: tid, seq: e.seq, entry: e, hash: e.hash })) });
+          sbServerLogMax = fresh[fresh.length - 1].seq;
+        }
+      } catch (e) {
+        const now = Date.now();
+        if (now - sbLastFailToast > 20000) { sbLastFailToast = now; toast('Sinkron ke server gagal — data aman di perangkat, akan dicoba lagi.'); }
+        setTimeout(scheduleSyncUp, 15000);
+      } finally { sbSyncBusy = false; }
+    }
+    setInterval(function () { if (sbSession) scheduleSyncUp(); }, 45000);
+
     function loadData() {
       let si = localStorage.getItem('kontur_catalog_v2');
       inventory = si ? JSON.parse(si) : JSON.parse(JSON.stringify(SEED_CATALOG));
@@ -1787,13 +1958,19 @@
       localStorage.setItem('kontur_completed_v2', JSON.stringify(completedRentals));
       localStorage.setItem('kontur_log_v2', JSON.stringify(movementLog));
       localStorage.setItem('kontur_siteconfig_v2', JSON.stringify(siteConfig));
+      scheduleSyncUp();
     }
 
     // ===== LOGIN =====
-    function checkSession() {
-      if (sessionStorage.getItem('kontur_admin_session') === 'true') {
+    async function checkSession() {
+      if (sbLoadSession() && (await sbEnsureSession())) {
+        try { await sbPullAll(); } catch (e) {}
         showApp();
-      } else {
+        return;
+      }
+      sbSession = null; sbSaveSession();
+      await sbPullConfigOnly();
+      {
         // Update login branding before showing
         const stored = localStorage.getItem('kontur_siteconfig_v2');
         if (stored) {
@@ -1807,15 +1984,20 @@
         updateAdminBranding();
       }
     }
-    function doLogin() {
+    async function doLogin() {
       const user = document.getElementById('loginUser').value.trim();
       const pass = document.getElementById('loginPass').value;
-      if (user === ADMIN_USER && pass === ADMIN_PASS) {
-        sessionStorage.setItem('kontur_admin_session', 'true');
+      const errEl = document.getElementById('loginErr');
+      if (!user || !pass) { errEl.style.display = 'block'; return; }
+      errEl.style.display = 'none';
+      try {
+        await sbLogin(user, pass);
+        try { await sbPullAll(); } catch (e) {}
         showApp();
+        scheduleSyncUp();
         toast('Selamat datang, Operator.');
-      } else {
-        document.getElementById('loginErr').style.display = 'block';
+      } catch (e) {
+        errEl.style.display = 'block';
         document.getElementById('loginPass').value = '';
       }
     }
@@ -1827,8 +2009,8 @@
       populateConfigForms();
       updateAdminBranding();
     }
-    function doLogout() {
-      sessionStorage.removeItem('kontur_admin_session');
+    async function doLogout() {
+      await sbLogoutRemote();
       location.reload();
     }
 
