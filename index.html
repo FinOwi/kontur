@@ -537,8 +537,8 @@
 
     .card-photo-box {
       width: 100%;
-      height: 220px;
-      background: var(--bg-surface-subtle);
+      aspect-ratio: 4 / 3;
+      background: #FFFFFF;
       position: relative;
       overflow: hidden;
       border-bottom: 1px solid var(--border);
@@ -550,7 +550,9 @@
     .card-photo-box img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
+      padding: 14px;
+      box-sizing: border-box;
       display: block;
     }
 
@@ -2218,7 +2220,7 @@
         <button class="modal-close-btn" onclick="closePackageModal()">&times;</button>
       </div>
       <div style="margin-bottom: 14px;">
-        <img id="pkgModalImg" alt="" style="display:none; width:100%; height:160px; object-fit:cover; margin-bottom:12px;">
+        <img id="pkgModalImg" alt="" style="display:none; width:100%; height:190px; object-fit:contain; background:#FFFFFF; margin-bottom:12px;">
         <div style="font-family: var(--font-serif); font-size: 18px; font-weight: 600; color: var(--forest-dark);" id="pkgModalName">Paket</div>
         <div class="mono" style="font-size: 13px; color: var(--terracotta); margin-top: 2px;" id="pkgModalPrice">Rp 0</div>
         <div style="font-size: 12px; color: var(--text-muted); margin-top: 6px;" id="pkgModalItems"></div>
@@ -3033,7 +3035,7 @@
       }
       grid.innerHTML = siteConfig.packages.map(pkg => `
         <div style="background:white; border:1px solid var(--border); border-radius:4px; overflow:hidden;">
-          <img src="${pkg.image || DEFAULT_PKG_IMAGE}" alt="${pkg.name}" loading="lazy" style="width:100%; height:180px; object-fit:cover; display:block;">
+          <img src="${pkg.image || DEFAULT_PKG_IMAGE}" alt="${pkg.name}" loading="lazy" style="width:100%; height:200px; object-fit:contain; background:#FFFFFF; padding:10px; box-sizing:border-box; display:block;">
           <div style="padding:24px;">
           <h3 style="font-family:var(--font-serif); font-size:22px; font-weight:700; color:var(--forest-dark); margin-bottom:8px;">${pkg.name}</h3>
           <p style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">${pkg.description}</p>
