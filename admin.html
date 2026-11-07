@@ -628,7 +628,7 @@
               <span class="badge-tag" style="color:var(--text-subtle); border-color:var(--border);">JSON</span>
             </div>
             <p style="font-size:12px; line-height:1.6; color:var(--text-muted); margin-bottom:14px;">
-              Data demo ini tersimpan di browser. Unduh backup berkala agar katalog, konfigurasi situs, sewa aktif, arsip selesai, dan riwayat barang tidak hilang saat cache dibersihkan. File backup dapat dipulihkan di sini kapan saja &mdash; memulihkan akan <strong>menimpa</strong> data saat ini.
+              Data tersimpan di server dan tersinkron ke semua perangkat. Unduh backup berkala sebagai cadangan tambahan untuk katalog, konfigurasi situs, sewa aktif, dan arsip selesai. File backup dapat dipulihkan di sini kapan saja &mdash; memulihkan akan <strong>menimpa</strong> data saat ini.
             </p>
             <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
               <button type="button" class="btn btn-primary" onclick="downloadBackup()">UNDUH BACKUP (.JSON)</button>
@@ -2022,15 +2022,15 @@
       if (el) el.classList.add('active');
 
       const titles = {
-        dashboard: ['Dashboard Overview', 'BK ADVENTURE // ADMIN CONSOLE'],
-        identity: ['Identitas & Hero Editor', 'BK ADVENTURE // SITE CONFIG'],
-        catalog: ['Header Katalog Editor', 'BK ADVENTURE // CATALOG CONTENT'],
-        inventory: ['Inventaris Barang', 'BK ADVENTURE // STOCK MANAGEMENT'],
-        rentals: ['Sewa & Kontrak', 'BK ADVENTURE // RENTAL OPERATIONS'],
-        trips: ['Paket & Open Trip', 'BK ADVENTURE // PACKAGES & TRIPS']
+        dashboard: ['Dashboard Overview', 'ADMIN CONSOLE'],
+        identity: ['Identitas & Hero Editor', 'SITE CONFIG'],
+        catalog: ['Header Katalog Editor', 'CATALOG CONTENT'],
+        inventory: ['Inventaris Barang', 'STOCK MANAGEMENT'],
+        rentals: ['Sewa & Kontrak', 'RENTAL OPERATIONS'],
+        trips: ['Paket & Open Trip', 'PACKAGES & TRIPS']
       };
       document.getElementById('topbarTitle').textContent = titles[tabId][0];
-      document.getElementById('topbarCrumb').textContent = titles[tabId][1];
+      document.getElementById('topbarCrumb').textContent = (siteConfig.brandName || 'BK ADVENTURE').toUpperCase() + ' // ' + titles[tabId][1];
     }
 
     // ===== RENDER ALL =====
@@ -3142,6 +3142,13 @@
       
       if (sidebarBrandName) {
         sidebarBrandName.textContent = siteConfig.brandName || 'BK ADVENTURE';
+      }
+
+      const crumbEl = document.getElementById('topbarCrumb');
+      if (crumbEl) {
+        const parts = crumbEl.textContent.split(' // ');
+        const suffix = parts.length > 1 ? parts.slice(1).join(' // ') : 'ADMIN CONSOLE';
+        crumbEl.textContent = (siteConfig.brandName || 'BK ADVENTURE').toUpperCase() + ' // ' + suffix;
       }
     }
 
