@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KONTUR // Admin Console</title>
+  <title>BK ADVENTURE // Admin Console</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -462,7 +462,7 @@
         <img id="loginLogoImg" style="display:none; width:100%; height:100%; object-fit:contain;">
         <span id="loginLogoText">K</span>
       </div>
-      <h1 id="loginBrandName">KONTUR Admin Console</h1>
+      <h1 id="loginBrandName">BK ADVENTURE Admin Console</h1>
       <div class="sub">Depot Management Terminal</div>
 
       <div class="login-err" id="loginErr">Username atau password salah. Akses ditolak.</div>
@@ -489,7 +489,7 @@
           <span id="sidebarLogoText">K</span>
         </div>
         <div>
-          <div class="name" id="sidebarBrandName">KONTUR</div>
+          <div class="name" id="sidebarBrandName">BK ADVENTURE</div>
           <div class="tag" id="sidebarBrandTag">ADMIN CONSOLE</div>
         </div>
       </div>
@@ -543,7 +543,7 @@
       <div class="topbar">
         <div>
           <div class="topbar-title" id="topbarTitle">Dashboard Overview</div>
-          <div class="topbar-crumb" id="topbarCrumb">KONTUR // ADMIN CONSOLE</div>
+          <div class="topbar-crumb" id="topbarCrumb">BK ADVENTURE // ADMIN CONSOLE</div>
         </div>
         <div class="topbar-right">
           <div class="topbar-session">
@@ -1409,7 +1409,7 @@
     ];
 
     const SITE_CONFIG_DEFAULT = {
-      brandName:"KONTUR OUTDOOR", brandSubtitle:"DEPOT PERALATAN SEWA & RETAIL",
+      brandName:"BK ADVENTURE", brandSubtitle:"DEPOT PERALATAN SEWA & RETAIL",
       logoUrl:"", // NEW: Logo brand upload
       announceLeft:"HYGIENE GRADE-A · REAL-TIME TRACKING", announceRight:"EST. 2026 // SEWA & RETAIL",
       heroImage:"https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=1920&q=80",
@@ -1436,8 +1436,8 @@
       address:"Jl. Jamin Ginting No. 88, Berastagi, Kab. Karo, Sumatera Utara",
       mapsUrl:"https://www.google.com/maps/search/?api=1&query=Berastagi%2C+Karo%2C+Sumatera+Utara",
       trustItems:["100% Inspeksi Fisik","Garansi Tukar Unit di Basecamp","Pengambilan Langsung di Depot"],
-      footerBrand:"KONTUR OUTDOOR DEPOT", footerTagline:"Alpine & Expedition Grade Equipment - Jakarta Depot",
-      footerCopyright:"(c) 2026 KONTUR OUTDOOR. SELURUH HAK CIPTA DILINDUNGI.",
+      footerBrand:"BK ADVENTURE", footerTagline:"Alpine & Expedition Grade Equipment - Jakarta Depot",
+      footerCopyright:"(c) 2026 BK ADVENTURE. SELURUH HAK CIPTA DILINDUNGI.",
       catalogEyebrow:"INVENTARIS GUDANG TERKINI", catalogTitle:"Pilih Peralatan Ekspedisi Anda",
       catalogSubtitle:"Setiap item diinspeksi kelayakan fisiknya dan dihitung ketersediaan unitnya secara live."
     };
@@ -1582,7 +1582,7 @@
       const v = verifyLog();
       const rows = movementLog.map(e => '<tr><td>' + e.seq + '</td><td>' + fmtLogTime(e.ts) + '</td><td>' + e.type + '</td><td>' + e.itemName + '</td><td>' + (e.size || '-') + '</td><td>' + e.qty + '</td><td>' + (e.ref || '-') + '</td><td>' + e.note + '</td><td>' + e.source + '</td></tr>').join('');
       document.getElementById('printArea').innerHTML = '<div style="font-family:Arial,sans-serif;font-size:12px;color:#000;padding:10px;">' +
-        '<h2 style="margin:0 0 4px;">' + (siteConfig.brandName || 'KONTUR OUTDOOR') + ' &mdash; Laporan Riwayat Barang</h2>' +
+        '<h2 style="margin:0 0 4px;">' + (siteConfig.brandName || 'BK ADVENTURE') + ' &mdash; Laporan Riwayat Barang</h2>' +
         '<div>Dicetak: ' + new Date().toLocaleString('id-ID') + ' | Integritas: ' + (v.ok ? 'UTUH' : 'RUSAK PADA ENTRI #' + v.at) + ' | Total entri: ' + movementLog.length + '</div>' +
         '<table border="1" cellspacing="0" cellpadding="5" style="border-collapse:collapse;width:100%;margin-top:10px;font-size:11px;"><thead><tr><th>No</th><th>Waktu</th><th>Jenis</th><th>Barang</th><th>Ukuran</th><th>Qty</th><th>Ref</th><th>Keterangan</th><th>Sumber</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
       window.print();
@@ -1610,7 +1610,7 @@
         '<div style="width:' + paperCfg.w + ';margin:0 auto;font-family:\'Courier New\',monospace;font-size:' + paperCfg.f + ';color:#000;">' +
         '<div style="text-align:center;">' +
         ((siteConfig.receiptShowLogo !== false && siteConfig.logoUrl) ? '<img src="' + siteConfig.logoUrl + '" style="height:44px;max-width:85%;object-fit:contain;display:block;margin:0 auto 4px;filter:grayscale(1);">' : '') +
-        '<div style="font-size:16px;font-weight:bold;">' + (siteConfig.brandName || 'KONTUR OUTDOOR') + '</div>' +
+        '<div style="font-size:16px;font-weight:bold;">' + (siteConfig.brandName || 'BK ADVENTURE') + '</div>' +
         '<div>' + (siteConfig.brandSubtitle || '') + '</div>' +
         (siteConfig.receiptNote ? '<div>' + siteConfig.receiptNote + '</div>' : '') +
         ((siteConfig.receiptShowAddress !== false && siteConfig.address) ? '<div>' + siteConfig.address + '</div>' : '') +
@@ -1677,7 +1677,7 @@
       });
       const L = [];
       const add = (t, o) => { wrapTextLines(String(t).replace(/\u00A0/g, ' '), maxChars).forEach(x => L.push(Object.assign({ t: x }, o || {}))); };
-      add(siteConfig.brandName || 'KONTUR OUTDOOR', { big: 1, c: 1, b: 1 });
+      add(siteConfig.brandName || 'BK ADVENTURE', { big: 1, c: 1, b: 1 });
       if (siteConfig.receiptNote) add(siteConfig.receiptNote, { c: 1 });
       if (siteConfig.receiptShowAddress !== false && siteConfig.address) add(siteConfig.address, { c: 1 });
       if (siteConfig.receiptShowPhone !== false && siteConfig.depotPhone) add('WA Depot: ' + siteConfig.depotPhone, { c: 1 });
@@ -1742,7 +1742,7 @@
         total += sub;
         items += '- ' + x.itemName + '\n  ' + x.qty + ' unit x ' + (x.days || 1) + ' hari @ ' + fmtRupiah(price) + ' = ' + fmtRupiah(sub) + '\n';
       });
-      const msg = '*STRUK SEWA \u2014 ' + (siteConfig.brandName || 'KONTUR OUTDOOR') + '*\n' +
+      const msg = '*STRUK SEWA \u2014 ' + (siteConfig.brandName || 'BK ADVENTURE') + '*\n' +
         (siteConfig.receiptNote ? siteConfig.receiptNote + '\n' : '') +
         ((siteConfig.receiptShowAddress !== false && siteConfig.address) ? siteConfig.address + '\n' : '') +
         ((siteConfig.receiptShowPhone !== false && siteConfig.depotPhone) ? 'WA Depot: ' + siteConfig.depotPhone + '\n' : '') +
@@ -2022,12 +2022,12 @@
       if (el) el.classList.add('active');
 
       const titles = {
-        dashboard: ['Dashboard Overview', 'KONTUR // ADMIN CONSOLE'],
-        identity: ['Identitas & Hero Editor', 'KONTUR // SITE CONFIG'],
-        catalog: ['Header Katalog Editor', 'KONTUR // CATALOG CONTENT'],
-        inventory: ['Inventaris Barang', 'KONTUR // STOCK MANAGEMENT'],
-        rentals: ['Sewa & Kontrak', 'KONTUR // RENTAL OPERATIONS'],
-        trips: ['Paket & Open Trip', 'KONTUR // PACKAGES & TRIPS']
+        dashboard: ['Dashboard Overview', 'BK ADVENTURE // ADMIN CONSOLE'],
+        identity: ['Identitas & Hero Editor', 'BK ADVENTURE // SITE CONFIG'],
+        catalog: ['Header Katalog Editor', 'BK ADVENTURE // CATALOG CONTENT'],
+        inventory: ['Inventaris Barang', 'BK ADVENTURE // STOCK MANAGEMENT'],
+        rentals: ['Sewa & Kontrak', 'BK ADVENTURE // RENTAL OPERATIONS'],
+        trips: ['Paket & Open Trip', 'BK ADVENTURE // PACKAGES & TRIPS']
       };
       document.getElementById('topbarTitle').textContent = titles[tabId][0];
       document.getElementById('topbarCrumb').textContent = titles[tabId][1];
@@ -2110,7 +2110,7 @@
       const c = found.c, batch = found.batch;
       const phone = normalizePhone(c.renterPhone, c.renterName);
       if (!phone) { toast('Nomor WhatsApp penyewa tidak tersedia pada kontrak ini.'); return; }
-      const brand = siteConfig.brandName || 'KONTUR OUTDOOR';
+      const brand = siteConfig.brandName || 'BK ADVENTURE';
       const items = batch.map(x => '- ' + x.itemName + (x.size ? ' (Uk: ' + x.size + ')' : '') + ' \u00D7 ' + x.qty + ' unit').join('\n');
       const msg = '*PENGINGAT PENGEMBALIAN \u2014 ' + brand + '*\n\n' +
         'Halo ' + (c.renterName || 'kak') + ', kami mengingatkan sewa berikut sudah melewati tanggal kembali.\n\n' +
@@ -2922,10 +2922,10 @@
         const raw = localStorage.getItem(k);
         if (raw !== null) { try { data[k] = JSON.parse(raw); } catch (e) { data[k] = raw; } }
       });
-      return { app: 'KONTUR', kind: 'backup', version: 1, exportedAt: new Date().toISOString(), data };
+      return { app: 'BK ADVENTURE', kind: 'backup', version: 1, exportedAt: new Date().toISOString(), data };
     }
     function validateBackup(backup) {
-      if (!backup || backup.app !== 'KONTUR' || !backup.data || typeof backup.data !== 'object') return null;
+      if (!backup || backup.app !== 'BK ADVENTURE' || !backup.data || typeof backup.data !== 'object') return null;
       const present = BACKUP_KEYS.filter(k => backup.data[k] !== undefined);
       return present.length ? present : null;
     }
@@ -3123,7 +3123,7 @@
       }
       
       if (loginBrandName) {
-        loginBrandName.textContent = (siteConfig.brandName || 'KONTUR') + ' Admin Console';
+        loginBrandName.textContent = (siteConfig.brandName || 'BK ADVENTURE') + ' Admin Console';
       }
       
       // Update sidebar
@@ -3141,7 +3141,7 @@
       }
       
       if (sidebarBrandName) {
-        sidebarBrandName.textContent = siteConfig.brandName || 'KONTUR';
+        sidebarBrandName.textContent = siteConfig.brandName || 'BK ADVENTURE';
       }
     }
 
@@ -3159,7 +3159,7 @@
       
       const headers = ['SKU', 'NAMA BARANG', 'KATEGORI', 'TIPE', 'KONDISI', 'HARGA_RENTAL', 'HARGA_RETAIL', 'STOK_READY', 'STOK_SEWA', 'TOTAL_UNIT'];
       const summaryRows = [
-        ['KONTUR OUTDOOR - INVENTARIS EXPORT'],
+        ['BK ADVENTURE - INVENTARIS EXPORT'],
         ['Tanggal Export: ' + new Date().toLocaleString('id-ID', {timeZone: 'Asia/Jakarta'})],
         ['Total SKU: ' + inventory.length + ' | Ready: ' + totalReady + ' | Disewa: ' + totalRented + ' | Retail: ' + totalRetail],
         []
@@ -3178,7 +3178,7 @@
         i.stockTotal
       ]);
       
-      downloadExcelHTML('KONTUR_Inventaris_' + timestamp + '.xls', headers, rows, summaryRows, 'inventaris');
+      downloadExcelHTML('BK_ADVENTURE_Inventaris_' + timestamp + '.xls', headers, rows, summaryRows, 'inventaris');
       toast('Inventaris diekspor ke Excel (' + inventory.length + ' SKU)');
     }
 
@@ -3202,7 +3202,7 @@
       let htmlTable = '<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse; font-family:Arial;">';
       
       // Header summary with green background
-      htmlTable += '<tr><td colspan="12" style="background:#193828; color:white; font-weight:bold; font-size:16px; padding:10px;">KONTUR OUTDOOR - LAPORAN KONTRAK SEWA</td></tr>';
+      htmlTable += '<tr><td colspan="12" style="background:#193828; color:white; font-weight:bold; font-size:16px; padding:10px;">BK ADVENTURE - LAPORAN KONTRAK SEWA</td></tr>';
       htmlTable += '<tr><td style="background:#EBF3EE; font-weight:bold;">Tanggal Export</td><td colspan="11" style="background:#F8F5EE;">' + dateStr + ' WIB</td></tr>';
       htmlTable += '<tr><td style="background:#EBF3EE; font-weight:bold;">Total Kontrak</td><td style="background:#F8F5EE;">' + (activeRentals.length + completedRentals.length) + '</td><td style="background:#EBF3EE; font-weight:bold;">Revenue Lifetime</td><td colspan="9" style="background:#ECFDF5; font-weight:bold; color:#1C7A3D;">Rp ' + (activeRev + completedRev).toLocaleString('id-ID') + '</td></tr>';
       htmlTable += '<tr><td style="background:#EBF3EE; font-weight:bold;">Kontrak Aktif</td><td style="background:#FFFBEB;">' + activeRentals.length + '</td><td style="background:#EBF3EE; font-weight:bold;">Revenue Aktif</td><td colspan="9" style="background:#FFFBEB;">Rp ' + activeRev.toLocaleString('id-ID') + '</td></tr>';
@@ -3271,7 +3271,7 @@
       
       htmlTable += '</table>';
       
-      downloadExcelHTMLRaw('KONTUR_Kontrak_Sewa_' + timestamp + '.xls', htmlTable);
+      downloadExcelHTMLRaw('BK_ADVENTURE_Kontrak_Sewa_' + timestamp + '.xls', htmlTable);
       toast('Kontrak sewa diekspor: ' + activeRentals.length + ' aktif, ' + completedRentals.length + ' completed');
     }
 
