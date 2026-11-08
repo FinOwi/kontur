@@ -2007,6 +2007,16 @@
     let sbSyncTimer = null;
     let sbSyncBusy = false;
     let sbLastFailToast = 0;
+    // 100% ONLINE: memuat data (loadData) TIDAK boleh memicu dorongan ke
+    // server — hanya tindakan eksplisit pemilik (simpan/dispatch/dll) yang
+    // boleh. Tanpa penekan ini, keadaan bawaan/kosong hasil muatan bisa
+    // terdorong naik menimpa server (insiden katalog kosong 8 Nov 2026).
+    let sbSuppressSync = false;
+    // Bendera sekali pakai persisten: pemulihan backup memang mengganti
+    // data secara massal — pagar penghapusan massal dilewati SATU kali
+    // untuk sinkronisasi sesudah pemulihan (diatur handleRestoreFile).
+    function sbMassReplaceArmed() { try { return localStorage.getItem('kontur_mass_replace_v1') === '1'; } catch (e) { return false; } }
+    function sbMassReplaceConsume() { try { localStorage.removeItem('kontur_mass_replace_v1'); } catch (e) {} }
     window.sbAccessToken = function () { return sbSession ? sbSession.access_token : null; };
     function sbSaveSession() {
       if (sbSession) localStorage.setItem('kontur_prod_session', JSON.stringify(sbSession));
@@ -2158,30 +2168,6 @@
           .catch(() => cb(null));
       } catch (e) { cb(null); }
     };
-    // Bootstrap panel yang belum pernah punya basis (panel dari era sebelum
-    // basis persisten, atau panel baru): baris lokal yang TIDAK ada di server
-    // dan BUKAN data contoh bawaan aplikasi adalah pekerjaan admin yang
-    // belum terkirim — dorong dulu, jangan ditimpa. Data contoh bawaan
-    // (SEED_CATALOG) memang dibuang dan digantikan data server.
-    async function sbBootstrapPush(tid) {
-      const st = await sbFetchState(tid);
-      const nowIso = sbNowISO();
-      const seedById = new Map();
-      try { (typeof SEED_CATALOG !== 'undefined' ? SEED_CATALOG : []).forEach(i => seedById.set(i.id, i)); } catch (e) {}
-      const localCat = JSON.parse(localStorage.getItem('kontur_catalog_v2') || '[]');
-      const newCat = localCat.filter(i => !st.cat.has(i.id) && !(seedById.has(i.id) && sbEq(i, seedById.get(i.id))));
-      if (newCat.length) {
-        await sbRest('catalog_items?on_conflict=tenant_id,item_id', { method: 'POST', headers: { 'Prefer': 'resolution=merge-duplicates' }, body: newCat.map(i => ({ tenant_id: tid, item_id: i.id, data: i, updated_at: nowIso })) });
-      }
-      const localAct = JSON.parse(localStorage.getItem('kontur_rentals_v2') || '[]');
-      const localDone = JSON.parse(localStorage.getItem('kontur_completed_v2') || '[]');
-      const newRen = localAct.filter(c => !st.ren.has(c.contractId)).map(c => ({ c, st: 'active' }))
-        .concat(localDone.filter(c => !st.ren.has(c.contractId)).map(c => ({ c, st: 'completed' })));
-      if (newRen.length) {
-        await sbRest('rentals?on_conflict=tenant_id,contract_id', { method: 'POST', headers: { 'Prefer': 'resolution=merge-duplicates' }, body: newRen.map(e => ({ tenant_id: tid, contract_id: e.c.contractId, status: e.st, data: e.c, updated_at: nowIso })) });
-      }
-      if (newCat.length || newRen.length) toast('Data yang belum sempat terkirim dari perangkat ini diamankan ke server (' + (newCat.length + newRen.length) + ' baris).');
-    }
     async function sbPullAll() {
       const tid = await sbResolveTenant();
       if (!tid) { toast('Tenant belum terdaftar di server — data tampil dari perangkat ini.'); return false; }
@@ -2195,7 +2181,9 @@
             if (sbMemoryDirty()) { try { saveData(); } catch (e) {} }
             if (sbIsDirty()) await sbSyncUp();
           }
-          else await sbBootstrapPush(tid);
+          // Tanpa basis: panel ini belum pernah selaras dengan server.
+          // 100% online — panel baru WAJIB menarik data server, tidak
+          // pernah mendorong data lokalnya ke server.
         } catch (e) {}
       }
       // Amankan entri riwayat lokal yang belum terkirim sebelum cermin ditimpa.
@@ -2229,6 +2217,7 @@
     }
     function scheduleSyncUp() {
       if (!sbSession) return;
+      if (sbSuppressSync) return;
       sbLocalRev++;
       if (sbSyncTimer) clearTimeout(sbSyncTimer);
       sbSyncTimer = setTimeout(sbSyncUp, 700);
@@ -2268,6 +2257,17 @@
       });
       return { upserts, deletes, resolved };
     }
+    // Pembatalan sinkron yang TERLIHAT: dorongan dinyatakan basi/rusak,
+    // dibatalkan, dan panel dimuat ulang dari server. Tidak ada penghapusan
+    // yang terjadi. (Pagar insiden katalog kosong 8 Nov 2026.)
+    async function sbAbortSyncAsStale() {
+      toast('Sinkron dibatalkan: data di perangkat ini terlihat kosong/rusak — dimuat ulang dari server. Tidak ada data yang dihapus.');
+      try {
+        await sbPullAll();
+        const root = document.getElementById('appRoot');
+        if (root && root.classList.contains('active')) { loadData(); renderAll(); }
+      } catch (e) {}
+    }
     async function sbSyncUp() {
       if (!sbSession || sbSyncBusy) return;
       if (!(await sbEnsureSession())) return;
@@ -2278,9 +2278,24 @@
       const rev0 = sbLocalRev;
       try {
         const st = await sbFetchState(tid);
-        if (!sbBase) sbBase = { cat: new Map(), ren: new Map(), cfg: null };
+        // 100% ONLINE: tanpa basis sinkron (potret server terakhir yang
+        // ditarik panel ini), panel TIDAK berhak mendorong apa pun.
+        if (!sbBase) return;
         const conflicts = [];
         const nowIso = sbNowISO();
+        // PAGAR KOSONG TOTAL: koleksi lokal kosong padahal BASIS panel ini
+        // sendiri berisi = panel ini pernah tahu baris-baris itu lalu
+        // mengklaim tidak ada — cermin rusak/basi, bukan niat pemilik.
+        // (Basis kosong + lokal kosong BUKAN pelanggaran: panel itu hanya
+        // belum menarik baris baru admin lain; gabung tiga arah menanganinya
+        // dengan aman karena tidak ada penghapusan yang bisa dihitung.)
+        const massArmed = sbMassReplaceArmed();
+        const preLocalCat = JSON.parse(localStorage.getItem('kontur_catalog_v2') || '[]');
+        const preLocalRen = JSON.parse(localStorage.getItem('kontur_rentals_v2') || '[]').concat(JSON.parse(localStorage.getItem('kontur_completed_v2') || '[]'));
+        if (!massArmed && ((sbBase.cat.size > 0 && st.cat.size > 0 && preLocalCat.length === 0) || (sbBase.ren.size > 0 && st.ren.size > 0 && preLocalRen.length === 0))) {
+          await sbAbortSyncAsStale();
+          return;
+        }
         // ---- Konfigurasi: gabung per kunci ----
         const localCfg = JSON.parse(localStorage.getItem('kontur_siteconfig_v2') || 'null');
         if (localCfg) {
@@ -2305,6 +2320,10 @@
         // ---- Katalog: hanya baris yang berubah yang ditulis ----
         const localCat = JSON.parse(localStorage.getItem('kontur_catalog_v2') || '[]');
         const catRes = sbMergeCollection(localCat.map(i => ({ key: i.id, d: i })), sbBase.cat, st.cat, conflicts, 'barang');
+        if (!massArmed && st.cat.size >= 5 && catRes.deletes.length >= Math.ceil(st.cat.size * 0.4)) {
+          await sbAbortSyncAsStale();
+          return;
+        }
         if (catRes.upserts.length) {
           await sbRest('catalog_items?on_conflict=tenant_id,item_id', { method: 'POST', headers: { 'Prefer': 'resolution=merge-duplicates' }, body: catRes.upserts.map(e => ({ tenant_id: tid, item_id: e.key, data: e.d, updated_at: nowIso })) });
         }
@@ -2318,6 +2337,10 @@
         const renEntries = localAct.map(c => ({ key: c.contractId, d: c, st: 'active' }))
           .concat(localDone.map(c => ({ key: c.contractId, d: c, st: 'completed' })));
         const renRes = sbMergeCollection(renEntries, sbBase.ren, st.ren, conflicts, 'sewa');
+        if (!massArmed && st.ren.size >= 5 && renRes.deletes.length >= Math.ceil(st.ren.size * 0.4)) {
+          await sbAbortSyncAsStale();
+          return;
+        }
         if (renRes.upserts.length) {
           await sbRest('rentals?on_conflict=tenant_id,contract_id', { method: 'POST', headers: { 'Prefer': 'resolution=merge-duplicates' }, body: renRes.upserts.map(e => ({ tenant_id: tid, contract_id: e.key, status: e.st, data: e.d, updated_at: nowIso })) });
         }
@@ -2341,12 +2364,13 @@
           const after = [localStorage.getItem('kontur_catalog_v2'), localStorage.getItem('kontur_siteconfig_v2'), localStorage.getItem('kontur_rentals_v2')].join('|');
           if (before !== after && document.getElementById('appRoot').classList.contains('active')) { loadData(); renderAll(); }
         }
+        if (massArmed) sbMassReplaceConsume();
         if (conflicts.length) {
           toast('Data berikut juga diubah admin lain — versi server dipertahankan: ' + conflicts.slice(0, 3).join(', ') + (conflicts.length > 3 ? ', …' : ''));
         }
       } catch (e) {
         const now = Date.now();
-        if (now - sbLastFailToast > 20000) { sbLastFailToast = now; toast('Sinkron ke server gagal — data aman di perangkat, akan dicoba lagi.'); }
+        if (now - sbLastFailToast > 20000) { sbLastFailToast = now; toast('Koneksi ke server terputus — perubahan belum tersimpan di server; web ini 100% online, akan dikirim ulang otomatis saat tersambung.'); }
         setTimeout(scheduleSyncUp, 15000);
       } finally { sbSyncBusy = false; }
     }
@@ -2429,7 +2453,8 @@
       let sc = localStorage.getItem('kontur_siteconfig_v2');
       siteConfig = sc ? Object.assign({}, SITE_CONFIG_DEFAULT, JSON.parse(sc)) : Object.assign({}, SITE_CONFIG_DEFAULT);
       if (siteConfig.trustItems && siteConfig.trustItems[2] === 'Pengambilan Basecamp / Kurir Instant') siteConfig.trustItems[2] = 'Pengambilan Langsung di Basecamp';
-      saveData();
+      sbSuppressSync = true;
+      try { saveData(); } finally { sbSuppressSync = false; }
     }
     function saveData() {
       localStorage.setItem('kontur_catalog_v2', JSON.stringify(inventory));
@@ -3445,6 +3470,7 @@
         const present = validateBackup(backup);
         if (!present) { toast('File backup tidak valid. Data tidak berubah.'); return; }
         if (!confirm('File backup valid (' + present.length + ' bagian data). Pulihkan sekarang? Data saat ini akan ditimpa.')) return;
+        try { localStorage.setItem('kontur_mass_replace_v1', '1'); } catch (e) {}
         applyBackupData(backup);
         toast('Data dipulihkan dari backup. Memuat ulang...');
         setTimeout(() => location.reload(), 600);
