@@ -2419,6 +2419,30 @@
 
     // ===== LAPISAN DATA PRODUKSI — STOREFRONT (baca saja) =====
     let sbLastPublicRaw = '';
+    function ixCanon(v) {
+      if (v === null || typeof v !== 'object') return JSON.stringify(v === undefined ? null : v);
+      if (Array.isArray(v)) return '[' + v.map(ixCanon).join(',') + ']';
+      return '{' + Object.keys(v).sort().map(k => JSON.stringify(k) + ':' + ixCanon(v[k])).join(',') + '}';
+    }
+    // Panel admin memakai penyimpanan lokal yang SAMA (satu origin, satu
+    // peramban di HP pemilik). Bila cermin lokal berbeda dari basis sinkron
+    // terakhir, admin punya pekerjaan yang belum terkirim — storefront
+    // JANGAN menimpa cermin; tampilkan apa adanya sampai admin selesai
+    // menyinkronkan (balapan antar-tab, kejadian nyata 8 Nov 2026).
+    function ixAdminPending() {
+      try {
+        const rawBase = localStorage.getItem('kontur_base_v1');
+        if (!rawBase) return false;
+        const base = JSON.parse(rawBase);
+        const localCat = JSON.parse(localStorage.getItem('kontur_catalog_v2') || '[]');
+        const baseCat = new Map((base.cat || []).map(e => [e.k, e.d]));
+        if (localCat.length !== baseCat.size) return true;
+        for (const it of localCat) { const b = baseCat.get(it.id); if (!b || ixCanon(it) !== ixCanon(b)) return true; }
+        const localCfg = JSON.parse(localStorage.getItem('kontur_siteconfig_v2') || 'null');
+        if (localCfg && base.cfg && base.cfg.d && ixCanon(localCfg) !== ixCanon(base.cfg.d)) return true;
+        return false;
+      } catch (e) { return false; }
+    }
     async function sbPullPublic() {
       const tid = await sbResolveTenant();
       if (!tid) return false;
@@ -2433,6 +2457,7 @@
         const catRows = await rk.json();
         const raw = JSON.stringify([confRows, catRows]);
         if (raw === sbLastPublicRaw) return false;
+        if (ixAdminPending()) return false;
         sbLastPublicRaw = raw;
         if (confRows.length && confRows[0].config) {
           localStorage.setItem('kontur_siteconfig_v2', JSON.stringify(confRows[0].config));
