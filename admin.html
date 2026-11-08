@@ -919,7 +919,7 @@
                 <div class="form-group">
                   <label class="form-label">Foto Produk</label>
                   <input type="file" class="form-input" id="newImageFile" accept="image/*" onchange="handleNewImageUpload(event)" style="padding:6px 12px;">
-                  <div style="font-size:11px; color:var(--text-subtle); margin-top:4px;">Foto dari perangkat otomatis dipotong 4:3 &amp; diperkecil agar tampil rapi di katalog.</div>
+                  <div style="font-size:11px; color:var(--text-subtle); margin-top:4px;">Foto dari perangkat otomatis distandarkan 4:3 — seluruh foto tampil utuh, sisa ruang diisi putih.</div>
                   <input type="text" class="form-input" id="newImage" placeholder="atau paste URL foto" oninput="previewNewImg(this.value)" style="margin-top:8px;">
                   <img class="img-preview" id="newImgPreview">
                 </div>
@@ -1195,7 +1195,7 @@
                   <label class="form-label">Foto Paket (URL atau unggah)</label>
                   <input type="text" class="form-input" id="pkgImage" placeholder="https://..." oninput="previewPkgImage(this.value)">
                   <input type="file" class="form-input" accept="image/*" style="margin-top:8px; padding:6px 10px;" onchange="uploadPkgImage(event)">
-                  <div style="font-size:11px; color:var(--text-subtle); margin-top:4px;">Foto dari perangkat otomatis dipotong 4:3 &amp; diperkecil agar tampil rapi di katalog.</div>
+                  <div style="font-size:11px; color:var(--text-subtle); margin-top:4px;">Foto dari perangkat otomatis distandarkan 4:3 — seluruh foto tampil utuh, sisa ruang diisi putih.</div>
                   <img id="pkgImagePreview" alt="" style="display:none; width:100%; height:130px; object-fit:cover; margin-top:8px; border:1px solid var(--border);">
                 </div>
                 <div class="form-row">
@@ -1311,7 +1311,7 @@
         <div class="form-group">
           <label class="form-label">Foto Produk</label>
           <input type="file" class="form-input" id="editImageFile" accept="image/*" onchange="handleEditImageUpload(event)" style="padding:6px 12px;">
-                  <div style="font-size:11px; color:var(--text-subtle); margin-top:4px;">Foto dari perangkat otomatis dipotong 4:3 &amp; diperkecil agar tampil rapi di katalog.</div>
+                  <div style="font-size:11px; color:var(--text-subtle); margin-top:4px;">Foto dari perangkat otomatis distandarkan 4:3 — seluruh foto tampil utuh, sisa ruang diisi putih.</div>
           <input type="text" class="form-input" id="editImage" placeholder="atau paste URL foto" oninput="previewEditImg(this.value)" style="margin-top:8px;">
           <img class="img-preview" id="editImgPreview">
         </div>
@@ -3380,16 +3380,15 @@
     }
 
     // ===== IMAGE UPLOAD HANDLERS =====
-    // Foto dari perangkat diolah dulu: dipotong tengah 4:3 (mengikuti kotak
-    // kartu katalog), diperkecil ke 1200x900, dikompres JPEG q0.85 — tampil
-    // rapi & ringan. Di produksi, hasil olahan diteruskan ke
-    // window.sbStoreImage (Supabase Storage) bila tersedia; bila tidak,
-    // data URL hasil olahan yang disimpan.
-    function sbCropRect(sw, sh) {
-      const target = 4 / 3;
-      let w = sw, h = sw / target;
-      if (h > sh) { h = sh; w = sh * target; }
-      return { sx: Math.round((sw - w) / 2), sy: Math.round((sh - h) / 2), w: Math.round(w), h: Math.round(h) };
+    // Foto dari perangkat diolah dulu: SELURUH foto diskalakan muat ke dalam
+    // bingkai 1200x900 (4:3) dan sisa ruang diisi putih — tidak ada bagian
+    // foto yang terpotong, tampilan katalog seragam & rapi. Dikompres JPEG
+    // q0.85. Di produksi, hasil olahan diteruskan ke window.sbStoreImage
+    // (Supabase Storage) bila tersedia; bila tidak, data URL yang disimpan.
+    function sbFitRect(sw, sh) {
+      const scale = Math.min(1200 / sw, 900 / sh);
+      const w = Math.round(sw * scale), h = Math.round(sh * scale);
+      return { dx: Math.round((1200 - w) / 2), dy: Math.round((900 - h) / 2), w, h };
     }
     function processImageFile(file, cb) {
       const rawFallback = () => { const r = new FileReader(); r.onload = () => cb(r.result); r.onerror = () => cb(null); r.readAsDataURL(file); };
@@ -3401,14 +3400,15 @@
       const img = new Image();
       img.onload = () => settle(() => {
         try {
-          const r = sbCropRect(img.naturalWidth || img.width, img.naturalHeight || img.height);
+          const sw = img.naturalWidth || img.width, sh = img.naturalHeight || img.height;
+          const f = sbFitRect(sw, sh);
           const canvas = document.createElement('canvas');
           canvas.width = 1200; canvas.height = 900;
           const ctx = canvas.getContext('2d');
           if (!ctx) { cb(null); return; }
           ctx.fillStyle = '#FFFFFF';
           ctx.fillRect(0, 0, 1200, 900);
-          ctx.drawImage(img, r.sx, r.sy, r.w, r.h, 0, 0, 1200, 900);
+          ctx.drawImage(img, 0, 0, sw, sh, f.dx, f.dy, f.w, f.h);
           cb(canvas.toDataURL('image/jpeg', 0.85));
         } catch (err) { rawFallback(); }
       });
