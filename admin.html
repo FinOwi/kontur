@@ -1971,6 +1971,7 @@
       try { sbSession = JSON.parse(localStorage.getItem('kontur_prod_session') || 'null'); } catch (e) { sbSession = null; }
       return sbSession;
     }
+    sbLoadBase();
     async function sbAuthCall(path, body) {
       const r = await fetch(KONFIG.SUPABASE_URL + '/auth/v1/' + path, {
         method: 'POST',
@@ -2050,9 +2051,30 @@
       if (logTop && logTop.length) st.logMax = logTop[0].seq;
       return st;
     }
+    // Basis disimpan persisten agar panel yang dibuka ulang tetap tahu mana
+    // perubahan lokal yang belum terkirim (basis di memori saja hilang saat
+    // tab ditutup — dan perubahan lokal ikut hilang saat tarik berikutnya).
+    function sbPersistBase() {
+      try {
+        if (!sbBase) { localStorage.removeItem('kontur_base_v1'); return; }
+        const ser = m => [...m.entries()].map(([k, v]) => ({ k, d: v.d, u: v.u, st: v.st }));
+        localStorage.setItem('kontur_base_v1', JSON.stringify({ cat: ser(sbBase.cat), ren: ser(sbBase.ren), cfg: sbBase.cfg, logMax: sbServerLogMax }));
+      } catch (e) {}
+    }
+    function sbLoadBase() {
+      try {
+        const raw = localStorage.getItem('kontur_base_v1');
+        if (!raw) return;
+        const o = JSON.parse(raw);
+        const de = a => new Map((a || []).map(e => [e.k, { d: e.d, u: e.u, st: e.st }]));
+        sbBase = { cat: de(o.cat), ren: de(o.ren), cfg: o.cfg || null };
+        sbServerLogMax = o.logMax || 0;
+      } catch (e) {}
+    }
     function sbSetBase(st) {
       sbBase = { cat: st.cat, ren: st.ren, cfg: st.cfg };
       sbServerLogMax = st.logMax;
+      sbPersistBase();
     }
     function sbApplyMirrors(st) {
       if (st.cfg && st.cfg.d) localStorage.setItem('kontur_siteconfig_v2', JSON.stringify(st.cfg.d));
@@ -2062,9 +2084,43 @@
       localStorage.setItem('kontur_rentals_v2', JSON.stringify(act));
       localStorage.setItem('kontur_completed_v2', JSON.stringify(done));
     }
+    // Bootstrap panel yang belum pernah punya basis (panel dari era sebelum
+    // basis persisten, atau panel baru): baris lokal yang TIDAK ada di server
+    // dan BUKAN data contoh bawaan aplikasi adalah pekerjaan admin yang
+    // belum terkirim — dorong dulu, jangan ditimpa. Data contoh bawaan
+    // (SEED_CATALOG) memang dibuang dan digantikan data server.
+    async function sbBootstrapPush(tid) {
+      const st = await sbFetchState(tid);
+      const nowIso = sbNowISO();
+      const seedById = new Map();
+      try { (typeof SEED_CATALOG !== 'undefined' ? SEED_CATALOG : []).forEach(i => seedById.set(i.id, i)); } catch (e) {}
+      const localCat = JSON.parse(localStorage.getItem('kontur_catalog_v2') || '[]');
+      const newCat = localCat.filter(i => !st.cat.has(i.id) && !(seedById.has(i.id) && sbEq(i, seedById.get(i.id))));
+      if (newCat.length) {
+        await sbRest('catalog_items?on_conflict=tenant_id,item_id', { method: 'POST', headers: { 'Prefer': 'resolution=merge-duplicates' }, body: newCat.map(i => ({ tenant_id: tid, item_id: i.id, data: i, updated_at: nowIso })) });
+      }
+      const localAct = JSON.parse(localStorage.getItem('kontur_rentals_v2') || '[]');
+      const localDone = JSON.parse(localStorage.getItem('kontur_completed_v2') || '[]');
+      const newRen = localAct.filter(c => !st.ren.has(c.contractId)).map(c => ({ c, st: 'active' }))
+        .concat(localDone.filter(c => !st.ren.has(c.contractId)).map(c => ({ c, st: 'completed' })));
+      if (newRen.length) {
+        await sbRest('rentals?on_conflict=tenant_id,contract_id', { method: 'POST', headers: { 'Prefer': 'resolution=merge-duplicates' }, body: newRen.map(e => ({ tenant_id: tid, contract_id: e.c.contractId, status: e.st, data: e.c, updated_at: nowIso })) });
+      }
+      if (newCat.length || newRen.length) toast('Data yang belum sempat terkirim dari perangkat ini diamankan ke server (' + (newCat.length + newRen.length) + ' baris).');
+    }
     async function sbPullAll() {
       const tid = await sbResolveTenant();
       if (!tid) { toast('Tenant belum terdaftar di server — data tampil dari perangkat ini.'); return false; }
+      // PENJAGA KEHILANGAN DATA: perubahan lokal yang belum terkirim WAJIB
+      // didorong ke server dulu sebelum cermin ditimpa. Tanpa ini, barang
+      // yang ditambah saat sinkron gagal (tab tertutup / jaringan putus)
+      // hilang permanen pada tarik berikutnya (kejadian nyata 8 Nov 2026).
+      if (sbSession) {
+        try {
+          if (sbBase) { if (sbIsDirty()) await sbSyncUp(); }
+          else await sbBootstrapPush(tid);
+        } catch (e) {}
+      }
       // Amankan entri riwayat lokal yang belum terkirim sebelum cermin ditimpa.
       const localLogBefore = JSON.parse(localStorage.getItem('kontur_log_v2') || '[]');
       const st = await sbFetchState(tid);
@@ -2256,12 +2312,6 @@
     function loadData() {
       let si = localStorage.getItem('kontur_catalog_v2');
       inventory = si ? JSON.parse(si) : JSON.parse(JSON.stringify(SEED_CATALOG));
-      if (!inventory.some(i => i.id === 'ITM-10')) {
-        inventory.push(
-          {id:"ITM-10",sku:"RNT-APR-BTS",name:"Salomon X Ultra 5 GTX Trail Boots",category:"Pakaian & Sepatu",type:"rental",condition:"Grade A (Sangat Baik)",size:"42",image:"https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?auto=format&fit=crop&w=800&q=80",desc:"Sepatu gunung waterproof dengan sol grip agresif untuk jalur berbatu dan licin.",specs:["Waterproof GTX","Grip Agresif","Mid Cut"],priceRental:45000,priceSale:0,stockReady:3,stockRented:1,stockTotal:4},
-          {id:"ITM-11",sku:"RNT-APR-JKT",name:"Arc'teryx Beta LT Hardshell Jacket",category:"Pakaian & Sepatu",type:"rental",condition:"Grade A (Sangat Baik)",size:"L",image:"https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=800&q=80",desc:"Jaket windbreaker 3-layer ringan untuk menahan angin dan gerimis di jalur pendakian.",specs:["Windproof","3-Layer","Hoodie Lepas"],priceRental:35000,priceSale:0,stockReady:4,stockRented:1,stockTotal:5}
-        );
-      }
       migrateSizes();
       let sl = localStorage.getItem('kontur_log_v2');
       movementLog = sl ? JSON.parse(sl) : [];
@@ -2288,6 +2338,7 @@
       if (sbLoadSession() && (await sbEnsureSession())) {
         try { await sbPullAll(); } catch (e) {}
         showApp();
+        scheduleSyncUp();
         return;
       }
       sbSession = null; sbSaveSession();
