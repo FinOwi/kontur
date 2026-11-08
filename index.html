@@ -124,6 +124,11 @@
       font-size: 22px;
     }
 
+    /* Mode logo gambar: kotak penampung hilang, hitam pada logo melebur ke
+       latar header gelap (screen) — logo tampil menyatu, bukan tempelan. */
+    .brand-symbol.has-logo { background: transparent; }
+    .brand-symbol.has-logo img { mix-blend-mode: screen; }
+
     .brand-text-title {
       font-family: var(--font-serif);
       font-size: 20px;
@@ -2536,13 +2541,16 @@
       // Apply logo
       const logoImg = document.getElementById('brandLogoImg');
       const logoText = document.getElementById('brandLogoText');
+      const logoBox = document.getElementById('brandLogo');
       if (siteConfig.logoUrl && siteConfig.logoUrl.trim()) {
         logoImg.src = siteConfig.logoUrl;
         logoImg.style.display = 'block';
         logoText.style.display = 'none';
+        if (logoBox) logoBox.classList.add('has-logo');
       } else {
         logoImg.style.display = 'none';
         logoText.style.display = 'block';
+        if (logoBox) logoBox.classList.remove('has-logo');
       }
       
       setText('heroDescription', siteConfig.heroDescription);
