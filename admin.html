@@ -1623,7 +1623,7 @@
           '<td class="mono" style="font-size:11px;">' + (e.ref || '&mdash;') + '</td>' +
           '<td style="font-size:12px;">' + e.note + '</td>' +
           '<td class="mono" style="font-size:11px;">' + e.source + '</td>' +
-          '<td>' + (canStruk ? '<button class="btn btn-secondary" style="font-size:10px;padding:4px 8px;" onclick="printStruk(\'' + e.ref + '\')">STRUK</button> <button class="btn btn-secondary" style="font-size:10px;padding:4px 8px;" onclick="sendStrukWA(\'' + e.ref + '\')">PDF</button>' : '') + '</td></tr>';
+          '<td>' + (canStruk ? '<button class="btn btn-secondary" style="font-size:10px;padding:4px 8px;" onclick="printStruk(\'' + e.ref + '\')">STRUK</button> <button class="btn btn-secondary" style="font-size:10px;padding:4px 8px;" onclick="sendStrukWA(\'' + e.ref + '\')">PDF</button> <button class="btn btn-secondary" style="font-size:10px;padding:4px 8px;" onclick="sendStrukImageWA(\'' + e.ref + '\')">GAMBAR</button>' : '') + '</td></tr>';
       }).join('');
     }
     function printLogReport() {
@@ -1871,8 +1871,9 @@
       });
       return out;
     }
-    function buildStrukPDF(contractId) {
-      if (!window.jspdf || !window.jspdf.jsPDF) return null;
+    // Pembangun baris struk BERSAMA untuk PDF & gambar: satu sumber tata
+    // letak, dua keluaran. Mengembalikan { L, paper, margin, c } atau null.
+    function buildStrukLines(contractId) {
       const found = strukBatch(contractId);
       if (!found) return null;
       const c = found.c, batch = found.batch;
@@ -1925,6 +1926,13 @@
       add('Tanggal Kembali: ' + (c.returnDate || '-'), {});
       add('-'.repeat(maxChars), {});
       add(siteConfig.receiptFooter || 'Barang harap kembali tepat waktu dalam kondisi baik. Terima kasih!', { c: 1 });
+      return { L: L, paper: paper, margin: margin, c: c };
+    }
+    function buildStrukPDF(contractId) {
+      if (!window.jspdf || !window.jspdf.jsPDF) return null;
+      const built = buildStrukLines(contractId);
+      if (!built) return null;
+      const L = built.L, paper = built.paper, margin = built.margin, c = built.c;
       const lh = x => x.big ? 6.4 : 4.7;
       const H = 10 + L.reduce((s2, x) => s2 + lh(x), 0) + 4;
       const doc = new window.jspdf.jsPDF({ unit: 'mm', format: [paper, H], orientation: 'portrait' });
@@ -1941,6 +1949,65 @@
         y += lh(x);
       });
       return { blob: doc.output('blob'), filename: 'Struk-' + c.contractId + '.pdf', contract: c };
+    }
+    // Struk sebagai GAMBAR (PNG): di WhatsApp gambar tampil LANGSUNG di
+    // dalam chat (utuh terlihat tanpa membuka file), tidak seperti PDF yang
+    // hanya tampil sebagai chip berkas. Digambar dari baris yang sama
+    // persis dengan PDF, di kanvas putih 8px/mm (80mm -> 640px).
+    function buildStrukImage(contractId) {
+      const built = buildStrukLines(contractId);
+      if (!built) return null;
+      const L = built.L, paper = built.paper, margin = built.margin, c = built.c;
+      const S = 8;
+      const lhPx = x => (x.big ? 6.4 : 4.7) * S;
+      const Hmm = 10 + L.reduce((s2, x) => s2 + (x.big ? 6.4 : 4.7), 0) + 4;
+      const cv = document.createElement('canvas');
+      cv.width = Math.round(paper * S);
+      cv.height = Math.round(Hmm * S);
+      const g = cv.getContext('2d');
+      if (!g) return null;
+      g.fillStyle = '#ffffff';
+      g.fillRect(0, 0, cv.width, cv.height);
+      g.fillStyle = '#111111';
+      let y = 7 * S;
+      L.forEach(x => {
+        g.font = (x.b ? 'bold ' : '') + Math.round((x.big ? 13 : 9.5) * 25.4 / 72 * S) + 'px "Courier New", Courier, monospace';
+        if (x.l !== undefined || x.r !== undefined) {
+          g.textAlign = 'left';
+          if (x.l) g.fillText(x.l, margin * S, y);
+          g.textAlign = 'right';
+          if (x.r) g.fillText(x.r, (paper - margin) * S, y);
+        }
+        else if (x.c) { g.textAlign = 'center'; g.fillText(x.t, cv.width / 2, y); }
+        else { g.textAlign = 'left'; g.fillText(x.t, margin * S, y); }
+        y += lhPx(x);
+      });
+      return { canvas: cv, filename: 'Struk-' + c.contractId + '.png', contract: c };
+    }
+    function sendStrukImageWA(contractId) {
+      const img = buildStrukImage(contractId);
+      if (!img) { toast('Struk tidak ditemukan.'); return; }
+      const c = img.contract;
+      img.canvas.toBlob(blob => {
+        if (!blob) { toast('Gagal membuat gambar struk.'); return; }
+        const file = new File([blob], img.filename, { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], title: 'Struk Sewa ' + c.contractId }).catch(() => {});
+          toast('Pilih WhatsApp, lalu kontak penyewa — struk tampil sebagai gambar di chat.');
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = img.filename;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+        const phone = normalizePhone(c.renterPhone, c.renterName);
+        if (phone) {
+          const note = 'Halo ' + (c.renterName || 'kak') + ', ini struk sewa Anda — gambarnya baru saja diunduh di perangkat ini, silakan lampirkan ke chat ini sebagai foto. Terima kasih!';
+          window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(note), '_blank');
+        }
+        toast('Gambar struk diunduh. Lampirkan sebagai foto di chat WhatsApp penyewa.');
+      }, 'image/png');
     }
     function sendStrukWA(contractId) {
       const pdf = buildStrukPDF(contractId);
@@ -2669,7 +2736,7 @@
         '<td class="mono">' + c.qty + '</td>' +
         '<td class="mono">' + c.days + ' hari</td>' +
         '<td class="mono" style="color:' + (late > 0 ? 'var(--terracotta)' : 'var(--amber-warn)') + ';font-weight:600;">' + c.returnDate + (late > 0 ? ' <span class="badge-tag" style="background:var(--terracotta);color:#fff;border-color:var(--terracotta);">TELAT ' + late + ' HARI</span>' : '') + '</td>' +
-        '<td style="text-align:right; white-space:nowrap;">' + (late > 0 ? '<button class="btn" style="font-size:10px;padding:4px 10px;margin-right:4px;background:var(--terracotta);color:#fff;border:none;cursor:pointer;" onclick="remindLate(\'' + c.contractId + '\')">INGATKAN WA</button>' : '') + '<button class="btn btn-secondary" style="font-size:10px;padding:4px 10px;margin-right:4px;" onclick="printStruk(\'' + c.contractId + '\')">STRUK</button><button class="btn btn-secondary" style="font-size:10px;padding:4px 10px;margin-right:4px;" onclick="sendStrukWA(\'' + c.contractId + '\')">KIRIM PDF</button><button class="btn btn-primary" style="font-size:10px;padding:4px 10px;" onclick="returnItem(\'' + c.contractId + '\')">BARANG KEMBALI</button></td>' +
+        '<td style="text-align:right; white-space:nowrap;">' + (late > 0 ? '<button class="btn" style="font-size:10px;padding:4px 10px;margin-right:4px;background:var(--terracotta);color:#fff;border:none;cursor:pointer;" onclick="remindLate(\'' + c.contractId + '\')">INGATKAN WA</button>' : '') + '<button class="btn btn-secondary" style="font-size:10px;padding:4px 10px;margin-right:4px;" onclick="printStruk(\'' + c.contractId + '\')">STRUK</button><button class="btn btn-secondary" style="font-size:10px;padding:4px 10px;margin-right:4px;" onclick="sendStrukWA(\'' + c.contractId + '\')">KIRIM PDF</button><button class="btn btn-secondary" style="font-size:10px;padding:4px 10px;margin-right:4px;" onclick="sendStrukImageWA(\'' + c.contractId + '\')">GAMBAR WA</button><button class="btn btn-primary" style="font-size:10px;padding:4px 10px;" onclick="returnItem(\'' + c.contractId + '\')">BARANG KEMBALI</button></td>' +
       '</tr>'; }).join('');
     }
 
