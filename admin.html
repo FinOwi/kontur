@@ -79,6 +79,9 @@
       font-family: var(--serif); font-weight: 700; font-size: 24px;
       margin-bottom: 20px;
     }
+    /* Mode logo gambar di kartu login terang: lencana gelap membulat yang
+       menyatu dengan hitam logo — tampil sebagai lencana, bukan tempelan. */
+    .login-logo.has-logo { background: #101010; border-radius: 12px; overflow: hidden; }
     .login-box h1 {
       font-family: var(--serif); font-size: 22px; font-weight: 700;
       color: var(--forest); margin-bottom: 4px;
@@ -134,6 +137,9 @@
       display: flex; align-items: center; justify-content: center;
       font-family: var(--serif); font-weight: 700; font-size: 16px;
     }
+    /* Mode logo gambar di sidebar gelap: kotak hilang, hitam logo melebur. */
+    .sidebar-brand .mark.has-logo { background: transparent; }
+    .sidebar-brand .mark.has-logo img { mix-blend-mode: screen; }
     .sidebar-brand .name {
       font-family: var(--serif); font-size: 15px; font-weight: 700; color: #fff;
     }
@@ -3254,13 +3260,16 @@
       const loginLogoText = document.getElementById('loginLogoText');
       const loginBrandName = document.getElementById('loginBrandName');
       
+      const loginLogoBox = document.getElementById('loginLogo');
       if (siteConfig.logoUrl && siteConfig.logoUrl.trim()) {
         loginLogoImg.src = siteConfig.logoUrl;
         loginLogoImg.style.display = 'block';
         loginLogoText.style.display = 'none';
+        if (loginLogoBox) loginLogoBox.classList.add('has-logo');
       } else {
         loginLogoImg.style.display = 'none';
         loginLogoText.style.display = 'block';
+        if (loginLogoBox) loginLogoBox.classList.remove('has-logo');
       }
       
       if (loginBrandName) {
@@ -3272,13 +3281,16 @@
       const sidebarLogoText = document.getElementById('sidebarLogoText');
       const sidebarBrandName = document.getElementById('sidebarBrandName');
       
+      const sidebarLogoBox = document.getElementById('sidebarLogo');
       if (siteConfig.logoUrl && siteConfig.logoUrl.trim()) {
         sidebarLogoImg.src = siteConfig.logoUrl;
         sidebarLogoImg.style.display = 'block';
         sidebarLogoText.style.display = 'none';
+        if (sidebarLogoBox) sidebarLogoBox.classList.add('has-logo');
       } else {
         sidebarLogoImg.style.display = 'none';
         sidebarLogoText.style.display = 'block';
+        if (sidebarLogoBox) sidebarLogoBox.classList.remove('has-logo');
       }
       
       if (sidebarBrandName) {
