@@ -2186,7 +2186,10 @@
       // hilang permanen pada tarik berikutnya (kejadian nyata 8 Nov 2026).
       if (sbSession) {
         try {
-          if (sbBase) { if (sbIsDirty()) await sbSyncUp(); }
+          if (sbBase) {
+            if (sbMemoryDirty()) { try { saveData(); } catch (e) {} }
+            if (sbIsDirty()) await sbSyncUp();
+          }
           else await sbBootstrapPush(tid);
         } catch (e) {}
       }
@@ -2266,6 +2269,7 @@
       const tid = await sbResolveTenant();
       if (!tid) return;
       sbSyncBusy = true;
+      if (sbBase && sbMemoryDirty()) { try { saveData(); } catch (e) {} }
       const rev0 = sbLocalRev;
       try {
         const st = await sbFetchState(tid);
@@ -2341,6 +2345,34 @@
         setTimeout(scheduleSyncUp, 15000);
       } finally { sbSyncBusy = false; }
     }
+    // Cermin lokal bisa tertimpa pihak lain (tab storefront di peramban yang
+    // sama) sebelum sinkron berjalan. Keadaan di MEMORI panel adalah bukti
+    // terakhir pekerjaan admin: bila memori berbeda dari basis, pekerjaan
+    // itu belum aman — tulis ulang cermin dari memori, lalu sinkronkan.
+    function sbMemoryDirty() {
+      if (!sbBase) return false;
+      try {
+        if (typeof inventory !== 'undefined') {
+          if (inventory.length !== sbBase.cat.size) return true;
+          for (const it of inventory) { const b = sbBase.cat.get(it.id); if (!b || !sbEq(it, b.d)) return true; }
+        }
+        if (typeof activeRentals !== 'undefined' && typeof completedRentals !== 'undefined') {
+          if (activeRentals.length + completedRentals.length !== sbBase.ren.size) return true;
+          for (const c of activeRentals) { const b = sbBase.ren.get(c.contractId); if (!b || b.st !== 'active' || !sbEq(c, b.d)) return true; }
+          for (const c of completedRentals) { const b = sbBase.ren.get(c.contractId); if (!b || b.st !== 'completed' || !sbEq(c, b.d)) return true; }
+        }
+        if (typeof siteConfig !== 'undefined' && siteConfig && sbBase.cfg && sbBase.cfg.d) {
+          const def = (typeof SITE_CONFIG_DEFAULT !== 'undefined') ? SITE_CONFIG_DEFAULT : {};
+          const keys = new Set([].concat(Object.keys(sbBase.cfg.d), Object.keys(siteConfig)));
+          for (const k of keys) {
+            if (sbEq(siteConfig[k], sbBase.cfg.d[k])) continue;
+            if (sbBase.cfg.d[k] === undefined && sbEq(siteConfig[k], def[k])) continue;
+            return true;
+          }
+        }
+      } catch (e) { return false; }
+      return false;
+    }
     // Apakah cermin lokal punya perubahan yang belum terkirim?
     function sbIsDirty() {
       if (!sbBase) return true;
@@ -2368,6 +2400,7 @@
       const ae = document.activeElement;
       if (ae && /INPUT|TEXTAREA|SELECT/.test(ae.tagName)) return;
       if (document.querySelector('.modal-overlay.open, .modal-overlay.show, .modal-overlay.active')) return;
+      if (sbBase && sbMemoryDirty()) { try { saveData(); } catch (e) {} scheduleSyncUp(); return; }
       if (sbIsDirty()) { scheduleSyncUp(); return; }
       try {
         const ok = await sbPullAll();
