@@ -2284,9 +2284,9 @@
   <script>
     // Hardcoded Access Key for Staff / Operator
 
-    // Nomor WhatsApp Admin Depot (format internasional tanpa "+" atau spasi)
-    // Ganti dengan nomor WhatsApp admin depot Anda yang sebenarnya.
-    const DEPOT_WHATSAPP = "6281234567890";
+    // Nomor WhatsApp Admin Depot diambil dari konfigurasi (depotPhone).
+    // TANPA nomor cadangan karangan: checkout ke nomor yang salah lebih
+    // berbahaya daripada checkout yang berhenti dengan pesan jelas.
     function normalizeWaPhone(raw) {
       let d = String(raw || '').replace(/\D/g, '');
       if (d.startsWith('0')) d = '62' + d.slice(1);
@@ -2295,7 +2295,14 @@
     }
     function waAdminNumber() {
       const d = normalizeWaPhone(siteConfig.depotPhone || '');
-      return (d.length >= 10 && d.length <= 15) ? d : DEPOT_WHATSAPP;
+      return (d.length >= 10 && d.length <= 15) ? d : '';
+    }
+    const WA_BELUM_DIATUR = 'Nomor WhatsApp depot belum diatur — checkout belum bisa dilanjutkan. Hubungi depot langsung ya.';
+    // Semua teks dari data (nama barang, deskripsi, paket, trip) WAJIB lolos
+    // saringan ini sebelum masuk innerHTML — cegah injeksi markup/XSS
+    // tersimpan dari data katalog (terbukti bisa di run50).
+    function escHtml(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
     }
     const HARI_ID = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
     const BULAN_ID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
@@ -2773,8 +2780,11 @@
       if (item.sizes && item.sizes.length) {
         size = selectedSizes[itemId] || firstAvail(item);
         if (!size) { showToast('Semua ukuran habis untuk item ini.'); return; }
+        const se = item.sizes.find(s => s.label === size);
+        if (!se || (se.ready || 0) <= 0) { showToast('Ukuran ' + size + ' sedang habis.'); return; }
       } else if (item.size) size = item.size;
 
+      if ((!item.sizes || !item.sizes.length) && (item.stockReady || 0) <= 0) { showToast('Stok item ini sedang habis.'); return; }
       const existing = cart.find(c => c.itemId === itemId && (c.size || '') === size);
       if (existing) {
         showToast('Item ini' + (size ? ' ukuran ' + size : '') + ' sudah ada di keranjang.');
@@ -2900,8 +2910,8 @@
         return `
           <div class="cart-item">
             <div>
-              <div class="cart-item-name">${item.name}</div>
-              <div class="cart-item-meta">${(c.size || item.size) ? `Ukuran: ${c.size || item.size} &bull; ` : ''}${c.qty} unit × ${defaultDays} hari × ${formatRupiah(item.priceRental)}/hari</div>
+              <div class="cart-item-name">${escHtml(item.name)}</div>
+              <div class="cart-item-meta">${(c.size || item.size) ? `Ukuran: ${escHtml(c.size || item.size)} &bull; ` : ''}${c.qty} unit × ${defaultDays} hari × ${formatRupiah(item.priceRental)}/hari</div>
               <div class="cart-item-price">${formatRupiah(subtotal)}</div>
             </div>
             <div>
@@ -2959,7 +2969,7 @@
 
     function processCheckoutCart(e) {
       e.preventDefault();
-      
+      if (!waAdminNumber()) { showToast(WA_BELUM_DIATUR); return; }
       const name = document.getElementById('checkoutCartName').value.trim();
       const phone = document.getElementById('checkoutCartPhone').value.trim();
       const days = parseInt(document.getElementById('checkoutCartDays').value, 10);
@@ -3071,7 +3081,7 @@
       const modal = document.getElementById('rentalGuideModal');
       const content = document.getElementById('rentalGuideContent');
       if (siteConfig.rentalTerms) {
-        content.innerHTML = '<pre style="white-space: pre-wrap; font-family: var(--sans); line-height: 1.8;">' + siteConfig.rentalTerms + '</pre>';
+        content.innerHTML = '<pre style="white-space: pre-wrap; font-family: var(--sans); line-height: 1.8;">' + escHtml(siteConfig.rentalTerms) + '</pre>';
       } else {
         content.innerHTML = '<p>Ketentuan sewa belum diatur.</p>';
       }
@@ -3101,13 +3111,13 @@
       }
       grid.innerHTML = siteConfig.packages.map(pkg => `
         <div style="background:white; border:1px solid var(--border); border-radius:4px; overflow:hidden;">
-          <img src="${pkg.image || DEFAULT_PKG_IMAGE}" alt="${pkg.name}" loading="lazy" style="width:100%; height:200px; object-fit:contain; background:#FFFFFF; padding:10px; box-sizing:border-box; display:block;">
+          <img src="${escHtml(pkg.image || DEFAULT_PKG_IMAGE)}" alt="${escHtml(pkg.name)}" loading="lazy" style="width:100%; height:200px; object-fit:contain; background:#FFFFFF; padding:10px; box-sizing:border-box; display:block;">
           <div style="padding:24px;">
-          <h3 style="font-family:var(--font-serif); font-size:22px; font-weight:700; color:var(--forest-dark); margin-bottom:8px;">${pkg.name}</h3>
-          <p style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">${pkg.description}</p>
+          <h3 style="font-family:var(--font-serif); font-size:22px; font-weight:700; color:var(--forest-dark); margin-bottom:8px;">${escHtml(pkg.name)}</h3>
+          <p style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">${escHtml(pkg.description)}</p>
           <div style="margin-bottom:16px;">
             <div style="font-size:13px; color:var(--text-muted); margin-bottom:8px;">Termasuk:</div>
-            ${pkg.items.map(item => `<div style="font-size:14px; color:var(--text); margin-bottom:4px;">• ${item}</div>`).join('')}
+            ${pkg.items.map(item => `<div style="font-size:14px; color:var(--text); margin-bottom:4px;">• ${escHtml(item)}</div>`).join('')}
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; padding-top:16px; border-top:1px solid var(--border);">
             <div>
@@ -3143,6 +3153,7 @@
 
     function processPackageOrder(e) {
       e.preventDefault();
+      if (!waAdminNumber()) { showToast(WA_BELUM_DIATUR); return; }
       if (!currentPackage) return;
       const name = document.getElementById('pkgBuyerName').value.trim();
       const phone = document.getElementById('pkgBuyerPhone').value.trim();
@@ -3189,17 +3200,17 @@
         return `
           <div class="product-card">
             <div class="card-photo-box">
-              <img src="${t.image || ''}" alt="${t.name}" loading="lazy">
+              <img src="${escHtml(t.image || '')}" alt="${escHtml(t.name)}" loading="lazy">
               <span class="photo-badge-top-left">OPEN TRIP</span>
               <span class="photo-badge-top-right ${penuh ? 'badge-out' : 'badge-ready'}">${penuh ? 'KUOTA PENUH' : 'SISA ' + sisa + ' KURSI'}</span>
             </div>
             <div class="card-content">
               <div class="card-category-row"><span>${formatTanggalID(t.date)}</span><span class="mono">${t.days} HARI</span></div>
-              <h3 class="card-title">${t.name}</h3>
-              <p class="card-desc">${t.description || ''}</p>
-              <div class="card-specs-row">${(t.includes || []).map(i => `<span class="spec-chip">${i}</span>`).join('')}</div>
+              <h3 class="card-title">${escHtml(t.name)}</h3>
+              <p class="card-desc">${escHtml(t.description || '')}</p>
+              <div class="card-specs-row">${(t.includes || []).map(i => `<span class="spec-chip">${escHtml(i)}</span>`).join('')}</div>
               <div class="stock-strip">
-                <div class="stock-meta"><span class="mono" style="color: var(--forest-dark); font-weight: 600;">Titik kumpul: ${t.meetingPoint || '-'}</span></div>
+                <div class="stock-meta"><span class="mono" style="color: var(--forest-dark); font-weight: 600;">Titik kumpul: ${escHtml(t.meetingPoint || '-')}</span></div>
                 <div class="stock-meta"><span class="mono" style="color: var(--text-subtle);">Terisi: ${t.filled || 0} / ${t.quota || 0} peserta</span></div>
               </div>
             </div>
@@ -3217,6 +3228,7 @@
     }
 
     function orderOpenTrip(tripId) {
+      if (!waAdminNumber()) { showToast(WA_BELUM_DIATUR); return; }
       const t = (siteConfig.openTrips || []).find(x => x.id === tripId);
       if (!t) return;
       let waMessage = '*PENDAFTARAN OPEN TRIP - ' + (siteConfig.brandName || 'BK ADVENTURE') + '*\n\n';
@@ -3288,7 +3300,7 @@
           const selEntry = item.sizes.find(s => s.label === sel);
           const opts = item.sizes.map(s => {
             const outStock = (s.ready || 0) <= 0;
-            return '<button type="button" class="size-opt' + (s.label === sel ? ' selected' : '') + (outStock ? ' out' : '') + '" data-size="' + s.label + '"' + (outStock ? ' disabled' : ' onclick="selectSize(\'' + item.id + '\', \'' + s.label + '\')"') + '><span class="size-label">' + s.label + '</span>' + (outStock ? '<span class="size-out-tag">HABIS</span>' : '') + '</button>';
+            return '<button type="button" class="size-opt' + (s.label === sel ? ' selected' : '') + (outStock ? ' out' : '') + '" data-size="' + escHtml(s.label) + '"' + (outStock ? ' disabled' : ' onclick="selectSize(\'' + item.id + '\', \'' + s.label + '\')"') + '><span class="size-label">' + escHtml(s.label) + '</span>' + (outStock ? '<span class="size-out-tag">HABIS</span>' : '') + '</button>';
           }).join('');
           sizeBlock = '<div class="size-select-block"><div class="size-select-label">PILIH UKURAN:</div><div class="size-row" id="sizeRow-' + item.id + '">' + opts + '</div><div class="size-stock-note" id="sizeNote-' + item.id + '">' + (selEntry ? 'Ready ukuran ' + selEntry.label + ': ' + selEntry.ready + ' unit' : 'Semua ukuran habis') + '</div></div>';
         }
@@ -3296,22 +3308,22 @@
         return `
           <div class="product-card">
             <div class="card-photo-box">
-              <img src="${item.image}" alt="${item.name}" loading="lazy">
+              <img src="${escHtml(item.image)}" alt="${escHtml(item.name)}" loading="lazy">
               <span class="photo-badge-top-left">${isRental ? 'DISEWAKAN' : 'DIJUAL (BARU)'}</span>
               ${badgeHtml}
             </div>
 
             <div class="card-content">
               <div class="card-category-row">
-                <span>${item.category}</span>
-                <span class="mono">${item.condition}</span>
+                <span>${escHtml(item.category)}</span>
+                <span class="mono">${escHtml(item.condition)}</span>
               </div>
 
-              <h3 class="card-title">${item.name}</h3>
-              <p class="card-desc">${item.desc}</p>
+              <h3 class="card-title">${escHtml(item.name)}</h3>
+              <p class="card-desc">${escHtml(item.desc)}</p>
 
               <div class="card-specs-row">
-                ${(item.size && !(item.sizes && item.sizes.length)) ? `<span class="spec-chip size-chip">UKURAN: ${item.size}</span>` : ''}${(item.specs || []).map(s => `<span class="spec-chip">${s}</span>`).join('')}
+                ${(item.size && !(item.sizes && item.sizes.length)) ? `<span class="spec-chip size-chip">UKURAN: ${escHtml(item.size)}</span>` : ''}${(item.specs || []).map(s => `<span class="spec-chip">${escHtml(s)}</span>`).join('')}
               </div>
               ${sizeBlock}
 
@@ -3419,6 +3431,7 @@
 
     function processCheckout(e) {
       e.preventDefault();
+      if (!waAdminNumber()) { showToast(WA_BELUM_DIATUR); return; }
       if (!currentCheckoutItem) return;
 
       const qty = parseInt(document.getElementById('checkoutQty').value, 10);
