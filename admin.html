@@ -919,6 +919,7 @@
                 <div class="form-group">
                   <label class="form-label">Foto Produk</label>
                   <input type="file" class="form-input" id="newImageFile" accept="image/*" onchange="handleNewImageUpload(event)" style="padding:6px 12px;">
+                  <div style="font-size:11px; color:var(--text-subtle); margin-top:4px;">Foto dari perangkat otomatis dipotong 4:3 &amp; diperkecil agar tampil rapi di katalog.</div>
                   <input type="text" class="form-input" id="newImage" placeholder="atau paste URL foto" oninput="previewNewImg(this.value)" style="margin-top:8px;">
                   <img class="img-preview" id="newImgPreview">
                 </div>
@@ -957,7 +958,7 @@
                   </div>
                   <div class="form-group">
                     <label class="form-label" id="lblNewPrice">Tarif Sewa (/Hari)</label>
-                    <input type="number" class="form-input" id="newPrice" placeholder="50000" min="0" step="5000" required>
+                    <input type="number" class="form-input" id="newPrice" placeholder="50000" min="0" step="any" required>
                   </div>
                 </div>
                 <div class="form-group">
@@ -1194,12 +1195,13 @@
                   <label class="form-label">Foto Paket (URL atau unggah)</label>
                   <input type="text" class="form-input" id="pkgImage" placeholder="https://..." oninput="previewPkgImage(this.value)">
                   <input type="file" class="form-input" accept="image/*" style="margin-top:8px; padding:6px 10px;" onchange="uploadPkgImage(event)">
+                  <div style="font-size:11px; color:var(--text-subtle); margin-top:4px;">Foto dari perangkat otomatis dipotong 4:3 &amp; diperkecil agar tampil rapi di katalog.</div>
                   <img id="pkgImagePreview" alt="" style="display:none; width:100%; height:130px; object-fit:cover; margin-top:8px; border:1px solid var(--border);">
                 </div>
                 <div class="form-row">
                   <div class="form-group">
                     <label class="form-label">Harga Paket (Rp)</label>
-                    <input type="number" class="form-input" id="pkgPrice" min="0" step="5000" required>
+                    <input type="number" class="form-input" id="pkgPrice" min="0" step="any" required>
                   </div>
                   <div class="form-group">
                     <label class="form-label">Durasi</label>
@@ -1234,7 +1236,7 @@
                 <div class="form-row">
                   <div class="form-group">
                     <label class="form-label">Harga / Orang (Rp)</label>
-                    <input type="number" class="form-input" id="tripPrice" min="0" step="5000" required>
+                    <input type="number" class="form-input" id="tripPrice" min="0" step="any" required>
                   </div>
                   <div class="form-group">
                     <label class="form-label">Kuota Peserta</label>
@@ -1309,6 +1311,7 @@
         <div class="form-group">
           <label class="form-label">Foto Produk</label>
           <input type="file" class="form-input" id="editImageFile" accept="image/*" onchange="handleEditImageUpload(event)" style="padding:6px 12px;">
+                  <div style="font-size:11px; color:var(--text-subtle); margin-top:4px;">Foto dari perangkat otomatis dipotong 4:3 &amp; diperkecil agar tampil rapi di katalog.</div>
           <input type="text" class="form-input" id="editImage" placeholder="atau paste URL foto" oninput="previewEditImg(this.value)" style="margin-top:8px;">
           <img class="img-preview" id="editImgPreview">
         </div>
@@ -1353,7 +1356,7 @@
           </div>
           <div class="form-group">
             <label class="form-label" id="lblEditPrice">Tarif Sewa (/Hari)</label>
-            <input type="number" class="form-input" id="editPrice" min="0" step="5000" required>
+            <input type="number" class="form-input" id="editPrice" min="0" step="any" required>
           </div>
         </div>
         <div class="form-row">
@@ -2084,6 +2087,33 @@
       localStorage.setItem('kontur_rentals_v2', JSON.stringify(act));
       localStorage.setItem('kontur_completed_v2', JSON.stringify(done));
     }
+    // Unggah foto katalog ke Supabase Storage (bucket publik 'item-images',
+    // dibuat lewat storage-bucket.sql). Gagal (bucket belum ada / jaringan /
+    // belum login) -> cb(null): pemanggil memakai data URL hasil olahan.
+    function sbDataUrlToBlob(dataUrl) {
+      try {
+        const parts = dataUrl.split(',');
+        const mime = (parts[0].match(/data:(.*?);/) || [])[1] || 'image/jpeg';
+        const bin = atob(parts[1]);
+        const arr = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+        return new Blob([arr], { type: mime });
+      } catch (e) { return null; }
+    }
+    window.sbStoreImage = function (dataUrl, cb) {
+      try {
+        if (!sbSession) { cb(null); return; }
+        const blob = sbDataUrlToBlob(dataUrl);
+        if (!blob) { cb(null); return; }
+        const path = 'catalog/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.jpg';
+        fetch(KONFIG.SUPABASE_URL + '/storage/v1/object/item-images/' + path, {
+          method: 'POST',
+          headers: { 'apikey': KONFIG.SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + sbSession.access_token, 'Content-Type': 'image/jpeg', 'x-upsert': 'true' },
+          body: blob
+        }).then(r => { cb(r.ok ? (KONFIG.SUPABASE_URL + '/storage/v1/object/public/item-images/' + path) : null); })
+          .catch(() => cb(null));
+      } catch (e) { cb(null); }
+    };
     // Bootstrap panel yang belum pernah punya basis (panel dari era sebelum
     // basis persisten, atau panel baru): baris lokal yang TIDAK ada di server
     // dan BUKAN data contoh bawaan aplikasi adalah pekerjaan admin yang
@@ -3139,12 +3169,7 @@
     function uploadPkgImage(event) {
       const file = event.target.files && event.target.files[0];
       if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        document.getElementById('pkgImage').value = reader.result;
-        previewPkgImage(reader.result);
-      };
-      reader.readAsDataURL(file);
+      applyUploadedImage(file, v => { document.getElementById('pkgImage').value = v; previewPkgImage(v); });
       event.target.value = '';
     }
     function savePackage(e) {
@@ -3355,26 +3380,66 @@
     }
 
     // ===== IMAGE UPLOAD HANDLERS =====
+    // Foto dari perangkat diolah dulu: dipotong tengah 4:3 (mengikuti kotak
+    // kartu katalog), diperkecil ke 1200x900, dikompres JPEG q0.85 — tampil
+    // rapi & ringan. Di produksi, hasil olahan diteruskan ke
+    // window.sbStoreImage (Supabase Storage) bila tersedia; bila tidak,
+    // data URL hasil olahan yang disimpan.
+    function sbCropRect(sw, sh) {
+      const target = 4 / 3;
+      let w = sw, h = sw / target;
+      if (h > sh) { h = sh; w = sh * target; }
+      return { sx: Math.round((sw - w) / 2), sy: Math.round((sh - h) / 2), w: Math.round(w), h: Math.round(h) };
+    }
+    function processImageFile(file, cb) {
+      const rawFallback = () => { const r = new FileReader(); r.onload = () => cb(r.result); r.onerror = () => cb(null); r.readAsDataURL(file); };
+      let url;
+      try { url = URL.createObjectURL(file); } catch (e) { rawFallback(); return; }
+      let settled = false;
+      const settle = fn => { if (settled) return; settled = true; clearTimeout(timer); try { URL.revokeObjectURL(url); } catch (e) {} fn(); };
+      const timer = setTimeout(() => settle(rawFallback), 4000);
+      const img = new Image();
+      img.onload = () => settle(() => {
+        try {
+          const r = sbCropRect(img.naturalWidth || img.width, img.naturalHeight || img.height);
+          const canvas = document.createElement('canvas');
+          canvas.width = 1200; canvas.height = 900;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) { cb(null); return; }
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, 1200, 900);
+          ctx.drawImage(img, r.sx, r.sy, r.w, r.h, 0, 0, 1200, 900);
+          cb(canvas.toDataURL('image/jpeg', 0.85));
+        } catch (err) { rawFallback(); }
+      });
+      img.onerror = () => settle(rawFallback);
+      img.src = url;
+    }
+    function applyUploadedImage(file, setValue) {
+      if (!file) return;
+      toast('Memproses foto…');
+      processImageFile(file, dataUrl => {
+        if (!dataUrl) { toast('Foto gagal diproses. Coba foto JPG/PNG lain.'); return; }
+        if (typeof window.sbStoreImage === 'function') {
+          window.sbStoreImage(dataUrl, storedUrl => {
+            if (storedUrl) { setValue(storedUrl); toast('Foto terunggah & tersimpan rapi.'); }
+            else { setValue(dataUrl); toast('Penyimpanan awan belum aktif — foto disimpan di perangkat (sementara).'); }
+          });
+        } else setValue(dataUrl);
+      });
+    }
     function handleNewImageUpload(e) {
       const file = e.target.files[0];
       if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        document.getElementById('newImage').value = ev.target.result;
-        previewNewImg(ev.target.result);
-      };
-      reader.readAsDataURL(file);
+      applyUploadedImage(file, v => { document.getElementById('newImage').value = v; previewNewImg(v); });
+      e.target.value = '';
     }
 
     function handleEditImageUpload(e) {
       const file = e.target.files[0];
       if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        document.getElementById('editImage').value = ev.target.result;
-        previewEditImg(ev.target.result);
-      };
-      reader.readAsDataURL(file);
+      applyUploadedImage(file, v => { document.getElementById('editImage').value = v; previewEditImg(v); });
+      e.target.value = '';
     }
     
     function handleLogoUpload(e) {
