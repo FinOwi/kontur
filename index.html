@@ -2704,12 +2704,6 @@
         activeRentals = SEED_RENTALS;
       }
 
-      if (!inventory.some(i => i.id === 'ITM-10')) {
-        inventory.push(
-          {id:"ITM-10",sku:"RNT-APR-BTS",name:"Salomon X Ultra 5 GTX Trail Boots",category:"Pakaian & Sepatu",type:"rental",condition:"Grade A (Sangat Baik)",size:"42",image:"https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?auto=format&fit=crop&w=800&q=80",desc:"Sepatu gunung waterproof dengan sol grip agresif untuk jalur berbatu dan licin.",specs:["Waterproof GTX","Grip Agresif","Mid Cut"],priceRental:45000,priceSale:0,stockReady:3,stockRented:1,stockTotal:4},
-          {id:"ITM-11",sku:"RNT-APR-JKT",name:"Arc'teryx Beta LT Hardshell Jacket",category:"Pakaian & Sepatu",type:"rental",condition:"Grade A (Sangat Baik)",size:"L",image:"https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=800&q=80",desc:"Jaket windbreaker 3-layer ringan untuk menahan angin dan gerimis di jalur pendakian.",specs:["Windproof","3-Layer","Hoodie Lepas"],priceRental:35000,priceSale:0,stockReady:4,stockRented:1,stockTotal:5}
-        );
-      }
       migrateSizes();
 
       // NEW: Load cart
