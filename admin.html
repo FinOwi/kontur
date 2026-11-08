@@ -1617,7 +1617,7 @@
           '<td class="mono">' + e.seq + '</td>' +
           '<td class="mono" style="font-size:11px; white-space:nowrap;">' + fmtLogTime(e.ts) + '</td>' +
           '<td><span style="font-weight:700;color:' + (colors[e.type] || '#333') + ';">' + e.type + '</span></td>' +
-          '<td style="font-weight:600;">' + e.itemName + '</td>' +
+          '<td style="font-weight:600;">' + escHtml(e.itemName) + '</td>' +
           '<td class="mono">' + (e.size || '&mdash;') + '</td>' +
           '<td class="mono" style="font-weight:700;">' + e.qty + '</td>' +
           '<td class="mono" style="font-size:11px;">' + (e.ref || '&mdash;') + '</td>' +
@@ -1628,7 +1628,7 @@
     }
     function printLogReport() {
       const v = verifyLog();
-      const rows = movementLog.map(e => '<tr><td>' + e.seq + '</td><td>' + fmtLogTime(e.ts) + '</td><td>' + e.type + '</td><td>' + e.itemName + '</td><td>' + (e.size || '-') + '</td><td>' + e.qty + '</td><td>' + (e.ref || '-') + '</td><td>' + e.note + '</td><td>' + e.source + '</td></tr>').join('');
+      const rows = movementLog.map(e => '<tr><td>' + e.seq + '</td><td>' + fmtLogTime(e.ts) + '</td><td>' + escHtml(e.type) + '</td><td>' + escHtml(e.itemName) + '</td><td>' + escHtml(e.size || '-') + '</td><td>' + e.qty + '</td><td>' + escHtml(e.ref || '-') + '</td><td>' + escHtml(e.note) + '</td><td>' + escHtml(e.source) + '</td></tr>').join('');
       document.getElementById('printArea').innerHTML = '<div style="font-family:Arial,sans-serif;font-size:12px;color:#000;padding:10px;">' +
         '<h2 style="margin:0 0 4px;">' + (siteConfig.brandName || 'BK ADVENTURE') + ' &mdash; Laporan Riwayat Barang</h2>' +
         '<div>Dicetak: ' + new Date().toLocaleString('id-ID') + ' | Integritas: ' + (v.ok ? 'UTUH' : 'RUSAK PADA ENTRI #' + v.at) + ' | Total entri: ' + movementLog.length + '</div>' +
@@ -1651,7 +1651,7 @@
         const price = item ? (item.priceRental || 0) : 0;
         const sub = price * x.qty * (x.days || 1);
         total += sub;
-        rows += '<div style="margin-top:8px;">' + x.itemName + '</div><div style="display:flex;justify-content:space-between;"><span>' + x.qty + ' unit x ' + (x.days || 1) + ' hari @ ' + fmtRupiah(price) + '</span><span>' + fmtRupiah(sub) + '</span></div>';
+        rows += '<div style="margin-top:8px;">' + escHtml(x.itemName) + '</div><div style="display:flex;justify-content:space-between;"><span>' + x.qty + ' unit x ' + (x.days || 1) + ' hari @ ' + fmtRupiah(price) + '</span><span>' + fmtRupiah(sub) + '</span></div>';
       });
       const paperCfg = (siteConfig.receiptPaper || '80') === '58' ? { w: '48mm', f: '11px', page: '58mm' } : { w: '72mm', f: '12px', page: '80mm' };
       let pageStyle = document.getElementById('printPageStyle');
@@ -1670,7 +1670,7 @@
         '<div style="border-top:1px dashed #000;margin:8px 0;"></div>' +
         '<div style="display:flex;justify-content:space-between;"><span>STRUK SEWA</span><span>' + c.contractId + (batch.length > 1 ? ' (+' + (batch.length - 1) + ' kontrak lain)' : '') + '</span></div>' +
         '<div>Tgl: ' + dt.toLocaleDateString('id-ID') + ' ' + dt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + '</div>' +
-        '<div>Penyewa: ' + (c.renterName || '') + '</div>' +
+        '<div>Penyewa: ' + escHtml(c.renterName || '') + '</div>' +
         (c.renterPhone ? '<div>WA: ' + c.renterPhone + '</div>' : '') +
         '<div style="border-top:1px dashed #000;margin:8px 0;"></div>' + rows +
         '<div style="border-top:1px dashed #000;margin:8px 0;"></div>' +
@@ -1845,6 +1845,11 @@
       let batch = [c];
       if (c.dispatchTimestamp) batch = all.filter(x => x.dispatchTimestamp === c.dispatchTimestamp && x.renterName === c.renterName);
       return { c: c, batch: batch };
+    }
+    // Teks data (nama barang/penyewa/catatan) wajib disaring sebelum masuk
+    // innerHTML — cegah injeksi markup dari data (lihat run50 di storefront).
+    function escHtml(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
     }
     function normalizePhone(raw, fallbackName) {
       let p = (raw || '').replace(/[^0-9]/g, '');
@@ -2557,9 +2562,9 @@
       body.innerHTML = filtered.map(i => {
         const isR = i.type === 'rental';
         return '<tr>' +
-          '<td><img src="' + i.image + '" style="width:48px;height:36px;object-fit:cover;border:1px solid var(--border);"></td>' +
-          '<td class="mono" style="font-weight:600;">' + i.sku + '</td>' +
-          '<td><div style="font-weight:600;">' + i.name + '</div><div class="mono" style="font-size:10px;color:var(--text-subtle);">' + i.category + '</div>' + ((i.sizes && i.sizes.length) ? '<div class="mono" style="font-size:10px;color:#9A6E1F;font-weight:700;">' + i.sizes.map(s => s.label + ': ' + ((s.ready || 0) > 0 ? s.ready : 'HABIS')).join(' &middot; ') + '</div>' : (i.size ? '<div class="mono" style="font-size:10px;color:#9A6E1F;font-weight:700;">UKURAN: ' + i.size + '</div>' : '')) + '</td>' +
+          '<td><img src="' + escHtml(i.image) + '" style="width:48px;height:36px;object-fit:cover;border:1px solid var(--border);"></td>' +
+          '<td class="mono" style="font-weight:600;">' + escHtml(i.sku) + '</td>' +
+          '<td><div style="font-weight:600;">' + escHtml(i.name) + '</div><div class="mono" style="font-size:10px;color:var(--text-subtle);">' + escHtml(i.category) + '</div>' + ((i.sizes && i.sizes.length) ? '<div class="mono" style="font-size:10px;color:#9A6E1F;font-weight:700;">' + i.sizes.map(s => escHtml(s.label) + ': ' + ((s.ready || 0) > 0 ? s.ready : 'HABIS')).join(' &middot; ') + '</div>' : (i.size ? '<div class="mono" style="font-size:10px;color:#9A6E1F;font-weight:700;">UKURAN: ' + escHtml(i.size) + '</div>' : '')) + '</td>' +
           '<td><span class="badge-tag ' + (isR?'badge-rental':'badge-sale') + '">' + (isR?'RENTAL':'RETAIL') + '</span></td>' +
           '<td class="mono" style="color:var(--green-ok);font-weight:700;">' + i.stockReady + '</td>' +
           '<td class="mono">' + (isR ? (i.stockRented||0) : '&mdash;') + '</td>' +
@@ -2609,10 +2614,10 @@
         const late = daysLate(c);
         return '<tr' + (late > 0 ? ' style="background:#FDF2F0;"' : '') + '>' +
         '<td class="mono" style="font-weight:600;">' + c.contractId + '</td>' +
-        '<td>' + (c.renterName || c.renterName || '') + '</td>' +
-        '<td class="mono">' + (c.renterPhone || '') + '</td>' +
-        '<td class="mono" style="font-size:11px;">' + (c.renterNIK || '') + '</td>' +
-        '<td style="font-weight:600;">' + c.itemName + '</td>' +
+        '<td>' + escHtml(c.renterName || '') + '</td>' +
+        '<td class="mono">' + escHtml(c.renterPhone || '') + '</td>' +
+        '<td class="mono" style="font-size:11px;">' + escHtml(c.renterNIK || '') + '</td>' +
+        '<td style="font-weight:600;">' + escHtml(c.itemName) + '</td>' +
         '<td class="mono">' + c.qty + '</td>' +
         '<td class="mono">' + c.days + ' hari</td>' +
         '<td class="mono" style="color:' + (late > 0 ? 'var(--terracotta)' : 'var(--amber-warn)') + ';font-weight:600;">' + c.returnDate + (late > 0 ? ' <span class="badge-tag" style="background:var(--terracotta);color:#fff;border-color:var(--terracotta);">TELAT ' + late + ' HARI</span>' : '') + '</td>' +
@@ -2633,8 +2638,8 @@
           '<span class="mono" style="font-weight:600;font-size:11px;">' + c.contractId + '</span>' +
           '<span class="badge-tag badge-rented">' + c.returnDate + '</span>' + (daysLate(c) > 0 ? '<span class="badge-tag" style="background:var(--terracotta);color:#fff;border-color:var(--terracotta);margin-left:4px;">TELAT ' + daysLate(c) + ' HARI</span>' : '') +
         '</div>' +
-        '<div style="font-weight:600;font-size:12px;">' + c.itemName + '</div>' +
-        '<div class="mono" style="font-size:10px;color:var(--text-subtle);">' + (c.renterName||'') + ' (' + (c.renterPhone||'') + ') &bull; ' + c.qty + ' unit &bull; ' + c.days + ' hari</div>' +
+        '<div style="font-weight:600;font-size:12px;">' + escHtml(c.itemName) + '</div>' +
+        '<div class="mono" style="font-size:10px;color:var(--text-subtle);">' + escHtml(c.renterName||'') + ' (' + escHtml(c.renterPhone||'') + ') &bull; ' + c.qty + ' unit &bull; ' + c.days + ' hari</div>' +
         '</div>'
       ).join('');
     }
@@ -3028,7 +3033,7 @@
       }
       const ready = inventory.filter(i => i.type === 'rental' && i.stockReady > 0);
       el.innerHTML = dispatchItems.map((di, idx) => {
-        const opts = ready.map(i => '<option value="' + i.id + '" ' + (di.itemId === i.id ? 'selected' : '') + '>' + i.name + ' (Ready: ' + i.stockReady + ')</option>').join('');
+        const opts = ready.map(i => '<option value="' + i.id + '" ' + (di.itemId === i.id ? 'selected' : '') + '>' + escHtml(i.name) + ' (Ready: ' + i.stockReady + ')</option>').join('');
         const itSel = inventory.find(x => x.id === di.itemId);
         let sizeSel = '';
         if (itSel && itSel.sizes && itSel.sizes.length) {
