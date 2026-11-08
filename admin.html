@@ -480,7 +480,7 @@
         <span id="loginLogoText">K</span>
       </div>
       <h1 id="loginBrandName">BK ADVENTURE Admin Console</h1>
-      <div class="sub">Depot Management Terminal</div>
+      <div class="sub">Basecamp Management Terminal</div>
 
       <div class="login-err" id="loginErr">Username atau password salah. Akses ditolak.</div>
 
@@ -593,7 +593,7 @@
               <div class="icon-box"><svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
               <div class="label">Unit Siap Sewa</div>
               <div class="value" style="color:var(--green-ok);" id="mReady">0</div>
-              <div class="sub">Standby di rak depot</div>
+              <div class="sub">Standby di rak basecamp</div>
             </div>
             <div class="metric-card">
               <div class="icon-box"><svg class="icon" viewBox="0 0 24 24"><path d="M12 20v-6M6 20V10M18 20V4"></path></svg></div>
@@ -717,7 +717,7 @@
               </div>
               <div class="form-group">
                 <label class="form-label">Trust Badge 3</label>
-                <input type="text" class="form-input" id="cfgTrust3" placeholder="Contoh: Pengambilan Langsung di Depot">
+                <input type="text" class="form-input" id="cfgTrust3" placeholder="Contoh: Pengambilan Langsung di Basecamp">
               </div></div>
 
               <div style="height:1px; background:var(--border); margin:20px 0;"></div>
@@ -789,10 +789,10 @@
               <div style="height:1px; background:var(--border); margin:20px 0;"></div>
         </div>
         <div class="panel" id="sec-lokasi">
-          <div class="panel-head"><h3>Lokasi Depot &amp; Google Maps</h3></div>
+          <div class="panel-head"><h3>Lokasi Basecamp &amp; Google Maps</h3></div>
 
               <div class="form-group">
-                <label class="form-label">Alamat Lengkap Depot (tampil di web + jadi titik peta)</label>
+                <label class="form-label">Alamat Lengkap Basecamp (tampil di web + jadi titik peta)</label>
                 <textarea class="form-textarea" id="cfgAddress" rows="2" placeholder="Contoh: Jl. Jamin Ginting No. 88, Berastagi, Kab. Karo"></textarea>
               </div>
               <div class="form-group">
@@ -801,7 +801,7 @@
                 <div style="font-size:11px; color:var(--text-subtle); margin-top:4px;">Tombol "Buka di Google Maps" di web akan memakai link ini. Peta yang tertanam otomatis memakai alamat di atas.</div>
               </div>
               <div class="form-group">
-                <label style="display:flex; gap:8px; align-items:center; font-size:13px; cursor:pointer;"><input type="checkbox" id="cfgPickupOnly"> Pengambilan hanya di depot — tidak melayani pengiriman (info tampil di web &amp; pesan WhatsApp)</label>
+                <label style="display:flex; gap:8px; align-items:center; font-size:13px; cursor:pointer;"><input type="checkbox" id="cfgPickupOnly"> Pengambilan hanya di basecamp — tidak melayani pengiriman (info tampil di web &amp; pesan WhatsApp)</label>
               </div>
               
 
@@ -816,23 +816,23 @@
                   <option value="80">Thermal 80mm (paling umum)</option>
                   <option value="58">Thermal 58mm (kecil)</option>
                 </select>
-                <div style="font-size:11px; color:var(--text-subtle); margin-top:4px;">Lebar struk sewa saat dicetak mengikuti ukuran kertas printer thermal yang dipakai depot.</div>
+                <div style="font-size:11px; color:var(--text-subtle); margin-top:4px;">Lebar struk sewa saat dicetak mengikuti ukuran kertas printer thermal yang dipakai basecamp.</div>
               </div>
               <div class="form-group">
                 <label style="display:flex; gap:8px; align-items:center; font-size:13px; cursor:pointer;"><input type="checkbox" id="cfgReceiptShowLogo"> Tampilkan logo brand di struk (memakai Logo Brand di atas; di kertas thermal tercetak hitam-putih)</label>
               </div>
               <div class="form-group">
-                <label style="display:flex; gap:8px; align-items:center; font-size:13px; cursor:pointer;"><input type="checkbox" id="cfgReceiptShowAddress"> Tampilkan alamat depot di struk</label>
+                <label style="display:flex; gap:8px; align-items:center; font-size:13px; cursor:pointer;"><input type="checkbox" id="cfgReceiptShowAddress"> Tampilkan alamat basecamp di struk</label>
               </div>
               <div class="form-group">
-                <label style="display:flex; gap:8px; align-items:center; font-size:13px; cursor:pointer;"><input type="checkbox" id="cfgReceiptShowPhone"> Tampilkan nomor WhatsApp depot di struk</label>
+                <label style="display:flex; gap:8px; align-items:center; font-size:13px; cursor:pointer;"><input type="checkbox" id="cfgReceiptShowPhone"> Tampilkan nomor WhatsApp basecamp di struk</label>
               </div>
               <div class="form-group">
-                <label class="form-label">Nomor WhatsApp / Telepon Depot (untuk struk)</label>
+                <label class="form-label">Nomor WhatsApp / Telepon Basecamp (untuk struk)</label>
                 <input type="text" class="form-input" id="cfgDepotPhone" placeholder="Contoh: 0812-3456-7890">
               </div>
               <div class="form-group">
-                <label class="form-label">Catatan di Bawah Nama Depot (opsional)</label>
+                <label class="form-label">Catatan di Bawah Nama Basecamp (opsional)</label>
                 <input type="text" class="form-input" id="cfgReceiptNote" placeholder="Contoh: Buka setiap hari 08.00-21.00 WIB">
               </div>
               <div class="form-group">
@@ -1274,7 +1274,7 @@
                   </div>
                   <div class="form-group">
                     <label class="form-label">Titik Kumpul</label>
-                    <input type="text" class="form-input" id="tripMeeting" placeholder="Contoh: Berastagi - basecamp depot">
+                    <input type="text" class="form-input" id="tripMeeting" placeholder="Contoh: Berastagi - basecamp">
                   </div>
                 </div>
                 <div class="form-group">
@@ -1457,12 +1457,12 @@
     ];
 
     const SITE_CONFIG_DEFAULT = {
-      brandName:"BK ADVENTURE", brandSubtitle:"DEPOT PERALATAN SEWA & RETAIL",
+      brandName:"BK ADVENTURE", brandSubtitle:"TOKO PERALATAN SEWA & RETAIL",
       logoUrl:"", // NEW: Logo brand upload
       announceLeft:"HYGIENE GRADE-A · REAL-TIME TRACKING", announceRight:"EST. 2026 // SEWA & RETAIL",
       heroImage:"https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=1920&q=80",
       heroHeading:"Udara Bebas, Jalur Terbuka,<br>Peralatan Siap Badai.",
-      heroDescription:"Depot persewaan dan penjualan perlengkapan outdoor teknikal grade ekspedisi.",
+      heroDescription:"Basecamp persewaan dan penjualan perlengkapan outdoor teknikal grade ekspedisi.",
       heroCtaPrimary:"JELAJAHI KATALOG STOK", heroCtaSecondary:"KETENTUAN SEWA & DEPOSIT",
       rentalTerms:"1. Deposit wajib dibayarkan sebelum pengambilan barang\n2. Barang wajib dikembalikan sesuai jadwal yang disepakati\n3. Kerusakan atau kehilangan menjadi tanggung jawab penyewa",
       packageEyebrow:"PAKET BUNDLING HEMAT",
@@ -1477,14 +1477,14 @@
       openTripTitle:"Open Trip Berangkat Bareng",
       openTripSubtitle:"Kuota terbatas per keberangkatan. Daftar lewat WhatsApp, alat sewa bisa sekalian dipesan.",
       openTrips:[
-        {id:"trip-sibayak",name:"Open Trip Gunung Sibayak",date:"2026-11-21",days:2,price:350000,quota:15,filled:8,meetingPoint:"Berastagi - basecamp depot",image:"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80",includes:["Transport PP dari titik kumpul","Guide & porter tim","Tenda & alat masak tim","Makan 3x selama trip","Dokumentasi"],description:"Pendakian 2 hari 1 malam yang ramah pemula dengan kawah aktif dan pemandangan Danau Toba dari kejauhan."},
+        {id:"trip-sibayak",name:"Open Trip Gunung Sibayak",date:"2026-11-21",days:2,price:350000,quota:15,filled:8,meetingPoint:"Berastagi - basecamp",image:"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80",includes:["Transport PP dari titik kumpul","Guide & porter tim","Tenda & alat masak tim","Makan 3x selama trip","Dokumentasi"],description:"Pendakian 2 hari 1 malam yang ramah pemula dengan kawah aktif dan pemandangan Danau Toba dari kejauhan."},
         {id:"trip-sibuatan",name:"Open Trip Gunung Sibuatan",date:"2026-12-05",days:2,price:450000,quota:12,filled:3,meetingPoint:"Medan - titik kumpul diberitahu admin",image:"https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",includes:["Transport PP dari titik kumpul","Guide lokal","Tenda & alat masak tim","Makan 3x selama trip","Dokumentasi"],description:"Jalur hutan lumut Sibuatan untuk pendaki yang ingin suasana hutan pegunungan yang masih sepi."}
       ],
       receiptPaper:"80", pickupOnly:true, receiptShowLogo:true, receiptShowAddress:true, receiptShowPhone:true, depotPhone:"", receiptNote:"", receiptFooter:"Barang harap kembali tepat waktu dalam kondisi baik. Terima kasih!",
       address:"Jl. Jamin Ginting No. 88, Berastagi, Kab. Karo, Sumatera Utara",
       mapsUrl:"https://www.google.com/maps/search/?api=1&query=Berastagi%2C+Karo%2C+Sumatera+Utara",
-      trustItems:["100% Inspeksi Fisik","Garansi Tukar Unit di Basecamp","Pengambilan Langsung di Depot"],
-      footerBrand:"BK ADVENTURE", footerTagline:"Alpine & Expedition Grade Equipment - Jakarta Depot",
+      trustItems:["100% Inspeksi Fisik","Garansi Tukar Unit di Basecamp","Pengambilan Langsung di Basecamp"],
+      footerBrand:"BK ADVENTURE", footerTagline:"Alpine & Expedition Grade Equipment - Jakarta Basecamp",
       footerCopyright:"(c) 2026 BK ADVENTURE. SELURUH HAK CIPTA DILINDUNGI.",
       catalogEyebrow:"INVENTARIS GUDANG TERKINI", catalogTitle:"Pilih Peralatan Ekspedisi Anda",
       catalogSubtitle:"Setiap item diinspeksi kelayakan fisiknya dan dihitung ketersediaan unitnya secara live."
@@ -1894,7 +1894,7 @@
       add(siteConfig.brandName || 'BK ADVENTURE', { big: 1, c: 1, b: 1 });
       if (siteConfig.receiptNote) add(siteConfig.receiptNote, { c: 1 });
       if (siteConfig.receiptShowAddress !== false && siteConfig.address) add(siteConfig.address, { c: 1 });
-      if (siteConfig.receiptShowPhone !== false && siteConfig.depotPhone) add('WA Depot: ' + siteConfig.depotPhone, { c: 1 });
+      if (siteConfig.receiptShowPhone !== false && siteConfig.depotPhone) add('WA Toko: ' + siteConfig.depotPhone, { c: 1 });
       add('-'.repeat(maxChars), {});
       add('No. Kontrak: ' + c.contractId, {});
       add('Tanggal: ' + dt.toLocaleDateString('id-ID') + ' ' + dt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }), {});
@@ -1959,7 +1959,7 @@
       const msg = '*STRUK SEWA \u2014 ' + (siteConfig.brandName || 'BK ADVENTURE') + '*\n' +
         (siteConfig.receiptNote ? siteConfig.receiptNote + '\n' : '') +
         ((siteConfig.receiptShowAddress !== false && siteConfig.address) ? siteConfig.address + '\n' : '') +
-        ((siteConfig.receiptShowPhone !== false && siteConfig.depotPhone) ? 'WA Depot: ' + siteConfig.depotPhone + '\n' : '') +
+        ((siteConfig.receiptShowPhone !== false && siteConfig.depotPhone) ? 'WA Toko: ' + siteConfig.depotPhone + '\n' : '') +
         '------------------------------\n' +
         'No. Kontrak: ' + c.contractId + '\n' +
         'Tanggal: ' + dt.toLocaleDateString('id-ID') + ' ' + dt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + '\n' +
@@ -2428,7 +2428,7 @@
       completedRentals = scr ? JSON.parse(scr) : [];
       let sc = localStorage.getItem('kontur_siteconfig_v2');
       siteConfig = sc ? Object.assign({}, SITE_CONFIG_DEFAULT, JSON.parse(sc)) : Object.assign({}, SITE_CONFIG_DEFAULT);
-      if (siteConfig.trustItems && siteConfig.trustItems[2] === 'Pengambilan Depot / Kurir Instant') siteConfig.trustItems[2] = 'Pengambilan Langsung di Depot';
+      if (siteConfig.trustItems && siteConfig.trustItems[2] === 'Pengambilan Basecamp / Kurir Instant') siteConfig.trustItems[2] = 'Pengambilan Langsung di Basecamp';
       saveData();
     }
     function saveData() {
@@ -2456,7 +2456,7 @@
         if (stored) {
           try {
             siteConfig = Object.assign({}, SITE_CONFIG_DEFAULT, JSON.parse(stored));
-            if (siteConfig.trustItems && siteConfig.trustItems[2] === 'Pengambilan Depot / Kurir Instant') siteConfig.trustItems[2] = 'Pengambilan Langsung di Depot';
+            if (siteConfig.trustItems && siteConfig.trustItems[2] === 'Pengambilan Basecamp / Kurir Instant') siteConfig.trustItems[2] = 'Pengambilan Langsung di Basecamp';
           } catch (e) {
             siteConfig = Object.assign({}, SITE_CONFIG_DEFAULT);
           }
@@ -2598,7 +2598,7 @@
         '*Barang:*\n' + items + '\n' +
         'Tanggal kembali: ' + (c.returnDate || '-') + '\n' +
         '*Keterlambatan: ' + daysLate(c) + ' hari*\n\n' +
-        'Mohon segera dikembalikan ke depot' + (siteConfig.address ? ' (' + siteConfig.address + ')' : '') + '. Terima kasih!';
+        'Mohon segera dikembalikan ke basecamp' + (siteConfig.address ? ' (' + siteConfig.address + ')' : '') + '. Terima kasih!';
       window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(msg), '_blank');
     }
 
