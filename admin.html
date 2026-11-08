@@ -1877,21 +1877,36 @@
       if (!found) return null;
       const c = found.c, batch = found.batch;
       const paper = siteConfig.receiptPaper === '58' ? 58 : 80;
-      const maxChars = paper === 58 ? 30 : 42;
+      // Lebar teks dihitung dari metrik font Courier jsPDF (monospace,
+      // persis 0,6 em per karakter) terhadap lebar kertas — bukan tebakan
+      // jumlah karakter. Versi lama: 42 karakter @9,5pt = 84,5mm di kertas
+      // 80mm -> teks meluber keluar halaman, nominal terpotong (kejadian
+      // struk CTR-297257, 8 Nov 2026). Kini semua baris dijamin muat:
+      // dibungkus per lebar, dan nominal digambar rata kanan di tepi kertas.
+      const margin = 4;
+      const usable = paper - margin * 2;
+      const charW = fs => fs * 0.6 * 25.4 / 72;
+      const maxChars = Math.max(16, Math.floor(usable / charW(9.5)));
+      const bigChars = Math.max(10, Math.floor(usable / charW(13)));
+      const clean = t => String(t).replace(/\u00A0/g, ' ');
       const dt = c.dispatchTimestamp ? new Date(c.dispatchTimestamp) : new Date();
       let total = 0;
-      const itemLines = [];
+      const items = [];
       batch.forEach(x => {
         const item = inventory.find(i => i.id === x.itemId);
         const price = item ? (item.priceRental || 0) : 0;
         const sub = price * x.qty * (x.days || 1);
         total += sub;
-        itemLines.push('- ' + x.itemName + (x.size ? ' (Uk: ' + x.size + ')' : ''));
-        itemLines.push('  ' + x.qty + ' unit x ' + (x.days || 1) + ' hari @ ' + fmtRupiah(price) + ' = ' + fmtRupiah(sub));
+        items.push({
+          name: '- ' + x.itemName + (x.size ? ' (Uk: ' + x.size + ')' : ''),
+          detail: '  ' + x.qty + ' unit x ' + (x.days || 1) + ' hari @ ' + clean(fmtRupiah(price)),
+          amount: clean(fmtRupiah(sub))
+        });
       });
       const L = [];
-      const add = (t, o) => { wrapTextLines(String(t).replace(/\u00A0/g, ' '), maxChars).forEach(x => L.push(Object.assign({ t: x }, o || {}))); };
-      add(siteConfig.brandName || 'BK ADVENTURE', { big: 1, c: 1, b: 1 });
+      const add = (t, o) => { wrapTextLines(clean(t), maxChars).forEach(x => L.push(Object.assign({ t: x }, o || {}))); };
+      const addBig = (t, o) => { wrapTextLines(clean(t), bigChars).forEach(x => L.push(Object.assign({ t: x, big: 1 }, o || {}))); };
+      addBig(siteConfig.brandName || 'BK ADVENTURE', { c: 1, b: 1 });
       if (siteConfig.receiptNote) add(siteConfig.receiptNote, { c: 1 });
       if (siteConfig.receiptShowAddress !== false && siteConfig.address) add(siteConfig.address, { c: 1 });
       if (siteConfig.receiptShowPhone !== false && siteConfig.depotPhone) add('WA Toko: ' + siteConfig.depotPhone, { c: 1 });
@@ -1900,21 +1915,29 @@
       add('Tanggal: ' + dt.toLocaleDateString('id-ID') + ' ' + dt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }), {});
       add('Penyewa: ' + (c.renterName || ''), {});
       add('-'.repeat(maxChars), {});
-      itemLines.forEach(t => add(t, {}));
+      items.forEach(it => {
+        add(it.name, {});
+        if (it.detail.length + 1 + it.amount.length <= maxChars) L.push({ l: it.detail, r: it.amount });
+        else { add(it.detail, {}); L.push({ r: it.amount }); }
+      });
       add('-'.repeat(maxChars), {});
-      add('TOTAL: ' + fmtRupiah(total), { b: 1 });
+      L.push({ l: 'TOTAL:', r: clean(fmtRupiah(total)), b: 1 });
       add('Tanggal Kembali: ' + (c.returnDate || '-'), {});
       add('-'.repeat(maxChars), {});
       add(siteConfig.receiptFooter || 'Barang harap kembali tepat waktu dalam kondisi baik. Terima kasih!', { c: 1 });
       const lh = x => x.big ? 6.4 : 4.7;
-      const H = 10 + L.reduce((s, x) => s + lh(x), 0) + 4;
+      const H = 10 + L.reduce((s2, x) => s2 + lh(x), 0) + 4;
       const doc = new window.jspdf.jsPDF({ unit: 'mm', format: [paper, H], orientation: 'portrait' });
       let y = 7;
       L.forEach(x => {
         doc.setFont('courier', x.b ? 'bold' : 'normal');
         doc.setFontSize(x.big ? 13 : 9.5);
-        if (x.c) doc.text(x.t, paper / 2, y, { align: 'center' });
-        else doc.text(x.t, 4, y);
+        if (x.l !== undefined || x.r !== undefined) {
+          if (x.l) doc.text(x.l, margin, y);
+          if (x.r) doc.text(x.r, paper - margin, y, { align: 'right' });
+        }
+        else if (x.c) doc.text(x.t, paper / 2, y, { align: 'center' });
+        else doc.text(x.t, margin, y);
         y += lh(x);
       });
       return { blob: doc.output('blob'), filename: 'Struk-' + c.contractId + '.pdf', contract: c };
