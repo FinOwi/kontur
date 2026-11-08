@@ -828,6 +828,20 @@
                 <label class="form-label">Teks Penutup Struk</label>
                 <textarea class="form-textarea" id="cfgReceiptFooter" rows="2"></textarea>
               </div>
+              <div style="border-top:1px dashed var(--border); margin:16px 0 12px;"></div>
+              <div class="form-group">
+                <label class="form-label">Printer Bluetooth (Cetak Langsung)</label>
+                <div id="btPrintBox">
+                  <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                    <button type="button" class="btn btn-secondary" id="btConnectBtn" onclick="btConnect()">Hubungkan Printer</button>
+                    <button type="button" class="btn btn-secondary" id="btTestBtn" onclick="btTestPrint()" style="display:none;">Tes Cetak</button>
+                    <button type="button" class="btn btn-secondary" id="btDisconnectBtn" onclick="btDisconnect()" style="display:none;">Putuskan</button>
+                    <span id="btStatus" style="font-size:12px; color:var(--text-subtle);">Belum terhubung</span>
+                  </div>
+                  <div style="font-size:11px; color:var(--text-subtle); margin-top:6px;">Chrome di Android: cetak struk langsung ke printer thermal Bluetooth (BLE) tanpa aplikasi perantara. Hubungkan sekali setiap membuka panel admin. Selama printer terhubung, tombol STRUK dan cetak otomatis sesudah barang keluar langsung mengirim ke printer ini (bukan dialog print). iPhone tidak mendukung fitur ini — gunakan dialog print atau tombol PDF.</div>
+                </div>
+                <div id="btUnsupported" style="display:none; font-size:12px; color:var(--text-subtle);">Browser ini tidak mendukung Web Bluetooth (perlu Chrome di Android). Cetak tetap bisa lewat tombol STRUK (dialog print) atau PDF.</div>
+              </div>
         </div>
         <div class="panel" id="sec-footer">
           <div class="panel-head"><h3>Footer Website</h3></div>
@@ -1582,6 +1596,9 @@
       window.print();
     }
     function printStruk(contractId) {
+      // Printer Bluetooth terhubung? Kirim ESC/POS langsung, tanpa dialog.
+      if (typeof btReady === 'function' && btReady() && !btFallbackOnce) { btPrintStruk(contractId); return; }
+      btFallbackOnce = false;
       const all = activeRentals.concat(completedRentals);
       const c = all.find(x => x.contractId === contractId);
       if (!c) return;
@@ -1623,6 +1640,164 @@
         '<div style="text-align:center;">' + String(siteConfig.receiptFooter || 'Barang harap kembali tepat waktu dalam kondisi baik. Terima kasih!').split('\n').join('<br>') + '</div></div>';
       window.print();
     }
+    // ===== CETAK BLUETOOTH LANGSUNG (Web Bluetooth + ESC/POS) =====
+    // Hanya Chrome/Android (Web Bluetooth). Bila printer terhubung,
+    // printStruk() mengirim byte ESC/POS ke printer ini alih-alih membuka
+    // dialog print. Gagal kirim -> jatuh kembali ke dialog print (sekali).
+    let btDevice = null, btChar = null, btFallbackOnce = false;
+    const BT_SERVICE_CANDIDATES = [0x18f0, 0xff00, 0xfff0, 0xffe0,
+      '49535343-fe7d-4ae5-8fa9-9fafd205e455', 'e7810a71-73ae-499d-8c15-faa9aef0c3f2'];
+    function btSupported() { return !!(navigator && navigator.bluetooth); }
+    function btReady() { return !!(btChar && btDevice && btDevice.gatt && btDevice.gatt.connected); }
+    function btSetStatus(txt) {
+      const el = document.getElementById('btStatus');
+      if (el) el.textContent = txt;
+      const on = btReady();
+      const t = document.getElementById('btTestBtn');
+      const dc = document.getElementById('btDisconnectBtn');
+      if (t) t.style.display = on ? '' : 'none';
+      if (dc) dc.style.display = on ? '' : 'none';
+    }
+    async function btConnect() {
+      if (!btSupported()) { toast('Browser ini tidak mendukung Web Bluetooth (perlu Chrome di Android).'); return; }
+      try {
+        btSetStatus('Memilih printer…');
+        btDevice = await navigator.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: BT_SERVICE_CANDIDATES });
+        btDevice.addEventListener('gattserverdisconnected', function() { btChar = null; btSetStatus('Terputus — hubungkan lagi untuk mencetak.'); });
+        const server = await btDevice.gatt.connect();
+        let found = null;
+        for (const svc of BT_SERVICE_CANDIDATES) {
+          try {
+            const service = await server.getPrimaryService(svc);
+            const chars = await service.getCharacteristics();
+            found = chars.find(ch => ch.properties && (ch.properties.write || ch.properties.writeWithoutResponse)) || null;
+            if (found) break;
+          } catch (e) { /* coba layanan berikutnya */ }
+        }
+        if (!found) { btSetStatus('Kanal cetak tidak ditemukan di printer ini.'); toast('Printer ditemukan, tapi kanal cetaknya tidak cocok.'); return; }
+        btChar = found;
+        btSetStatus('Terhubung: ' + (btDevice.name || 'Printer Bluetooth'));
+        toast('Printer Bluetooth terhubung.');
+      } catch (e) {
+        btSetStatus('Belum terhubung');
+        if (e && e.name !== 'NotFoundError') toast('Gagal menghubungkan printer: ' + (e.message || e));
+      }
+    }
+    async function btDisconnect() {
+      try { if (btDevice && btDevice.gatt && btDevice.gatt.connected) btDevice.gatt.disconnect(); } catch (e) {}
+      btChar = null;
+      btSetStatus('Belum terhubung');
+    }
+    function btNormalize(s) {
+      return String(s == null ? '' : s).replace(/\u00A0/g, ' ').replace(/[—–]/g, '-').replace(/[“”]/g, '"').replace(/[‘’]/g, "'");
+    }
+    function btEncodeText(s) {
+      const out = [];
+      const t = btNormalize(s);
+      for (let i = 0; i < t.length; i++) { const c = t.charCodeAt(i); out.push(c <= 255 ? c : 63); }
+      return out;
+    }
+    function btStrukBytes(contractId) {
+      const found = strukBatch(contractId);
+      if (!found) return null;
+      const c = found.c, batch = found.batch;
+      const cols = (siteConfig.receiptPaper === '58') ? 32 : 48;
+      const dt = c.dispatchTimestamp ? new Date(c.dispatchTimestamp) : new Date();
+      let total = 0;
+      const items = [];
+      batch.forEach(x => {
+        const item = inventory.find(i => i.id === x.itemId);
+        const price = item ? (item.priceRental || 0) : 0;
+        const sub = price * x.qty * (x.days || 1);
+        total += sub;
+        items.push({ name: x.itemName + (x.size ? ' (Uk: ' + x.size + ')' : ''), detail: x.qty + ' unit x ' + (x.days || 1) + ' hari @ ' + fmtRupiah(price), sub: fmtRupiah(sub) });
+      });
+      const B = [];
+      const raw = function() { for (let i = 0; i < arguments.length; i++) B.push(arguments[i]); };
+      const line = function(s) { const enc = btEncodeText(s); for (let i = 0; i < enc.length; i++) B.push(enc[i]); B.push(0x0A); };
+      const center = function(s, bold, dblH) {
+        raw(0x1B, 0x61, 1);
+        if (bold) raw(0x1B, 0x45, 1);
+        if (dblH) raw(0x1D, 0x21, 0x01);
+        wrapTextLines(btNormalize(s), cols).forEach(w => line(w));
+        if (dblH) raw(0x1D, 0x21, 0x00);
+        if (bold) raw(0x1B, 0x45, 0);
+        raw(0x1B, 0x61, 0);
+      };
+      const two = function(l, r, bold) {
+        if (bold) raw(0x1B, 0x45, 1);
+        const ln = btNormalize(l), rn = btNormalize(r);
+        if (ln.length + 1 + rn.length <= cols) line(ln + ' '.repeat(cols - ln.length - rn.length) + rn);
+        else { line(ln); line(' '.repeat(Math.max(0, cols - rn.length)) + rn); }
+        if (bold) raw(0x1B, 0x45, 0);
+      };
+      raw(0x1B, 0x40);
+      center(siteConfig.brandName || 'BK ADVENTURE', true, true);
+      if (siteConfig.brandSubtitle) center(siteConfig.brandSubtitle);
+      if (siteConfig.receiptNote) center(siteConfig.receiptNote);
+      if (siteConfig.receiptShowAddress !== false && siteConfig.address) center(siteConfig.address);
+      if (siteConfig.receiptShowPhone !== false && siteConfig.depotPhone) center('WA: ' + siteConfig.depotPhone);
+      line('-'.repeat(cols));
+      two('STRUK SEWA', c.contractId + (batch.length > 1 ? ' (+' + (batch.length - 1) + ')' : ''));
+      line('Tgl: ' + dt.toLocaleDateString('id-ID') + ' ' + dt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }));
+      wrapTextLines('Penyewa: ' + (c.renterName || ''), cols).forEach(w => line(w));
+      if (c.renterPhone) line('WA: ' + c.renterPhone);
+      line('-'.repeat(cols));
+      items.forEach(it => { wrapTextLines(it.name, cols).forEach(w => line(w)); two('  ' + it.detail, it.sub); });
+      line('-'.repeat(cols));
+      two('TOTAL', fmtRupiah(total), true);
+      line('Tgl Kembali: ' + (c.returnDate || '-'));
+      line('-'.repeat(cols));
+      center(siteConfig.receiptFooter || 'Barang harap kembali tepat waktu dalam kondisi baik. Terima kasih!');
+      raw(0x1B, 0x64, 3);
+      raw(0x1D, 0x56, 0x42, 0x00);
+      return new Uint8Array(B);
+    }
+    async function btWriteAll(bytes) {
+      const CHUNK = 100;
+      for (let i = 0; i < bytes.length; i += CHUNK) {
+        const part = bytes.slice(i, i + CHUNK);
+        if (btChar.properties && btChar.properties.writeWithoutResponse) await btChar.writeValueWithoutResponse(part);
+        else await btChar.writeValue(part);
+        await new Promise(r => setTimeout(r, 15));
+      }
+    }
+    async function btPrintStruk(contractId) {
+      const bytes = btStrukBytes(contractId);
+      if (!bytes) return;
+      try {
+        await btWriteAll(bytes);
+        toast('Struk terkirim ke printer Bluetooth.');
+      } catch (e) {
+        toast('Gagal mencetak via Bluetooth — membuka dialog print.');
+        btFallbackOnce = true;
+        printStruk(contractId);
+      }
+    }
+    async function btTestPrint() {
+      if (!btReady()) { toast('Printer belum terhubung.'); return; }
+      const cols = (siteConfig.receiptPaper === '58') ? 32 : 48;
+      const B = [];
+      const raw = function() { for (let i = 0; i < arguments.length; i++) B.push(arguments[i]); };
+      const line = function(s) { const enc = btEncodeText(s); for (let i = 0; i < enc.length; i++) B.push(enc[i]); B.push(0x0A); };
+      raw(0x1B, 0x40);
+      raw(0x1B, 0x61, 1, 0x1B, 0x45, 1);
+      wrapTextLines(btNormalize(siteConfig.brandName || 'BK ADVENTURE'), cols).forEach(w => line(w));
+      raw(0x1B, 0x45, 0);
+      line('TES CETAK - PRINTER TERHUBUNG');
+      line('-'.repeat(cols));
+      raw(0x1B, 0x61, 0, 0x1B, 0x64, 3, 0x1D, 0x56, 0x42, 0x00);
+      try { await btWriteAll(new Uint8Array(B)); toast('Tes cetak terkirim.'); }
+      catch (e) { toast('Tes cetak gagal: ' + (e.message || e)); }
+    }
+    (function btInitUi() {
+      if (!btSupported()) {
+        const box = document.getElementById('btPrintBox');
+        const un = document.getElementById('btUnsupported');
+        if (box) box.style.display = 'none';
+        if (un) un.style.display = '';
+      }
+    })();
     function strukBatch(contractId) {
       const all = activeRentals.concat(completedRentals);
       const c = all.find(x => x.contractId === contractId);
