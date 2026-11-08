@@ -2470,9 +2470,10 @@
           localStorage.setItem('kontur_siteconfig_v2', JSON.stringify(confRows[0].config));
           lastSiteConfigRaw = localStorage.getItem('kontur_siteconfig_v2');
         }
-        if (catRows.length) {
-          localStorage.setItem('kontur_catalog_v2', JSON.stringify(catRows.map(r => r.data)));
-        }
+        // 100% online: cermin mengikuti server PERSIS — termasuk katalog
+        // yang sah dikosongkan pemilik (penjaga ixAdminPending di atas
+        // tetap melindungi pekerjaan admin yang belum terkirim).
+        localStorage.setItem('kontur_catalog_v2', JSON.stringify(catRows.map(r => r.data)));
         return true;
       } catch (e) { return false; }
     }
