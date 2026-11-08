@@ -330,6 +330,17 @@
     }
     .img-preview.show { display: block; }
 
+    /* Panduan foto + pratinjau persis kartu toko */
+    .foto-guide { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; background: var(--bg-main); border: 1px dashed var(--border); padding: 10px; }
+    .foto-card-preview { position: relative; width: 160px; flex: none; aspect-ratio: 4 / 3; background: #fff; border: 1px solid var(--border); overflow: hidden; }
+    .foto-card-preview img { width: 100%; height: 100%; object-fit: contain; padding: 10px; box-sizing: border-box; display: block; }
+    .foto-card-preview .foto-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-subtle); text-align: center; padding: 8px; }
+    .foto-card-badge { position: absolute; top: 0; left: 0; background: #193828; color: #fff; font-size: 8px; letter-spacing: .08em; padding: 2px 6px; }
+    .foto-guide-text { font-size: 11px; color: var(--text-subtle); line-height: 1.55; min-width: 200px; flex: 1; }
+    .foto-guide-text strong { color: var(--text-main); font-size: 12px; }
+    .foto-guide-text ul { margin: 4px 0 6px 14px; padding: 0; }
+    .foto-guide-text a { color: var(--accent); font-weight: 600; }
+
     /* Two-column layout */
     .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
@@ -922,6 +933,19 @@
                   <div style="font-size:11px; color:var(--text-subtle); margin-top:4px;">Foto dari perangkat otomatis distandarkan 4:3 — seluruh foto tampil utuh, sisa ruang diisi putih.</div>
                   <input type="text" class="form-input" id="newImage" placeholder="atau paste URL foto" oninput="previewNewImg(this.value)" style="margin-top:8px;">
                   <img class="img-preview" id="newImgPreview">
+                  <div class="foto-guide">
+                    <div class="foto-card-preview"><img id="newCardPreview" alt=""><span class="foto-empty" id="newCardEmpty">Pratinjau tampilan<br>di toko</span><span class="foto-card-badge">DISEWAKAN</span></div>
+                    <div class="foto-guide-text">
+                      <strong>Template Foto Toko (bingkai 4:3)</strong>
+                      <ul>
+                        <li>Foto mendatar, barang di <b>tengah</b> — beri jarak dari tepi ±10% (area aman).</li>
+                        <li>Latar polos/terang, cahaya cukup, ambil lurus dari depan.</li>
+                        <li>Satu barang per foto; hindari teks &amp; watermark di foto.</li>
+                        <li>Pratinjau di kiri = tampilan persis di kartu toko.</li>
+                      </ul>
+                      <a class="tpl-foto-link" href="#" target="_blank" rel="noopener" style="display:none;">Unduh template bingkai (PNG 1200×900)</a>
+                    </div>
+                  </div>
                 </div>
                 <div class="form-group">
                   <label class="form-label">Nama Barang & Seri</label>
@@ -1314,6 +1338,19 @@
                   <div style="font-size:11px; color:var(--text-subtle); margin-top:4px;">Foto dari perangkat otomatis distandarkan 4:3 — seluruh foto tampil utuh, sisa ruang diisi putih.</div>
           <input type="text" class="form-input" id="editImage" placeholder="atau paste URL foto" oninput="previewEditImg(this.value)" style="margin-top:8px;">
           <img class="img-preview" id="editImgPreview">
+          <div class="foto-guide">
+            <div class="foto-card-preview"><img id="editCardPreview" alt=""><span class="foto-empty" id="editCardEmpty">Pratinjau tampilan<br>di toko</span><span class="foto-card-badge">DISEWAKAN</span></div>
+            <div class="foto-guide-text">
+              <strong>Template Foto Toko (bingkai 4:3)</strong>
+              <ul>
+                <li>Foto mendatar, barang di <b>tengah</b> — beri jarak dari tepi ±10% (area aman).</li>
+                <li>Latar polos/terang, cahaya cukup, ambil lurus dari depan.</li>
+                <li>Satu barang per foto; hindari teks &amp; watermark di foto.</li>
+                <li>Pratinjau di kiri = tampilan persis di kartu toko.</li>
+              </ul>
+              <a class="tpl-foto-link" href="#" target="_blank" rel="noopener" style="display:none;">Unduh template bingkai (PNG 1200×900)</a>
+            </div>
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label">Nama Barang</label>
@@ -1975,6 +2012,8 @@
       return sbSession;
     }
     sbLoadBase();
+    // Tautan unduh template bingkai foto (PNG di bucket panduan/)
+    document.querySelectorAll('.tpl-foto-link').forEach(a => { a.href = KONFIG.SUPABASE_URL + '/storage/v1/object/public/item-images/panduan/template-foto-1200x900.png'; a.style.display = ''; });
     async function sbAuthCall(path, body) {
       const r = await fetch(KONFIG.SUPABASE_URL + '/auth/v1/' + path, {
         method: 'POST',
@@ -2780,15 +2819,24 @@
       if (url && url.trim()) { img.src = url; img.classList.add('show'); }
       else img.classList.remove('show');
     }
+    function previewCardImg(url, imgId, emptyId) {
+      const ci = document.getElementById(imgId);
+      const ce = document.getElementById(emptyId);
+      if (!ci) return;
+      if (url && url.trim()) { ci.src = url; if (ce) ce.style.display = 'none'; }
+      else { ci.removeAttribute('src'); if (ce) ce.style.display = ''; }
+    }
     function previewNewImg(url) {
       const img = document.getElementById('newImgPreview');
       if (url && url.trim()) { img.src = url; img.classList.add('show'); }
       else img.classList.remove('show');
+      previewCardImg(url, 'newCardPreview', 'newCardEmpty');
     }
     function previewEditImg(url) {
       const img = document.getElementById('editImgPreview');
       if (url && url.trim()) { img.src = url; img.classList.add('show'); }
       else img.classList.remove('show');
+      previewCardImg(url, 'editCardPreview', 'editCardEmpty');
     }
 
     // ===== ADD PRODUCT =====
