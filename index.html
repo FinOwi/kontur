@@ -2301,6 +2301,27 @@
     // Semua teks dari data (nama barang, deskripsi, paket, trip) WAJIB lolos
     // saringan ini sebelum masuk innerHTML — cegah injeksi markup/XSS
     // tersimpan dari data katalog (terbukti bisa di run50).
+    // Penormalisasi link gambar: link HALAMAN dari situs berbagi foto
+    // diubah menjadi link FILE gambarnya supaya bisa tampil di mana pun.
+    // Link gambar langsung, data URL, dan URL penyimpanan tidak diubah.
+    function fixImageUrl(u) {
+      if (!u || typeof u !== 'string') return u;
+      const s = u.trim();
+      if (!s || s.indexOf('data:') === 0 || s.indexOf('blob:') === 0) return s;
+      let m = s.match(/^https?:\/\/(?:www\.)?unsplash\.com\/photos\/([A-Za-z0-9_-]+)/i);
+      if (m && s.indexOf('/download') < 0) {
+        const id = m[1].split('-').pop();
+        if (id && id.length >= 6) return 'https://unsplash.com/photos/' + id + '/download?force=true&w=1600';
+        return s;
+      }
+      m = s.match(/drive\.google\.com\/file\/d\/([A-Za-z0-9_-]+)/i) || s.match(/drive\.google\.com\/open\?id=([A-Za-z0-9_-]+)/i);
+      if (m) return 'https://drive.google.com/thumbnail?id=' + m[1] + '&sz=w1600';
+      if (/dropbox\.com\//i.test(s)) {
+        if (/[?&]dl=0/.test(s)) return s.replace(/([?&])dl=0/, '$1raw=1');
+        if (!/[?&](raw=1|dl=1)/.test(s)) return s + (s.indexOf('?') >= 0 ? '&' : '?') + 'raw=1';
+      }
+      return s;
+    }
     function escHtml(s) {
       return String(s == null ? '' : s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
     }
@@ -2576,7 +2597,7 @@
       const logoText = document.getElementById('brandLogoText');
       const logoBox = document.getElementById('brandLogo');
       if (siteConfig.logoUrl && siteConfig.logoUrl.trim()) {
-        logoImg.src = siteConfig.logoUrl;
+        logoImg.src = fixImageUrl(siteConfig.logoUrl);
         logoImg.style.display = 'block';
         logoText.style.display = 'none';
         if (logoBox) logoBox.classList.add('has-logo');
@@ -2631,7 +2652,7 @@
       if (heroHeading) heroHeading.innerHTML = siteConfig.heroHeading;
       const heroSection = document.getElementById('heroSection');
       if (heroSection) {
-        heroSection.style.backgroundImage = siteConfig.heroImage ? "url('" + siteConfig.heroImage + "')" : 'none';
+        heroSection.style.backgroundImage = siteConfig.heroImage ? "url('" + fixImageUrl(siteConfig.heroImage) + "')" : 'none';
       }
       
       // Show header & hero after content loaded
@@ -3112,7 +3133,7 @@
       }
       grid.innerHTML = siteConfig.packages.map(pkg => `
         <div style="background:white; border:1px solid var(--border); border-radius:4px; overflow:hidden;">
-          <img src="${escHtml(pkg.image || DEFAULT_PKG_IMAGE)}" alt="${escHtml(pkg.name)}" loading="lazy" style="width:100%; height:200px; object-fit:contain; background:#FFFFFF; padding:10px; box-sizing:border-box; display:block;">
+          <img src="${escHtml(fixImageUrl(pkg.image || DEFAULT_PKG_IMAGE))}" alt="${escHtml(pkg.name)}" loading="lazy" style="width:100%; height:200px; object-fit:contain; background:#FFFFFF; padding:10px; box-sizing:border-box; display:block;">
           <div style="padding:24px;">
           <h3 style="font-family:var(--font-serif); font-size:22px; font-weight:700; color:var(--forest-dark); margin-bottom:8px;">${escHtml(pkg.name)}</h3>
           <p style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">${escHtml(pkg.description)}</p>
@@ -3140,7 +3161,7 @@
       currentPackage = pkg;
       document.getElementById('pkgModalId').value = pkg.id;
       const pkgImgEl = document.getElementById('pkgModalImg');
-      if (pkgImgEl) { pkgImgEl.src = pkg.image || DEFAULT_PKG_IMAGE; pkgImgEl.style.display = 'block'; }
+      if (pkgImgEl) { pkgImgEl.src = fixImageUrl(pkg.image || DEFAULT_PKG_IMAGE); pkgImgEl.style.display = 'block'; }
       document.getElementById('pkgModalName').textContent = pkg.name;
       document.getElementById('pkgModalPrice').textContent = formatRupiah(pkg.price) + ' / ' + pkg.duration;
       document.getElementById('pkgModalItems').textContent = 'Isi paket: ' + (pkg.items || []).join(', ');
@@ -3201,7 +3222,7 @@
         return `
           <div class="product-card">
             <div class="card-photo-box">
-              <img src="${escHtml(t.image || '')}" alt="${escHtml(t.name)}" loading="lazy">
+              <img src="${escHtml(fixImageUrl(t.image || ''))}" alt="${escHtml(t.name)}" loading="lazy">
               <span class="photo-badge-top-left">OPEN TRIP</span>
               <span class="photo-badge-top-right ${penuh ? 'badge-out' : 'badge-ready'}">${penuh ? 'KUOTA PENUH' : 'SISA ' + sisa + ' KURSI'}</span>
             </div>
@@ -3309,7 +3330,7 @@
         return `
           <div class="product-card">
             <div class="card-photo-box">
-              <img src="${escHtml(item.image)}" alt="${escHtml(item.name)}" loading="lazy">
+              <img src="${escHtml(fixImageUrl(item.image))}" alt="${escHtml(item.name)}" loading="lazy">
               <span class="photo-badge-top-left">${isRental ? 'DISEWAKAN' : 'DIJUAL (BARU)'}</span>
               ${badgeHtml}
             </div>
