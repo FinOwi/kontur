@@ -2526,7 +2526,7 @@
         if (ok && document.getElementById('appRoot').classList.contains('active')) { loadData(); renderAll(); }
       } catch (e) {}
     }
-    setInterval(sbSoftPull, 60000);
+    setInterval(sbSoftPull, 45000);
     window.addEventListener('focus', sbSoftPull);
     document.addEventListener('visibilitychange', function () { if (!document.hidden) sbSoftPull(); });
 
