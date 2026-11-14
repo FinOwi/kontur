@@ -540,6 +540,7 @@
   .folder-table td { border-bottom: none; padding: 2px 0; }
   .folder-table td:last-child { padding-top: 8px; }
 </style>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 </head>
 <body>
 
@@ -1673,8 +1674,8 @@
         {id:"trip-sibuatan",name:"Open Trip Gunung Sibuatan",date:"2026-12-05",days:2,price:450000,quota:12,filled:3,meetingPoint:"Medan - titik kumpul diberitahu admin",image:"https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",includes:["Transport PP dari titik kumpul","Guide lokal","Tenda & alat masak tim","Makan 3x selama trip","Dokumentasi"],description:"Jalur hutan lumut Sibuatan untuk pendaki yang ingin suasana hutan pegunungan yang masih sepi."}
       ],
       receiptPaper:"80", pickupOnly:true, receiptShowLogo:true, receiptShowAddress:true, receiptShowPhone:true, depotPhone:"", receiptNote:"", receiptFooter:"Barang harap kembali tepat waktu dalam kondisi baik. Terima kasih!",
-      address:"Jl. Jamin Ginting No. 88, Berastagi, Kab. Karo, Sumatera Utara",
-      mapsUrl:"https://www.google.com/maps/search/?api=1&query=Berastagi%2C+Karo%2C+Sumatera+Utara",
+      address:"",
+      mapsUrl:"",
       trustItems:["100% Inspeksi Fisik","Garansi Tukar Unit di Basecamp","Pengambilan Langsung di Basecamp"],
       footerBrand:"BK ADVENTURE", footerTagline:"Alpine & Expedition Grade Equipment - Jakarta Basecamp",
       footerCopyright:"(c) 2026 BK ADVENTURE. SELURUH HAK CIPTA DILINDUNGI.",
@@ -1725,7 +1726,7 @@
       if (!wrap) return;
       const row = document.createElement('div');
       row.style.cssText = 'display:flex; gap:8px; margin-bottom:6px; align-items:center;';
-      row.innerHTML = '<input type="text" class="form-input ns-label" placeholder="Ukuran (42 / L)" value="' + (label || '') + '" style="flex:1;">' +
+      row.innerHTML = '<input type="text" class="form-input ns-label" placeholder="Ukuran (42 / L)" value="' + escHtml(label || '') + '" style="flex:1;">' +
         '<input type="number" class="form-input ns-qty" placeholder="Stok" min="0" value="' + (qty == null ? '' : qty) + '" style="width:92px;">' +
         '<button type="button" class="btn btn-danger" style="font-size:10px; padding:7px 10px;" onclick="this.parentElement.remove()">HAPUS</button>';
       wrap.appendChild(row);
@@ -1744,7 +1745,7 @@
       if (!wrap) return;
       const row = document.createElement('div');
       row.style.cssText = 'display:flex; gap:8px; margin-bottom:6px; align-items:center;';
-      row.innerHTML = '<input type="text" class="form-input es-label" placeholder="Ukuran" value="' + (label || '') + '" style="flex:1;">' +
+      row.innerHTML = '<input type="text" class="form-input es-label" placeholder="Ukuran" value="' + escHtml(label || '') + '" style="flex:1;">' +
         '<input type="number" class="form-input es-ready" placeholder="Ready" min="0" value="' + (ready == null ? '' : ready) + '" style="width:84px;" title="Stok ready">' +
         '<input type="number" class="form-input es-rented" placeholder="Dirental" min="0" value="' + (rented == null ? '' : rented) + '" style="width:84px;" title="Sedang dirental">' +
         '<button type="button" class="btn btn-danger" style="font-size:10px; padding:7px 10px;" onclick="this.parentElement.remove()">HAPUS</button>';
@@ -1810,11 +1811,11 @@
           '<td class="mono" style="font-size:11px; white-space:nowrap;">' + fmtLogTime(e.ts) + '</td>' +
           '<td><span style="font-weight:700;color:' + (colors[e.type] || '#333') + ';">' + e.type + '</span></td>' +
           '<td style="font-weight:600;">' + escHtml(e.itemName) + '</td>' +
-          '<td class="mono">' + (e.size || '&mdash;') + '</td>' +
+          '<td class="mono">' + (e.size ? escHtml(e.size) : '&mdash;') + '</td>' +
           '<td class="mono" style="font-weight:700;">' + e.qty + '</td>' +
-          '<td class="mono" style="font-size:11px;">' + (e.ref || '&mdash;') + '</td>' +
-          '<td style="font-size:12px;">' + e.note + '</td>' +
-          '<td class="mono" style="font-size:11px;">' + e.source + '</td>' +
+          '<td class="mono" style="font-size:11px;">' + (e.ref ? escHtml(e.ref) : '&mdash;') + '</td>' +
+          '<td style="font-size:12px;">' + escHtml(e.note || '') + '</td>' +
+          '<td class="mono" style="font-size:11px;">' + escHtml(e.source || '') + '</td>' +
           '<td>' + (canStruk ? '<button class="btn btn-secondary" style="font-size:10px;padding:4px 8px;" onclick="printStruk(\'' + e.ref + '\')">STRUK</button> <button class="btn btn-secondary" style="font-size:10px;padding:4px 8px;" onclick="sendStrukWA(\'' + e.ref + '\')">PDF</button> <button class="btn btn-secondary" style="font-size:10px;padding:4px 8px;" onclick="sendStrukImageWA(\'' + e.ref + '\')">GAMBAR</button>' : '') + '</td></tr>';
       }).join('');
     }
@@ -2441,7 +2442,7 @@
         if (!sbSession) { cb(null); return; }
         const blob = sbDataUrlToBlob(dataUrl);
         if (!blob) { cb(null); return; }
-        const path = 'catalog/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.jpg';
+        const path = KONFIG.TENANT_SLUG + '/catalog/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.jpg';
         fetch(KONFIG.SUPABASE_URL + '/storage/v1/object/item-images/' + path, {
           method: 'POST',
           headers: { 'apikey': KONFIG.SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + sbSession.access_token, 'Content-Type': 'image/jpeg', 'x-upsert': 'true' },
@@ -3453,7 +3454,7 @@
         const itSel = inventory.find(x => x.id === di.itemId);
         let sizeSel = '';
         if (itSel && itSel.sizes && itSel.sizes.length) {
-          const sopts = itSel.sizes.map(s => '<option value="' + s.label + '"' + (di.size === s.label ? ' selected' : '') + ((s.ready || 0) <= 0 ? ' disabled' : '') + '>' + s.label + ((s.ready || 0) <= 0 ? ' (Habis)' : ' (Ready: ' + s.ready + ')') + '</option>').join('');
+          const sopts = itSel.sizes.map(s => '<option value="' + escHtml(s.label) + '"' + (di.size === s.label ? ' selected' : '') + ((s.ready || 0) <= 0 ? ' disabled' : '') + '>' + escHtml(s.label) + ((s.ready || 0) <= 0 ? ' (Habis)' : ' (Ready: ' + s.ready + ')') + '</option>').join('');
           sizeSel = '<div style="width:118px;"><label class="form-label" style="font-size:10px;">UKURAN</label><select class="form-select" style="font-size:12px; padding:6px 10px;" onchange="dispatchItems[' + idx + '].size = this.value" required><option value="">-- Ukuran --</option>' + sopts + '</select></div>';
         } else if (itSel && itSel.size) {
           sizeSel = '<div style="width:118px;"><label class="form-label" style="font-size:10px;">UKURAN</label><div class="mono" style="font-size:12px; padding:7px 2px;">' + itSel.size + '</div></div>';
