@@ -2477,14 +2477,16 @@
       const tid = await sbResolveTenant();
       if (!tid) return false;
       try {
-        const H = { 'apikey': KONFIG.SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + KONFIG.SUPABASE_ANON_KEY };
+        const H = { 'apikey': KONFIG.SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + KONFIG.SUPABASE_ANON_KEY, 'Content-Type': 'application/json' };
         const [rc, rk] = await Promise.all([
-          fetch(KONFIG.SUPABASE_URL + '/rest/v1/site_config?tenant_id=eq.' + tid + '&select=config', { headers: H }),
-          fetch(KONFIG.SUPABASE_URL + '/rest/v1/catalog_items?tenant_id=eq.' + tid + '&select=data&order=item_id', { headers: H })
+          fetch(KONFIG.SUPABASE_URL + '/rest/v1/rpc/shop_config', { method: 'POST', headers: H, body: JSON.stringify({ s: KONFIG.TENANT_SLUG }) }),
+          fetch(KONFIG.SUPABASE_URL + '/rest/v1/rpc/shop_catalog', { method: 'POST', headers: H, body: JSON.stringify({ s: KONFIG.TENANT_SLUG }) })
         ]);
         if (!rc.ok || !rk.ok) return false;
-        const confRows = await rc.json();
-        const catRows = await rk.json();
+        const confObj = await rc.json();
+        const catList = await rk.json();
+        const confRows = confObj ? [{ config: confObj }] : [];
+        const catRows = (catList || []).map(d => ({ data: d }));
         const raw = JSON.stringify([confRows, catRows]);
         if (raw === sbLastPublicRaw) return false;
         if (ixAdminPending()) return false;
