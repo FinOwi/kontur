@@ -32,9 +32,6 @@
       --sans: 'Plus Jakarta Sans', sans-serif;
       --mono: 'JetBrains Mono', monospace;
       --sidebar-w: 240px;
-      /* Ritme jarak seragam (pass clean v4, nilai mockup yang disetujui) */
-      --sp-panel: 24px;
-      --sp-gap: 20px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -250,7 +247,7 @@
     /* Panel Cards */
     .panel {
       background: var(--surface); border: 1px solid var(--border);
-      padding: var(--sp-panel); margin-bottom: var(--sp-gap);
+      padding: 22px 24px; margin-bottom: 20px;
     }
     .panel-head {
       display: flex; align-items: center; justify-content: space-between;
@@ -275,7 +272,7 @@
     }
     .form-input, .form-select, .form-textarea {
       width: 100%; background: var(--surface); border: 1px solid var(--border);
-      padding: 9px 12px; font-size: 13px; font-family: var(--sans);
+      padding: 8px 12px; font-size: 13px; font-family: var(--sans);
       outline: none; transition: border-color 0.12s;
     }
     .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--forest); }
@@ -286,8 +283,7 @@
     /* Buttons */
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 9px 18px; min-height: 38px; border-radius: 2px;
-      font-family: var(--mono); font-size: 12px; font-weight: 600;
+      padding: 9px 18px; font-family: var(--mono); font-size: 12px; font-weight: 600;
       border: 1px solid var(--border-dark); cursor: pointer; letter-spacing: 0.04em;
       transition: background 0.12s;
     }
@@ -300,22 +296,19 @@
     .btn-warn { background: var(--ochre); color: var(--forest); border-color: var(--ochre); }
     .btn-warn:hover { background: #E5A93D; }
     .btn-full { width: 100%; }
-    .btn-sm { font-size: 11px; padding: 6px 12px; min-height: 32px; }
-    .btn-xs { font-size: 10px; padding: 5px 10px; min-height: 30px; }
 
     /* Tables */
     .table-wrap {
       background: var(--surface); border: 1px solid var(--border); overflow-x: auto;
-      margin-bottom: var(--sp-gap);
     }
-    table { width: 100%; border-collapse: collapse; font-size: 12.5px; text-align: left; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }
     th {
       background: var(--surface-2); font-family: var(--mono); font-size: 10px;
       font-weight: 600; color: var(--text-muted); text-transform: uppercase;
-      padding: 11px 14px; border-bottom: 1px solid var(--border);
+      padding: 10px 14px; border-bottom: 1px solid var(--border);
       white-space: nowrap;
     }
-    td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
     tr:hover td { background: #FCFCFA; }
     tr:last-child td { border-bottom: none; }
 
@@ -432,59 +425,6 @@
       font-family: var(--serif); font-size: 16px; color: var(--text-muted); margin-bottom: 4px;
     }
 
-    /* ===== KONTRAK AKTIF: folder per penyewa + pencarian (v4) ===== */
-    .rentals-box {
-      background: var(--surface); border: 1px solid var(--border);
-      margin-bottom: var(--sp-gap);
-    }
-    .rentals-head { padding: 12px 16px; background: var(--surface-2); border-bottom: 1px solid var(--border); }
-    .rentals-head-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .rental-search {
-      display: flex; align-items: center; gap: 8px; margin-top: 10px;
-      background: var(--surface); border: 1px solid var(--border);
-      padding: 0 10px; min-height: 42px;
-    }
-    .rental-search:focus-within { border-color: var(--forest); }
-    .rental-search .icon { color: var(--text-subtle); flex-shrink: 0; }
-    .rental-search input {
-      flex: 1; min-width: 0; border: none; outline: none; background: transparent;
-      font-family: var(--sans); font-size: 13px; color: var(--text); padding: 10px 0;
-    }
-    .rental-search-clear {
-      background: none; border: none; cursor: pointer; color: var(--text-muted);
-      display: none; align-items: center; justify-content: center;
-      width: 32px; height: 32px; flex-shrink: 0; padding: 0;
-    }
-    .rental-search-clear.show { display: inline-flex; }
-    .folder-list { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
-    .folder-list .empty-state { padding: 28px 20px; }
-    .renter-folder { border: 1px solid var(--border); background: var(--surface); }
-    .renter-folder-head {
-      display: flex; align-items: center; gap: 10px; padding: 12px 14px;
-      cursor: pointer; background: var(--surface-2); flex-wrap: wrap;
-    }
-    .renter-folder-head:hover { background: #E9E7DF; }
-    .renter-folder-head .folder-ic { color: var(--forest); display: inline-flex; flex-shrink: 0; }
-    .renter-folder-head .folder-main {
-      flex: 1; min-width: 200px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-    }
-    .renter-folder-head .folder-name { font-weight: 700; font-size: 13px; }
-    .folder-actions { display: inline-flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-    .folder-chevron { display: inline-flex; color: var(--text-muted); transition: transform 0.15s; flex-shrink: 0; }
-    .renter-folder.open .folder-chevron { transform: rotate(180deg); }
-    .renter-folder-body { display: none; border-top: 1px solid var(--border); }
-    .renter-folder.open .renter-folder-body { display: block; }
-    .folder-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .folder-table { min-width: 640px; }
-
-    /* ===== TAB PENGATURAN: folder lipat konfigurasi (pola folder penyewa) ===== */
-    .cfg-form > .cfg-folder { margin-bottom: 0; scroll-margin-top: 78px; }
-    .cfg-folder-in { padding: var(--sp-panel); }
-    @media (max-width: 720px) { .cfg-folder-in { padding: 18px 16px; } }
-    .cfg-subblock { scroll-margin-top: 120px; }
-    .cfg-subblock + .cfg-subblock { margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--border); }
-    .cfg-subhead { font-family: var(--serif); font-size: 17px; font-weight: 700; color: var(--forest); margin-bottom: 14px; }
-
     /* Responsive */
     @media (max-width: 900px) {
       .metrics-grid { grid-template-columns: repeat(2, 1fr); }
@@ -527,65 +467,6 @@
       .metrics-grid { grid-template-columns: 1fr; }
       .btn { padding: 9px 12px; }
       .topbar-title { font-size: 16px; }
-    }
-
-    /* ======================================================== */
-    /* PASS CLEAN+RESPONSIF v4 — nilai mockup yang disetujui    */
-    /* pemilik: sidebar bilah atas di HP, target sentuh besar,  */
-    /* lantai huruf formulir, folder kontrak ramah jempol.     */
-    /* ======================================================== */
-    @media (max-width: 720px) {
-      #appRoot { flex-direction: column; }
-      .sidebar {
-        width: 100%; height: auto; flex-direction: row; align-items: stretch;
-        border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08);
-      }
-      .sidebar-brand {
-        padding: 10px 12px; border-bottom: none;
-        border-right: 1px solid rgba(255,255,255,0.08);
-      }
-      .sidebar-brand .mark { width: 28px; height: 28px; font-size: 14px; }
-      .sidebar-nav {
-        display: flex; flex-direction: row; align-items: center;
-        overflow-x: auto; overflow-y: hidden; padding: 6px 8px; gap: 2px;
-        scrollbar-width: none;
-      }
-      .sidebar-nav::-webkit-scrollbar { display: none; }
-      .nav-item {
-        flex: none; gap: 7px; padding: 9px 11px; font-size: 12px;
-        border-left: none; border-bottom: 3px solid transparent; min-height: 40px;
-      }
-      .nav-item span { display: inline; }
-      .nav-item .icon { width: 16px; height: 16px; }
-      .nav-item.active { border-bottom-color: var(--ochre); }
-      .sidebar-footer {
-        padding: 8px; border-top: none;
-        border-left: 1px solid rgba(255,255,255,0.08);
-        display: flex; align-items: center;
-      }
-      .btn-logout { width: auto; padding: 8px 10px; min-height: 40px; }
-      .main-area { height: auto; flex: 1; min-height: 0; }
-      .btn { min-height: 42px; }
-      .btn-sm, .btn-xs { min-height: 40px; padding: 8px 12px; font-size: 11px; }
-      .form-input, .form-select, .form-textarea { font-size: 14px; padding: 11px 12px; }
-      .rental-search-clear { width: 40px; height: 40px; }
-      .renter-folder-head .folder-main { min-width: 0; }
-      .folder-actions { width: 100%; margin-top: 2px; }
-      .folder-list { padding: 10px; }
-      /* Tabel mini folder menumpuk di HP (port mockup v4): baris jadi
-         blok penuh, kepala tabel hilang, tombol aksi tidak lagi jatuh
-         di luar tepi kanan layar sempit. Sel aksi = td terakhir. */
-      .folder-scroll { overflow-x: visible; }
-      .folder-table { min-width: 0; }
-      .folder-table thead { display: none; }
-      .folder-table, .folder-table tbody, .folder-table tr, .folder-table td { display: block; width: 100%; }
-      .folder-table tr { padding: 10px 14px; border-bottom: 1px solid var(--border); }
-      .folder-table tr:last-child { border-bottom: none; }
-      .folder-table td { border-bottom: none; padding: 2px 0; }
-      .folder-table td:last-child { padding-top: 8px; }
-    }
-    @media (pointer: coarse) {
-      .btn { min-height: 40px; }
     }
   </style>
 </head>
@@ -640,7 +521,7 @@
         <div class="nav-section-label">Konten Situs</div>
         <div class="nav-item" onclick="switchTab('identity', this)">
           <svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 2 22 22 22"></polygon><line x1="12" y1="2" x2="12" y2="22"></line></svg>
-          <span>Pengaturan</span>
+          <span>Identitas & Hero</span>
         </div>
         <div class="nav-item" onclick="switchTab('catalog', this)">
           <svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
@@ -743,7 +624,7 @@
                 </button>
                 <button class="btn btn-secondary btn-full" onclick="switchTab('identity', document.querySelectorAll('.nav-item')[1])">
                   <svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 2 22 22 22"></polygon></svg>
-                  Buka Pengaturan Situs
+                  Edit Konten Hero & Identitas
                 </button>
               </div>
             </div>
@@ -780,22 +661,17 @@
         <div class="tab-panel" id="tab-identity">
       <form id="formIdentity" onsubmit="saveIdentity(event)" class="cfg-form">
         <div class="cfg-nav">
-        <a href="#sec-brand" onclick="cfgNavGo('tampilan')">Brand &amp; Logo</a>
-        <a href="#sec-announce" onclick="cfgNavGo('tampilan')">Announcement</a>
-        <a href="#sec-hero" onclick="cfgNavGo('tampilan')">Hero</a>
-        <a href="#sec-paket" onclick="cfgNavGo('paket')">Paket</a>
-        <a href="#sec-pembayaran" onclick="cfgNavGo('pembayaran')">Pembayaran</a>
-        <a href="#sec-ketentuan" onclick="cfgNavGo('ketentuan')">Ketentuan</a>
-        <a href="#sec-lokasi" onclick="cfgNavGo('lokasi')">Lokasi</a>
-        <a href="#sec-titik" onclick="cfgNavGo('titikberangkat')">Titik Berangkat</a>
-        <a href="#sec-struk" onclick="cfgNavGo('struk')">Struk</a>
-        <a href="#sec-footer" onclick="cfgNavGo('tampilan')">Footer</a>
+        <a href="#sec-brand">Brand &amp; Logo</a>
+        <a href="#sec-hero">Hero</a>
+        <a href="#sec-paket">Paket</a>
+        <a href="#sec-ketentuan">Ketentuan</a>
+        <a href="#sec-lokasi">Lokasi</a>
+        <a href="#sec-struk">Struk</a>
+        <a href="#sec-footer">Footer</a>
         </div>
-        <div class="renter-folder cfg-folder" id="sec-tampilan" data-cfg-folder="tampilan">
-          <div class="renter-folder-head" role="button" tabindex="0" aria-expanded="false" onclick="toggleCfgFolder('tampilan')" onkeydown="cfgFolderKey(event,'tampilan')"><span class="folder-ic"><svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></span><span class="folder-main"><span class="folder-name">Tampilan Website</span></span><span class="folder-chevron"><svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span></div>
-          <div class="renter-folder-body"><div class="cfg-folder-in">
-            <div class="cfg-subblock" id="sec-brand">
-              <div class="cfg-subhead">Ganti Identitas Brand</div>
+        <div class="panel" id="sec-brand">
+          <div class="panel-head"><h3>Identitas Brand & Announcement Bar</h3>
+              <span class="badge-tag" style="color:var(--text-subtle); border-color:var(--border);">SITE CONFIG</span></div>
 <div style="background:#EEF5F0; border:1px solid var(--border); border-left:4px solid var(--forest); padding:12px 14px; margin-bottom:18px; font-size:12px; line-height:1.6; color:var(--text-muted);">
                 <strong style="color:var(--forest);">Terhubung ke Index:</strong>
                 perubahan yang disimpan di sini memakai konfigurasi storefront yang sama. Index v25 yang sedang terbuka di tab lain akan memperbarui tampilannya otomatis; index yang baru dibuka akan langsung memakai data terbaru.
@@ -817,31 +693,66 @@
                 <input type="file" class="form-input" id="cfgLogoFile" accept="image/*" onchange="openLogoCropper(event)" style="padding:6px 12px;">
                 <input type="text" class="form-input" id="cfgLogoUrl" placeholder="atau paste URL logo" oninput="previewLogo(this.value)" style="margin-top:8px;">
                 <img class="img-preview" id="logoPreview" style="max-height:80px; object-fit:contain;">
-                
+                <div id="logoCropperModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999; padding:40px;">
+                  <div style="max-width:800px; margin:0 auto; background:white; padding:24px; border-radius:4px;">
+                    <h3 style="margin-bottom:16px; font-family:var(--serif);">Crop & Resize Logo</h3>
+                    <div style="max-height:500px; overflow:hidden;">
+                      <img id="logoCropperImage" style="max-width:100%;">
+                    </div>
+                    <div style="margin-top:16px; display:flex; gap:12px; justify-content:flex-end;">
+                      <button type="button" class="btn" onclick="closeLogoCropper()" style="background:var(--border); color:var(--text);">Batal</button>
+                      <button type="button" class="btn btn-primary" onclick="applyLogoCrop()">Terapkan Crop</button>
+                    </div>
+                  </div>
+                </div>
+                <div id="imgCropperModal" style="display:none; position:fixed; inset:0; background:rgba(10,15,12,0.88); z-index:9999; padding:18px; overflow:auto;">
+                  <div style="max-width:860px; margin:0 auto; background:white; padding:20px; border-radius:6px;">
+                    <h3 style="margin-bottom:6px; font-family:var(--serif);">Sesuaikan Foto</h3>
+                    <p style="font-size:12px; color:#666; margin:0 0 12px;">Di layar sentuh: <b>cubit</b> untuk zoom, seret untuk menggeser. Di komputer: roda mouse untuk zoom. Pilih template bingkai sesuai pemakaian foto:</p>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+                      <button type="button" class="btn crop-tpl" data-tpl="hero" onclick="setCropTemplate('hero')">Hero 16:9</button>
+                      <button type="button" class="btn crop-tpl" data-tpl="produk" onclick="setCropTemplate('produk')">Produk 4:3</button>
+                      <button type="button" class="btn crop-tpl" data-tpl="kotak" onclick="setCropTemplate('kotak')">Kotak 1:1</button>
+                      <button type="button" class="btn crop-tpl" data-tpl="potret" onclick="setCropTemplate('potret')">Potret 3:4</button>
+                      <button type="button" class="btn crop-tpl" data-tpl="bebas" onclick="setCropTemplate('bebas')">Bebas</button>
+                    </div>
+                    <div style="max-height:54vh; overflow:hidden; background:#141414;">
+                      <img id="imgCropperImage" style="max-width:100%; display:block;">
+                    </div>
+                    <div style="margin-top:14px; display:flex; gap:10px; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+                      <div style="display:flex; gap:8px;">
+                        <button type="button" class="btn" onclick="imgCropZoom(0.12)">Zoom +</button>
+                        <button type="button" class="btn" onclick="imgCropZoom(-0.12)">Zoom -</button>
+                        <button type="button" class="btn" onclick="imgCropRotate()">Putar 90&deg;</button>
+                      </div>
+                      <div style="display:flex; gap:10px;">
+                        <button type="button" class="btn" onclick="closeImageCropper()" style="background:var(--border); color:var(--text);">Batal</button>
+                        <button type="button" class="btn btn-primary" onclick="applyImageCrop()">Pakai Foto Ini</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
               
-              
+              <div class="cfg-grid-3"><div class="form-group">
+                <label class="form-label">Trust Badge 1</label>
+                <input type="text" class="form-input" id="cfgTrust1" placeholder="Contoh: 100% Inspeksi Fisik">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Trust Badge 2</label>
+                <input type="text" class="form-input" id="cfgTrust2" placeholder="Contoh: Garansi Tukar Unit">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Trust Badge 3</label>
+                <input type="text" class="form-input" id="cfgTrust3" placeholder="Contoh: Pengambilan Langsung di Basecamp">
+              </div></div>
 
               <div style="height:1px; background:var(--border); margin:20px 0;"></div>
-        
-            </div>
-            <div class="cfg-subblock" id="sec-announce">
-              <div class="cfg-subhead">Announcement Bar</div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Teks Kiri Announcement Bar</label>
-                  <input type="text" class="form-input" id="cfgAnnounceLeft" placeholder="Contoh: HYGIENE GRADE-A · REAL-TIME TRACKING">
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Teks Kanan Announcement Bar</label>
-                  <input type="text" class="form-input" id="cfgAnnounceRight" placeholder="Contoh: EST. 2026 // SEWA & RETAIL">
-                </div>
-              </div>
-              <div style="font-size:11px; color:var(--text-subtle);">Announcement bar adalah strip teks tipis di paling atas storefront &mdash; teks kiri tampil di awal bar, teks kanan di ujungnya.</div>
-            
-            </div>
-            <div class="cfg-subblock" id="sec-hero">
-              <div class="cfg-subhead">Konten Hero Section</div>
+        </div>
+        <div class="panel" id="sec-hero">
+          <div class="panel-head"><h3>Konten Hero Section</h3></div>
+
+
               <div class="form-group">
                 <label class="form-label">Foto Hero Background (lebar minimal 1920px)</label>
                 <input type="file" class="form-input" id="cfgHeroImageFile" accept="image/*" onchange="handleHeroImageUpload(event)" style="padding:6px 12px;">
@@ -867,48 +778,10 @@
                   <input type="text" class="form-input" id="cfgHeroCtaSecondary">
                 </div></div>
               </div>
-              
-              <div class="cfg-grid-3"><div class="form-group">
-                <label class="form-label">Trust Badge 1</label>
-                <input type="text" class="form-input" id="cfgTrust1" placeholder="Contoh: 100% Inspeksi Fisik">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Trust Badge 2</label>
-                <input type="text" class="form-input" id="cfgTrust2" placeholder="Contoh: Garansi Tukar Unit">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Trust Badge 3</label>
-                <input type="text" class="form-input" id="cfgTrust3" placeholder="Contoh: Pengambilan Langsung di Basecamp">
-              </div></div>
-
               <div style="height:1px; background:var(--border); margin:20px 0;"></div>
-        
-            </div>
-            <div class="cfg-subblock" id="sec-footer">
-              <div class="cfg-subhead">Footer Website</div>
-              <div class="form-row">
-                <div class="form-row"><div class="form-group">
-                  <label class="form-label">Nama Brand Footer</label>
-                  <input type="text" class="form-input" id="cfgFooterBrand">
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Tagline Footer</label>
-                  <input type="text" class="form-input" id="cfgFooterTagline">
-                </div></div>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Teks Copyright Footer</label>
-                <input type="text" class="form-input" id="cfgFooterCopyright">
-              </div>
-
-              <div style="height:1px; background:var(--border); margin:20px 0;"></div>
-        
-            </div>
-        </div></div>
         </div>
-        <div class="renter-folder cfg-folder" id="sec-paket" data-cfg-folder="paket">
-          <div class="renter-folder-head" role="button" tabindex="0" aria-expanded="false" onclick="toggleCfgFolder('paket')" onkeydown="cfgFolderKey(event,'paket')"><span class="folder-ic"><svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></span><span class="folder-main"><span class="folder-name">Paket Sewa Tenda</span></span><span class="folder-chevron"><svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span></div>
-          <div class="renter-folder-body"><div class="cfg-folder-in">
+        <div class="panel" id="sec-paket">
+          <div class="panel-head"><h3>Paket Sewa Tenda</h3></div>
 
               
               <div class="form-row"><div class="form-group">
@@ -930,100 +803,20 @@
               </div></div></details>
 
               <div style="height:1px; background:var(--border); margin:20px 0;"></div>
-        </div></div>
         </div>
-        <div class="renter-folder cfg-folder" id="sec-pembayaran" data-cfg-folder="pembayaran">
-          <div class="renter-folder-head" role="button" tabindex="0" aria-expanded="false" onclick="toggleCfgFolder('pembayaran')" onkeydown="cfgFolderKey(event,'pembayaran')"><span class="folder-ic"><svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></span><span class="folder-main"><span class="folder-name">Metode Pembayaran</span></span><span class="folder-chevron"><svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span></div>
-          <div class="renter-folder-body"><div class="cfg-folder-in">
-<div class="form-group">
-                <label class="form-label">Metode Pembayaran (tampil di formulir booking web)</label>
-                <div style="display:grid; gap:12px;">
-                  <div>
-                    <div style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em; color:var(--text-muted); margin-bottom:4px;">BRI</div>
-                    <div class="form-row">
-                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmBriNo" placeholder="Nomor Rekening / No. HP E-Wallet"></div>
-                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmBriAn" placeholder="Atas Nama (opsional)"></div>
-                    </div>
-                  </div>
-                  <div>
-                    <div style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em; color:var(--text-muted); margin-bottom:4px;">MANDIRI</div>
-                    <div class="form-row">
-                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmMandiriNo" placeholder="Nomor Rekening / No. HP E-Wallet"></div>
-                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmMandiriAn" placeholder="Atas Nama (opsional)"></div>
-                    </div>
-                  </div>
-                  <div>
-                    <div style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em; color:var(--text-muted); margin-bottom:4px;">BCA</div>
-                    <div class="form-row">
-                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmBcaNo" placeholder="Nomor Rekening / No. HP E-Wallet"></div>
-                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmBcaAn" placeholder="Atas Nama (opsional)"></div>
-                    </div>
-                  </div>
-                  <div>
-                    <div style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em; color:var(--text-muted); margin-bottom:4px;">BNI</div>
-                    <div class="form-row">
-                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmBniNo" placeholder="Nomor Rekening / No. HP E-Wallet"></div>
-                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmBniAn" placeholder="Atas Nama (opsional)"></div>
-                    </div>
-                  </div>
-                  <div>
-                    <div style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em; color:var(--text-muted); margin-bottom:4px;">DANA</div>
-                    <div class="form-row">
-                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmDanaNo" placeholder="Nomor Rekening / No. HP E-Wallet"></div>
-                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmDanaAn" placeholder="Atas Nama (opsional)"></div>
-                    </div>
-                  </div>
-                  <div>
-                    <div style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em; color:var(--text-muted); margin-bottom:4px;">OVO</div>
-                    <div class="form-row">
-                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmOvoNo" placeholder="Nomor Rekening / No. HP E-Wallet"></div>
-                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmOvoAn" placeholder="Atas Nama (opsional)"></div>
-                    </div>
-                  </div>
-                  <div>
-                    <div style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em; color:var(--text-muted); margin-bottom:4px;">GOPAY</div>
-                    <div class="form-row">
-                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmGopayNo" placeholder="Nomor Rekening / No. HP E-Wallet"></div>
-                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmGopayAn" placeholder="Atas Nama (opsional)"></div>
-                    </div>
-                  </div>
-                </div>
-                <div style="font-size:11px; color:var(--text-subtle); margin-top:6px;">Hanya metode yang nomornya diisi yang tampil ke pelanggan di formulir booking web, lengkap dengan logo resmi metode itu dan tombol salin nomor. Kosongkan nomor untuk menyembunyikan metode.</div>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Catatan Pembayaran (opsional)</label>
-                <textarea class="form-textarea" id="cfgPaymentInfo" rows="3" placeholder="Contoh: Sesudah transfer, konfirmasi ke admin lewat WhatsApp agar booking cepat diverifikasi."></textarea>
-                <div style="font-size:11px; color:var(--text-subtle); margin-top:4px;">Catatan bebas yang tampil di bawah daftar metode pembayaran pada formulir booking web. Boleh dikosongkan.</div>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Kode QR Pembayaran (QRIS)</label>
-                <input type="file" class="form-input" id="cfgPaymentQrFile" accept="image/png,image/jpeg,image/webp" onchange="handlePaymentQrUpload(event)" style="padding:6px 12px;">
-                <input type="hidden" id="cfgPaymentQrData">
-                <div id="paymentQrPreviewWrap" style="display:none; margin-top:10px; align-items:center; gap:12px;">
-                  <img id="paymentQrPreview" alt="Pratinjau kode QR pembayaran" style="width:120px; height:120px; object-fit:contain; background:#fff; border:1px solid var(--border); border-radius:8px; padding:6px;">
-                  <button type="button" class="btn btn-secondary" id="btnRemovePaymentQr" onclick="removePaymentQr()">Hapus QR</button>
-                </div>
-                <div style="font-size:11px; color:var(--text-subtle); margin-top:4px;">Unggah gambar kode QR (QRIS) toko — tampil otomatis di formulir booking web hanya saat pelanggan memilih metode QRIS. Gambar tidak dipotong; otomatis diperkecil ke maks 800px dan disimpan sebagai PNG/WebP kualitas tinggi agar tetap tajam saat dipindai. Berkas asli maks 3 MB.</div>
-              </div>
-            </div></div>
-        </div>
-        <div class="renter-folder cfg-folder" id="sec-ketentuan" data-cfg-folder="ketentuan">
-          <div class="renter-folder-head" role="button" tabindex="0" aria-expanded="false" onclick="toggleCfgFolder('ketentuan')" onkeydown="cfgFolderKey(event,'ketentuan')"><span class="folder-ic"><svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></span><span class="folder-main"><span class="folder-name">Ketentuan Sewa</span></span><span class="folder-chevron"><svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span></div>
-          <div class="renter-folder-body"><div class="cfg-folder-in">
+        <div class="panel" id="sec-ketentuan">
+          <div class="panel-head"><h3>Ketentuan Sewa (Terms of Service)</h3></div>
 
               
               <div class="form-group">
                 <label class="form-label">Ketentuan Sewa & Deposit (HTML atau plain text, tampil di modal)</label>
                 <textarea class="form-textarea" id="cfgRentalTerms" rows="10" placeholder="Ketik ketentuan sewa Anda di sini...&#10;&#10;Contoh:&#10;1. Deposit wajib 50% dari nilai barang&#10;2. Pembayaran via transfer bank&#10;3. Barang wajib dikembalikan dalam kondisi bersih"></textarea>
               </div>
-              
 
               <div style="height:1px; background:var(--border); margin:20px 0;"></div>
-        </div></div>
         </div>
-        <div class="renter-folder cfg-folder" id="sec-lokasi" data-cfg-folder="lokasi">
-          <div class="renter-folder-head" role="button" tabindex="0" aria-expanded="false" onclick="toggleCfgFolder('lokasi')" onkeydown="cfgFolderKey(event,'lokasi')"><span class="folder-ic"><svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></span><span class="folder-main"><span class="folder-name">Lokasi Basecamp &amp; Google Maps</span></span><span class="folder-chevron"><svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span></div>
-          <div class="renter-folder-body"><div class="cfg-folder-in">
+        <div class="panel" id="sec-lokasi">
+          <div class="panel-head"><h3>Lokasi Basecamp &amp; Google Maps</h3></div>
 
               <div class="form-group">
                 <label class="form-label">Alamat Lengkap Basecamp (tampil di web + jadi titik peta)</label>
@@ -1040,29 +833,9 @@
               
 
               <div style="border-top:1px dashed var(--border); margin:18px 0 14px;"></div>
-        </div></div>
         </div>
-        <div class="renter-folder cfg-folder" id="sec-titik" data-cfg-folder="titikberangkat">
-          <div class="renter-folder-head" role="button" tabindex="0" aria-expanded="false" onclick="toggleCfgFolder('titikberangkat')" onkeydown="cfgFolderKey(event,'titikberangkat')"><span class="folder-ic"><svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1 2-2V5a2 2 0 0 1 2 2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></span><span class="folder-main"><span class="folder-name">Titik Berangkat</span></span><span class="folder-chevron"><svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span></div>
-          <div class="renter-folder-body"><div class="cfg-folder-in">
-
-              <div style="font-size:11px; color:var(--text-subtle); margin-bottom:14px;">Konten halaman Tentang Kami (Titik Berangkat) di storefront — tampil sesudah pengaturan disimpan.</div>
-              <div class="form-group">
-                <label class="form-label">Teks Tentang Kami (pisahkan paragraf dengan baris kosong)</label>
-                <textarea class="form-textarea" id="cfgAboutText" rows="9"></textarea>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Jam Buka (teks tampil di web)</label>
-                <input type="text" class="form-input" id="cfgOpeningHours" placeholder="Contoh: Setiap hari 08.00–21.00 WIB">
-              </div>
-              <div style="font-size:11px; color:var(--text-subtle);">Alamat basecamp diisi di folder <a href="#sec-lokasi" onclick="cfgNavGo('lokasi')">Lokasi Basecamp &amp; Google Maps</a> — alamat yang sama tampil di halaman Titik Berangkat. Bila alamat kosong, halaman menampilkan teks &quot;Alamat basecamp — hubungi via WhatsApp&quot;.</div>
-
-              <div style="border-top:1px dashed var(--border); margin:18px 0 14px;"></div>
-        </div></div>
-        </div>
-        <div class="renter-folder cfg-folder" id="sec-struk" data-cfg-folder="struk">
-          <div class="renter-folder-head" role="button" tabindex="0" aria-expanded="false" onclick="toggleCfgFolder('struk')" onkeydown="cfgFolderKey(event,'struk')"><span class="folder-ic"><svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></span><span class="folder-main"><span class="folder-name">Kustomisasi Struk</span></span><span class="folder-chevron"><svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span></div>
-          <div class="renter-folder-body"><div class="cfg-folder-in">
+        <div class="panel" id="sec-struk">
+          <div class="panel-head"><h3>Kustomisasi Struk</h3></div>
 
 <div class="form-group">
                 <label class="form-label">Ukuran Kertas Struk (Printer Thermal)</label>
@@ -1107,7 +880,26 @@
                 </div>
                 <div id="btUnsupported" style="display:none; font-size:12px; color:var(--text-subtle);">Browser ini tidak mendukung Web Bluetooth (perlu Chrome di Android). Cetak tetap bisa lewat tombol STRUK (dialog print) atau PDF.</div>
               </div>
-        </div></div>
+        </div>
+        <div class="panel" id="sec-footer">
+          <div class="panel-head"><h3>Footer Website</h3></div>
+
+              <div class="form-row">
+                <div class="form-row"><div class="form-group">
+                  <label class="form-label">Nama Brand Footer</label>
+                  <input type="text" class="form-input" id="cfgFooterBrand">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Tagline Footer</label>
+                  <input type="text" class="form-input" id="cfgFooterTagline">
+                </div></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Teks Copyright Footer</label>
+                <input type="text" class="form-input" id="cfgFooterCopyright">
+              </div>
+
+              <div style="height:1px; background:var(--border); margin:20px 0;"></div>
         </div>
         <div class="cfg-savebar">
           <button type="submit" class="btn btn-primary btn-full" style="margin-top:8px;">
@@ -1117,19 +909,6 @@
               <a href="index.html" target="_blank" rel="noopener" class="btn btn-secondary btn-full" style="margin-top:10px; text-decoration:none;">BUKA INDEX UNTUK CEK HASIL</a>
         </div>
       </form>
-        <div id="logoCropperModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999; padding:40px;">
-                  <div style="max-width:800px; margin:0 auto; background:white; padding:24px; border-radius:4px;">
-                    <h3 style="margin-bottom:16px; font-family:var(--serif);">Crop & Resize Logo</h3>
-                    <div style="max-height:500px; overflow:hidden;">
-                      <img id="logoCropperImage" style="max-width:100%;">
-                    </div>
-                    <div style="margin-top:16px; display:flex; gap:12px; justify-content:flex-end;">
-                      <button type="button" class="btn" onclick="closeLogoCropper()" style="background:var(--border); color:var(--text);">Batal</button>
-                      <button type="button" class="btn btn-primary" onclick="applyLogoCrop()">Terapkan Crop</button>
-                    </div>
-                  </div>
-                </div>
-        
     </div>
 
 <!-- ===== TAB: CATALOG HEADER ===== -->
@@ -1310,23 +1089,6 @@
 
         <!-- ===== TAB: RENTALS ===== -->
         <div class="tab-panel" id="tab-rentals">
-
-          <!-- ===== BOOKING ONLINE (WEBSITE) ===== -->
-          <div class="panel" id="bookingInboxPanel" style="margin-bottom:18px;">
-            <div class="panel-head">
-              <h3>Booking Online dari Website</h3>
-              <span style="display:flex;gap:8px;align-items:center;">
-                <span class="badge-tag" id="bkPendingBadge" style="display:none;background:#E86A2C;color:#fff;">0 MENUNGGU</span>
-                <button type="button" class="btn btn-secondary" style="font-size:11px;padding:5px 10px;" onclick="bkLoadBookings(true)">MUAT ULANG</button>
-              </span>
-            </div>
-            <div id="bkList"><p style="font-size:13px;color:var(--text-subtle);">Memuat booking website...</p></div>
-          </div>
-          <!-- ===== MODAL BUKTI PEMBAYARAN BOOKING (lightbox, tanpa tab baru) ===== -->
-          <div id="bkProofModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(12,14,12,.88);align-items:center;justify-content:center;padding:18px;">
-            <button type="button" id="bkProofClose" aria-label="Tutup bukti" style="position:absolute;top:14px;right:16px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.4);background:rgba(0,0,0,.55);color:#fff;font-size:19px;line-height:1;cursor:pointer;">&#10005;</button>
-            <div id="bkProofBody" style="display:flex;align-items:center;justify-content:center;max-width:92vw;max-height:84vh;"></div>
-          </div>
           <div class="two-col">
             <!-- Dispatch Form -->
             <div class="panel">
@@ -1345,32 +1107,9 @@
                     <input type="tel" class="form-input" id="dispatchPhone" placeholder="0812-xxxx-xxxx" required>
                   </div>
                   <div class="form-group">
-                    <label class="form-label">Jenis Identitas</label>
-                    <select class="form-input" id="dispatchIdType">
-                      <option value="KTP">KTP</option>
-                      <option value="KTM">KTM (Kartu Mahasiswa)</option>
-                      <option value="SIM">SIM</option>
-                      <option value="Paspor">Paspor</option>
-                      <option value="Kartu Pelajar">Kartu Pelajar</option>
-                      <option value="Lainnya">Lainnya</option>
-                    </select>
+                    <label class="form-label">NIK / No. KTP</label>
+                    <input type="text" class="form-input" id="dispatchNIK" placeholder="16 digit NIK" minlength="16" maxlength="16" required>
                   </div>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Nomor Identitas</label>
-                  <input type="text" class="form-input" id="dispatchNIK" placeholder="Nomor sesuai kartu (boleh kosong bila foto dilampirkan)">
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Foto Identitas</label>
-                  <input type="file" id="dispatchIdPhotoInput" accept="image/*" capture="environment" style="display:none;" onchange="handleDispatchIdPhoto(this)">
-                  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-                    <button type="button" class="btn btn-secondary" style="font-size:11px;padding:7px 12px;" onclick="document.getElementById('dispatchIdPhotoInput').click()">LAMPIRKAN FOTO</button>
-                    <span id="dispatchIdPhotoWrap" style="display:none;align-items:center;gap:8px;">
-                      <img id="dispatchIdPhotoPreview" alt="Pratinjau foto identitas" style="max-width:120px;max-height:84px;border:1px solid var(--border);border-radius:6px;object-fit:cover;">
-                      <button type="button" class="btn btn-danger" style="font-size:11px;padding:7px 12px;" onclick="removeDispatchIdPhoto()">HAPUS FOTO</button>
-                    </span>
-                  </div>
-                  <div style="font-size:11px;color:var(--text-subtle);margin-top:6px;">Cukup salah satu: nomor identitas ATAU foto kartunya (KTP/KTM/SIM/Paspor/dll).</div>
                 </div>
                 
                 <div style="border-top:1px solid var(--border); margin:16px 0 12px; padding-top:16px;">
@@ -1411,20 +1150,28 @@
             </div>
           </div>
 
-          <!-- Active Rentals: folder per penyewa + pencarian -->
-          <div class="rentals-box">
-            <div class="rentals-head">
-              <div class="rentals-head-row">
-                <span class="mono" style="font-size:11px; font-weight:700;">KONTRAK SEWA AKTIF DI LAPANGAN</span>
-                <span class="mono" style="font-size:11px;" id="activeCount">0 KONTRAK</span>
-              </div>
-              <div class="rental-search">
-                <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.5" y2="16.5"></line></svg>
-                <input type="text" id="rentalSearchInput" placeholder="Cari penyewa, barang, kode kontrak, No. WA&hellip;" autocomplete="off" oninput="onRentalSearchInput(this)">
-                <button type="button" class="rental-search-clear" id="rentalSearchClear" aria-label="Bersihkan pencarian" onclick="clearRentalSearch()"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
-              </div>
+          <!-- Active Rentals Table -->
+          <div class="table-wrap">
+            <div style="padding:12px 16px; background:var(--surface-2); border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+              <span class="mono" style="font-size:11px; font-weight:700;">KONTRAK SEWA AKTIF DI LAPANGAN</span>
+              <span class="mono" style="font-size:11px;" id="activeCount">0 KONTRAK</span>
             </div>
-            <div id="rentalTableBody" class="folder-list"></div>
+            <table>
+              <thead>
+                <tr>
+                  <th>KONTRAK</th>
+                  <th>NAMA PENYEWA</th>
+                  <th>NO. WA</th>
+                  <th>NIK / KTP</th>
+                  <th>ALAT</th>
+                  <th>QTY</th>
+                  <th>DURASI</th>
+                  <th>TGL KEMBALI</th>
+                  <th style="text-align:right;">AKSI</th>
+                </tr>
+              </thead>
+              <tbody id="rentalTableBody"></tbody>
+            </table>
           </div>
         </div>
 
@@ -1724,56 +1471,6 @@
     </div>
   </div>
 
-  <!-- Modal Tangkap Identitas (dispatch booking & pengganti prompt NIK) -->
-  <div class="modal-overlay" id="idCaptureModal">
-    <div class="modal-box">
-      <div class="modal-head">
-        <h3>Identitas Penyewa</h3>
-        <button class="modal-close" type="button" onclick="cancelIdentityCapture()">&times;</button>
-      </div>
-      <p id="idCapSub" style="font-size:13px;color:var(--text-muted);margin-bottom:14px;"></p>
-      <div class="form-group">
-        <label class="form-label">Jenis Identitas</label>
-        <select class="form-input" id="idCapType" onchange="idCapRefresh()">
-          <option value="KTP">KTP</option>
-          <option value="KTM">KTM (Kartu Mahasiswa)</option>
-          <option value="SIM">SIM</option>
-          <option value="Paspor">Paspor</option>
-          <option value="Kartu Pelajar">Kartu Pelajar</option>
-          <option value="Lainnya">Lainnya</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Nomor Identitas</label>
-        <input type="text" class="form-input" id="idCapNumber" placeholder="Nomor sesuai kartu (boleh kosong bila foto dilampirkan)" oninput="idCapRefresh()">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Foto Identitas</label>
-        <input type="file" id="idCapPhotoInput" accept="image/*" capture="environment" style="display:none;" onchange="handleIdCapPhoto(this)">
-        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-          <button type="button" class="btn btn-secondary" style="font-size:11px;padding:7px 12px;" onclick="document.getElementById('idCapPhotoInput').click()">AMBIL FOTO / PILIH BERKAS</button>
-          <span id="idCapPhotoWrap" style="display:none;align-items:center;gap:8px;">
-            <img id="idCapPhotoPreview" alt="Pratinjau foto identitas" style="max-width:120px;max-height:84px;border:1px solid var(--border);border-radius:6px;object-fit:cover;">
-            <button type="button" class="btn btn-secondary" style="font-size:11px;padding:7px 12px;" onclick="document.getElementById('idCapPhotoInput').click()">GANTI</button>
-            <button type="button" class="btn btn-danger" style="font-size:11px;padding:7px 12px;" onclick="idCapSetPhoto('')">HAPUS</button>
-          </span>
-        </div>
-        <div style="font-size:11px;color:var(--text-subtle);margin-top:6px;">Cukup salah satu: nomor identitas ATAU foto kartunya. Identitas dicatat di depot saat barang diambil.</div>
-      </div>
-      <div id="idCapError" style="display:none;font-size:12.5px;color:var(--red-bad);background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:9px 11px;margin-bottom:12px;"></div>
-      <div style="display:flex;gap:8px;justify-content:flex-end;">
-        <button type="button" class="btn btn-secondary" id="idCapCancel" onclick="cancelIdentityCapture()">BATAL</button>
-        <button type="button" class="btn btn-primary" id="idCapConfirm" onclick="confirmIdentityCapture()">DISPATCH</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Lightbox Foto Identitas (pola visual bkProofModal) -->
-  <div id="idPhotoModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(12,14,12,.88);align-items:center;justify-content:center;padding:18px;">
-    <button type="button" id="idPhotoClose" aria-label="Tutup foto identitas" style="position:absolute;top:14px;right:16px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.4);background:rgba(0,0,0,.55);color:#fff;font-size:19px;line-height:1;cursor:pointer;">&#10005;</button>
-    <div id="idPhotoBody" style="display:flex;align-items:center;justify-content:center;max-width:92vw;max-height:84vh;"></div>
-  </div>
-
   <script>
     // Login produksi: Supabase Auth (username dipetakan ke email teknis).
 
@@ -1787,12 +1484,12 @@
     ];
 
     const SITE_CONFIG_DEFAULT = {
-      brandName:"BK ADVENTURE", brandSubtitle:"PETA LAPANGAN — MEDAN",
+      brandName:"BK ADVENTURE", brandSubtitle:"TOKO PERALATAN SEWA & RETAIL",
       logoUrl:"", // NEW: Logo brand upload
       announceLeft:"HYGIENE GRADE-A · REAL-TIME TRACKING", announceRight:"EST. 2026 // SEWA & RETAIL",
-      heroImage:"assets/hero-bk-adventure.jpg",
-      heroHeading:"Udara Segar, Alat Lengkap, Tidur Nyenyak.",
-      heroDescription:"Rental alat outdoor yang bekerja seperti membaca peta: tetapkan tanggal ambil dan durasi, katalog langsung menunjukkan alat yang tersedia untuk rentang itu. Booking, bayar, dan kode terbit di website — tanpa chat bolak-balik.",
+      heroImage:"https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=1920&q=80",
+      heroHeading:"Udara Bebas, Jalur Terbuka,<br>Peralatan Siap Badai.",
+      heroDescription:"Basecamp persewaan dan penjualan perlengkapan outdoor teknikal grade ekspedisi.",
       heroCtaPrimary:"JELAJAHI KATALOG STOK", heroCtaSecondary:"KETENTUAN SEWA & DEPOSIT",
       rentalTerms:"1. Deposit wajib dibayarkan sebelum pengambilan barang\n2. Barang wajib dikembalikan sesuai jadwal yang disepakati\n3. Kerusakan atau kehilangan menjadi tanggung jawab penyewa",
       packageEyebrow:"PAKET BUNDLING HEMAT",
@@ -1810,10 +1507,8 @@
         {id:"trip-sibayak",name:"Open Trip Gunung Sibayak",date:"2026-11-21",days:2,price:350000,quota:15,filled:8,meetingPoint:"Berastagi - basecamp",image:"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80",includes:["Transport PP dari titik kumpul","Guide & porter tim","Tenda & alat masak tim","Makan 3x selama trip","Dokumentasi"],description:"Pendakian 2 hari 1 malam yang ramah pemula dengan kawah aktif dan pemandangan Danau Toba dari kejauhan."},
         {id:"trip-sibuatan",name:"Open Trip Gunung Sibuatan",date:"2026-12-05",days:2,price:450000,quota:12,filled:3,meetingPoint:"Medan - titik kumpul diberitahu admin",image:"https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",includes:["Transport PP dari titik kumpul","Guide lokal","Tenda & alat masak tim","Makan 3x selama trip","Dokumentasi"],description:"Jalur hutan lumut Sibuatan untuk pendaki yang ingin suasana hutan pegunungan yang masih sepi."}
       ],
-      receiptPaper:"80", pickupOnly:true, receiptShowLogo:true, receiptShowAddress:true, receiptShowPhone:true, depotPhone:"", paymentInfo:"", paymentQr:"", paymentMethods:{bri:{no:"",an:""},mandiri:{no:"",an:""},bca:{no:"",an:""},bni:{no:"",an:""},dana:{no:"",an:""},ovo:{no:"",an:""},gopay:{no:"",an:""}}, receiptNote:"", receiptFooter:"Barang harap kembali tepat waktu dalam kondisi baik. Terima kasih!",
+      receiptPaper:"80", pickupOnly:true, receiptShowLogo:true, receiptShowAddress:true, receiptShowPhone:true, depotPhone:"", receiptNote:"", receiptFooter:"Barang harap kembali tepat waktu dalam kondisi baik. Terima kasih!",
       address:"Jl. Jamin Ginting No. 88, Berastagi, Kab. Karo, Sumatera Utara",
-      aboutText:"BK Adventure adalah tempat sewa alat camping di Medan untuk pendaki, komunitas, dan keluarga yang ingin berangkat tanpa membeli semua perlengkapan sendiri. Katalog kami berisi tenda, carrier, sleeping bag, matras, sampai set dapur lapangan — semuanya bisa dipesan lewat website ini.\n\nSebagai rental alat camping di Medan, kami menjalankan booking dengan cara yang berbeda: kamu memilih tanggal dulu, lalu katalog menunjukkan alat yang benar-benar tersedia untuk tanggal itu. Booking dibayar di muka, bukti pembayaran diunggah di formulir, dan kode booking terbit seketika — tanpa perlu chat bolak-balik untuk memastikan stok.\n\nSelain sewa satuan, tersedia Paket Tenda 2P dan 4P yang isinya sudah lengkap tinggal berangkat, plus open trip berkala ke jalur seperti Gunung Sibayak dan Gunung Sibuatan. Semua alat diambil dan dikembalikan di basecamp kami di Medan; deposit jaminan dibayar tunai saat pengambilan dan kembali penuh saat alat pulang lengkap dan bersih.",
-      openingHours:"Setiap hari 08.00–21.00 WIB",
       mapsUrl:"https://www.google.com/maps/search/?api=1&query=Berastagi%2C+Karo%2C+Sumatera+Utara",
       trustItems:["100% Inspeksi Fisik","Garansi Tukar Unit di Basecamp","Pengambilan Langsung di Basecamp"],
       footerBrand:"BK ADVENTURE", footerTagline:"Alpine & Expedition Grade Equipment - Jakarta Basecamp",
@@ -1971,15 +1666,12 @@
       // Printer Bluetooth terhubung? Kirim ESC/POS langsung, tanpa dialog.
       if (typeof btReady === 'function' && btReady() && !btFallbackOnce) { btPrintStruk(contractId); return; }
       btFallbackOnce = false;
-      const found = strukBatch(contractId);
-      if (!found) return;
-      printStrukHtmlFrom(found.c, found.batch, null);
-    }
-    // Isi dialog print struk (HTML) dari pasangan (kontrak jangkar, batch).
-    // opts (struk grup per penyewa): { contractLabel, timestamp } mengganti
-    // label kontrak & tanggal; tanpa opts keluaran identik perilaku lama.
-    function printStrukHtmlFrom(c, batch, opts) {
-      const dt = (opts && opts.timestamp != null) ? new Date(opts.timestamp) : (c.dispatchTimestamp ? new Date(c.dispatchTimestamp) : new Date());
+      const all = activeRentals.concat(completedRentals);
+      const c = all.find(x => x.contractId === contractId);
+      if (!c) return;
+      let batch = [c];
+      if (c.dispatchTimestamp) batch = all.filter(x => x.dispatchTimestamp === c.dispatchTimestamp && x.renterName === c.renterName);
+      const dt = c.dispatchTimestamp ? new Date(c.dispatchTimestamp) : new Date();
       let rows = ''; let total = 0;
       batch.forEach(x => {
         const item = inventory.find(i => i.id === x.itemId);
@@ -1987,11 +1679,6 @@
         const sub = price * x.qty * (x.days || 1);
         total += sub;
         rows += '<div style="margin-top:8px;">' + escHtml(x.itemName) + '</div><div style="display:flex;justify-content:space-between;"><span>' + x.qty + ' unit x ' + (x.days || 1) + ' hari @ ' + fmtRupiah(price) + '</span><span>' + fmtRupiah(sub) + '</span></div>';
-      });
-      collectSaleLines(batch, c).forEach(l => {
-        const sub = (l.price || 0) * (l.qty || 1);
-        total += sub;
-        rows += '<div style="margin-top:8px;">' + escHtml(l.itemName) + (l.size ? ' (Uk: ' + escHtml(l.size) + ')' : '') + ' (BELI)</div><div style="display:flex;justify-content:space-between;"><span>' + l.qty + ' unit @ ' + fmtRupiah(l.price || 0) + '</span><span>' + fmtRupiah(sub) + '</span></div>';
       });
       const paperCfg = (siteConfig.receiptPaper || '80') === '58' ? { w: '48mm', f: '11px', page: '58mm' } : { w: '72mm', f: '12px', page: '80mm' };
       let pageStyle = document.getElementById('printPageStyle');
@@ -2008,15 +1695,13 @@
         ((siteConfig.receiptShowPhone !== false && siteConfig.depotPhone) ? '<div>WA: ' + siteConfig.depotPhone + '</div>' : '') +
         '</div>' +
         '<div style="border-top:1px dashed #000;margin:8px 0;"></div>' +
-        '<div style="display:flex;justify-content:space-between;"><span>STRUK SEWA</span><span>' + (opts && opts.contractLabel ? escHtml(opts.contractLabel) : c.contractId + (batch.length > 1 ? ' (+' + (batch.length - 1) + ' kontrak lain)' : '')) + '</span></div>' +
+        '<div style="display:flex;justify-content:space-between;"><span>STRUK SEWA</span><span>' + c.contractId + (batch.length > 1 ? ' (+' + (batch.length - 1) + ' kontrak lain)' : '') + '</span></div>' +
         '<div>Tgl: ' + dt.toLocaleDateString('id-ID') + ' ' + dt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + '</div>' +
         '<div>Penyewa: ' + escHtml(c.renterName || '') + '</div>' +
         (c.renterPhone ? '<div>WA: ' + c.renterPhone + '</div>' : '') +
         '<div style="border-top:1px dashed #000;margin:8px 0;"></div>' + rows +
         '<div style="border-top:1px dashed #000;margin:8px 0;"></div>' +
         '<div style="display:flex;justify-content:space-between;font-weight:bold;"><span>TOTAL</span><span>' + fmtRupiah(total) + '</span></div>' +
-        (c.payMethod ? '<div style="display:flex;justify-content:space-between;"><span>PEMBAYARAN:</span><span>' + escHtml(c.payMethod) + '</span></div>' : '') +
-        (c.paySender ? '<div style="display:flex;justify-content:space-between;"><span>PENGIRIM:</span><span>' + escHtml(c.paySender) + '</span></div>' : '') +
         '<div>Tgl Kembali: ' + (c.returnDate || '-') + '</div>' +
         '<div style="border-top:1px dashed #000;margin:8px 0;"></div>' +
         '<div style="text-align:center;">' + String(siteConfig.receiptFooter || 'Barang harap kembali tepat waktu dalam kondisi baik. Terima kasih!').split('\n').join('<br>') + '</div></div>';
@@ -2082,15 +1767,9 @@
     function btStrukBytes(contractId) {
       const found = strukBatch(contractId);
       if (!found) return null;
-      return btStrukBytesFrom(found.c, found.batch, null);
-    }
-    // Byte ESC/POS struk dari pasangan (kontrak jangkar, batch). opts (struk
-    // grup per penyewa): { contractIds, timestamp } — tanggal = dispatch
-    // terawal grup + satu baris daftar semua kontrak grup; tanpa opts
-    // keluaran byte identik dengan perilaku lama.
-    function btStrukBytesFrom(c, batch, opts) {
+      const c = found.c, batch = found.batch;
       const cols = (siteConfig.receiptPaper === '58') ? 32 : 48;
-      const dt = (opts && opts.timestamp != null) ? new Date(opts.timestamp) : (c.dispatchTimestamp ? new Date(c.dispatchTimestamp) : new Date());
+      const dt = c.dispatchTimestamp ? new Date(c.dispatchTimestamp) : new Date();
       let total = 0;
       const items = [];
       batch.forEach(x => {
@@ -2099,11 +1778,6 @@
         const sub = price * x.qty * (x.days || 1);
         total += sub;
         items.push({ name: x.itemName + (x.size ? ' (Uk: ' + x.size + ')' : ''), detail: x.qty + ' unit x ' + (x.days || 1) + ' hari @ ' + fmtRupiah(price), sub: fmtRupiah(sub) });
-      });
-      collectSaleLines(batch, c).forEach(l => {
-        const sub = (l.price || 0) * (l.qty || 1);
-        total += sub;
-        items.push({ name: l.itemName + (l.size ? ' (Uk: ' + l.size + ')' : '') + ' (BELI)', detail: l.qty + ' unit @ ' + fmtRupiah(l.price || 0), sub: fmtRupiah(sub) });
       });
       const B = [];
       const raw = function() { for (let i = 0; i < arguments.length; i++) B.push(arguments[i]); };
@@ -2132,7 +1806,6 @@
       if (siteConfig.receiptShowPhone !== false && siteConfig.depotPhone) center('WA: ' + siteConfig.depotPhone);
       line('-'.repeat(cols));
       two('STRUK SEWA', c.contractId + (batch.length > 1 ? ' (+' + (batch.length - 1) + ')' : ''));
-      if (opts && opts.contractIds && opts.contractIds.length > 1) wrapTextLines('Kontrak: ' + opts.contractIds.join(', '), cols).forEach(w => line(w));
       line('Tgl: ' + dt.toLocaleDateString('id-ID') + ' ' + dt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }));
       wrapTextLines('Penyewa: ' + (c.renterName || ''), cols).forEach(w => line(w));
       if (c.renterPhone) line('WA: ' + c.renterPhone);
@@ -2140,8 +1813,6 @@
       items.forEach(it => { wrapTextLines(it.name, cols).forEach(w => line(w)); two('  ' + it.detail, it.sub); });
       line('-'.repeat(cols));
       two('TOTAL', fmtRupiah(total), true);
-      if (c.payMethod) two('PEMBAYARAN:', c.payMethod);
-      if (c.paySender) two('PENGIRIM:', c.paySender);
       line('Tgl Kembali: ' + (c.returnDate || '-'));
       line('-'.repeat(cols));
       center(siteConfig.receiptFooter || 'Barang harap kembali tepat waktu dalam kondisi baik. Terima kasih!');
@@ -2168,20 +1839,6 @@
         toast('Gagal mencetak via Bluetooth — membuka dialog print.');
         btFallbackOnce = true;
         printStruk(contractId);
-      }
-    }
-    async function btPrintStrukGroup(contractId) {
-      const g = strukGroupData(contractId);
-      if (!g) return;
-      const bytes = btStrukBytesFrom(g.c, g.batch, g.opts);
-      if (!bytes) return;
-      try {
-        await btWriteAll(bytes);
-        toast('Struk terkirim ke printer Bluetooth.');
-      } catch (e) {
-        toast('Gagal mencetak via Bluetooth — membuka dialog print.');
-        btFallbackOnce = true;
-        printStrukGroup(contractId);
       }
     }
     async function btTestPrint() {
@@ -2216,24 +1873,6 @@
       if (c.dispatchTimestamp) batch = all.filter(x => x.dispatchTimestamp === c.dispatchTimestamp && x.renterName === c.renterName);
       return { c: c, batch: batch };
     }
-    // Baris BELI (penjualan dari booking website) menumpang field
-    // saleLines di SEMUA kontrak satu batch dispatch (pola payMethod):
-    // { itemName, size, qty, price } dengan price = harga jual saat
-    // booking dibuat. Kumpulkan SEKALI per dispatchTimestamp agar struk
-    // grup lintas batch tidak menggandakan; jangkar sintetis booking
-    // murni-jual (tanpa kontrak, batch kosong) dibaca dari c sendiri.
-    function collectSaleLines(batch, c) {
-      const seen = {}, out = [];
-      const take = x => {
-        if (!x || !Array.isArray(x.saleLines) || !x.saleLines.length) return;
-        const k = String(x.dispatchTimestamp || 0);
-        if (seen[k]) return; seen[k] = 1;
-        x.saleLines.forEach(l => out.push(l));
-      };
-      (batch || []).forEach(take);
-      if (c && (batch || []).indexOf(c) === -1) take(c);
-      return out;
-    }
     // Teks data (nama barang/penyewa/catatan) wajib disaring sebelum masuk
     // innerHTML — cegah injeksi markup dari data (lihat run50 di storefront).
     function escHtml(s) {
@@ -2264,12 +1903,7 @@
     function buildStrukLines(contractId) {
       const found = strukBatch(contractId);
       if (!found) return null;
-      return buildStrukLinesFrom(found.c, found.batch, null);
-    }
-    // opts (struk grup per penyewa): { contractLabel, timestamp } — baris
-    // "No. Kontrak" memuat SEMUA kontrak grup & "Tanggal" memakai
-    // dispatchTimestamp terawal grup; tanpa opts perilaku lama persis.
-    function buildStrukLinesFrom(c, batch, opts) {
+      const c = found.c, batch = found.batch;
       const paper = siteConfig.receiptPaper === '58' ? 58 : 80;
       // Lebar teks dihitung dari metrik font Courier jsPDF (monospace,
       // persis 0,6 em per karakter) terhadap lebar kertas — bukan tebakan
@@ -2283,7 +1917,7 @@
       const maxChars = Math.max(16, Math.floor(usable / charW(9.5)));
       const bigChars = Math.max(10, Math.floor(usable / charW(13)));
       const clean = t => String(t).replace(/\u00A0/g, ' ');
-      const dt = (opts && opts.timestamp != null) ? new Date(opts.timestamp) : (c.dispatchTimestamp ? new Date(c.dispatchTimestamp) : new Date());
+      const dt = c.dispatchTimestamp ? new Date(c.dispatchTimestamp) : new Date();
       let total = 0;
       const items = [];
       batch.forEach(x => {
@@ -2297,17 +1931,6 @@
           amount: clean(fmtRupiah(sub))
         });
       });
-      // Baris BELI: harga jual tersimpan di barisnya (harga saat booking
-      // dibuat), TANPA durasi/hari; ikut menambah TOTAL.
-      collectSaleLines(batch, c).forEach(l => {
-        const sub = (l.price || 0) * (l.qty || 1);
-        total += sub;
-        items.push({
-          name: '- ' + l.itemName + (l.size ? ' (Uk: ' + l.size + ')' : '') + ' [BELI]',
-          detail: '  ' + l.qty + ' unit @ ' + clean(fmtRupiah(l.price || 0)),
-          amount: clean(fmtRupiah(sub))
-        });
-      });
       const L = [];
       const add = (t, o) => { wrapTextLines(clean(t), maxChars).forEach(x => L.push(Object.assign({ t: x }, o || {}))); };
       const addBig = (t, o) => { wrapTextLines(clean(t), bigChars).forEach(x => L.push(Object.assign({ t: x, big: 1 }, o || {}))); };
@@ -2316,7 +1939,7 @@
       if (siteConfig.receiptShowAddress !== false && siteConfig.address) add(siteConfig.address, { c: 1 });
       if (siteConfig.receiptShowPhone !== false && siteConfig.depotPhone) add('WA Toko: ' + siteConfig.depotPhone, { c: 1 });
       add('-'.repeat(maxChars), {});
-      add('No. Kontrak: ' + (opts && opts.contractLabel ? opts.contractLabel : c.contractId), {});
+      add('No. Kontrak: ' + c.contractId, {});
       add('Tanggal: ' + dt.toLocaleDateString('id-ID') + ' ' + dt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }), {});
       add('Penyewa: ' + (c.renterName || ''), {});
       add('-'.repeat(maxChars), {});
@@ -2327,20 +1950,15 @@
       });
       add('-'.repeat(maxChars), {});
       L.push({ l: 'TOTAL:', r: clean(fmtRupiah(total)), b: 1 });
-      if (c.payMethod) L.push({ l: 'PEMBAYARAN:', r: clean(c.payMethod) });
-      if (c.paySender) L.push({ l: 'PENGIRIM:', r: clean(c.paySender) });
       add('Tanggal Kembali: ' + (c.returnDate || '-'), {});
       add('-'.repeat(maxChars), {});
       add(siteConfig.receiptFooter || 'Barang harap kembali tepat waktu dalam kondisi baik. Terima kasih!', { c: 1 });
       return { L: L, paper: paper, margin: margin, c: c };
     }
     function buildStrukPDF(contractId) {
+      if (!window.jspdf || !window.jspdf.jsPDF) return null;
       const built = buildStrukLines(contractId);
       if (!built) return null;
-      return renderStrukPDF(built);
-    }
-    function renderStrukPDF(built) {
-      if (!window.jspdf || !window.jspdf.jsPDF) return null;
       const L = built.L, paper = built.paper, margin = built.margin, c = built.c;
       const lh = x => x.big ? 6.4 : 4.7;
       const H = 10 + L.reduce((s2, x) => s2 + lh(x), 0) + 4;
@@ -2366,9 +1984,6 @@
     function buildStrukImage(contractId) {
       const built = buildStrukLines(contractId);
       if (!built) return null;
-      return renderStrukImage(built);
-    }
-    function renderStrukImage(built) {
       const L = built.L, paper = built.paper, margin = built.margin, c = built.c;
       const S = 8;
       const lhPx = x => (x.big ? 6.4 : 4.7) * S;
@@ -2399,9 +2014,6 @@
     function sendStrukImageWA(contractId) {
       const img = buildStrukImage(contractId);
       if (!img) { toast('Struk tidak ditemukan.'); return; }
-      deliverStrukImage(img);
-    }
-    function deliverStrukImage(img) {
       const c = img.contract;
       img.canvas.toBlob(blob => {
         if (!blob) { toast('Gagal membuat gambar struk.'); return; }
@@ -2427,9 +2039,6 @@
     function sendStrukWA(contractId) {
       const pdf = buildStrukPDF(contractId);
       if (!pdf) { toast('Library PDF belum termuat (butuh internet). Mengirim versi teks.'); sendStrukWAText(contractId); return; }
-      deliverStrukPDF(pdf);
-    }
-    function deliverStrukPDF(pdf) {
       const c = pdf.contract;
       const file = new File([pdf.blob], pdf.filename, { type: 'application/pdf' });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -2452,12 +2061,10 @@
     function sendStrukWAText(contractId) {
       const found = strukBatch(contractId);
       if (!found) return;
-      sendStrukWATextFrom(found.c, found.batch, null);
-    }
-    function sendStrukWATextFrom(c, batch, opts) {
+      const c = found.c, batch = found.batch;
       const phone = normalizePhone(c.renterPhone, c.renterName);
       if (!phone) { alert('Nomor WhatsApp penyewa tidak tersedia pada kontrak ini.'); return; }
-      const dt = (opts && opts.timestamp != null) ? new Date(opts.timestamp) : (c.dispatchTimestamp ? new Date(c.dispatchTimestamp) : new Date());
+      const dt = c.dispatchTimestamp ? new Date(c.dispatchTimestamp) : new Date();
       let total = 0, items = '';
       batch.forEach(x => {
         const item = inventory.find(i => i.id === x.itemId);
@@ -2466,73 +2073,21 @@
         total += sub;
         items += '- ' + x.itemName + '\n  ' + x.qty + ' unit x ' + (x.days || 1) + ' hari @ ' + fmtRupiah(price) + ' = ' + fmtRupiah(sub) + '\n';
       });
-      collectSaleLines(batch, c).forEach(l => {
-        const sub = (l.price || 0) * (l.qty || 1);
-        total += sub;
-        items += '- ' + l.itemName + ' (BELI)\n  ' + l.qty + ' unit @ ' + fmtRupiah(l.price || 0) + ' = ' + fmtRupiah(sub) + '\n';
-      });
       const msg = '*STRUK SEWA \u2014 ' + (siteConfig.brandName || 'BK ADVENTURE') + '*\n' +
         (siteConfig.receiptNote ? siteConfig.receiptNote + '\n' : '') +
         ((siteConfig.receiptShowAddress !== false && siteConfig.address) ? siteConfig.address + '\n' : '') +
         ((siteConfig.receiptShowPhone !== false && siteConfig.depotPhone) ? 'WA Toko: ' + siteConfig.depotPhone + '\n' : '') +
         '------------------------------\n' +
-        'No. Kontrak: ' + (opts && opts.contractLabel ? opts.contractLabel : c.contractId) + '\n' +
+        'No. Kontrak: ' + c.contractId + '\n' +
         'Tanggal: ' + dt.toLocaleDateString('id-ID') + ' ' + dt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + '\n' +
         'Penyewa: ' + (c.renterName || '') + '\n' +
         '------------------------------\n' + items +
         '------------------------------\n' +
         '*TOTAL: ' + fmtRupiah(total) + '*\n' +
-        (c.payMethod ? 'Pembayaran: ' + c.payMethod + '\n' : '') +
-        (c.paySender ? 'Pengirim: ' + c.paySender + '\n' : '') +
         'Tanggal Kembali: ' + (c.returnDate || '-') + '\n' +
         '------------------------------\n' +
         (siteConfig.receiptFooter || 'Barang harap kembali tepat waktu dalam kondisi baik. Terima kasih!');
       window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(msg), '_blank');
-    }
-
-    // ===== STRUK GABUNGAN PER PENYEWA =====
-    // Perintah pemilik: satu orang = SATU struk untuk SEMUA kontrak
-    // aktifnya, lintas batch/dispatchTimestamp ("alken > barang > struk
-    // 1 aja"). Grup dihitung dari activeRentals SAJA dengan kunci grup
-    // yang sama seperti tabel sewa aktif (rentalRenterKey). Jalur lama
-    // per batch (printStruk/sendStrukWA/sendStrukImageWA) TIDAK berubah.
-    function strukGroup(contractId) {
-      const anchor = activeRentals.find(x => x.contractId === contractId);
-      if (!anchor) return null;
-      const key = rentalRenterKey(anchor);
-      return { c: anchor, batch: activeRentals.filter(x => rentalRenterKey(x) === key) };
-    }
-    function strukGroupData(contractId) {
-      const g = strukGroup(contractId);
-      if (!g) return null;
-      const ids = g.batch.map(x => x.contractId);
-      let ts = null;
-      g.batch.forEach(x => { if (x.dispatchTimestamp && (ts === null || x.dispatchTimestamp < ts)) ts = x.dispatchTimestamp; });
-      return { c: g.c, batch: g.batch, opts: { contractLabel: ids.join(', '), contractIds: ids, timestamp: ts } };
-    }
-    function printStrukGroup(contractId) {
-      // Sama seperti printStruk: Bluetooth terhubung -> ESC/POS langsung.
-      if (typeof btReady === 'function' && btReady() && !btFallbackOnce) { btPrintStrukGroup(contractId); return; }
-      btFallbackOnce = false;
-      const g = strukGroupData(contractId);
-      if (!g) return;
-      printStrukHtmlFrom(g.c, g.batch, g.opts);
-    }
-    function sendStrukWAGroup(contractId) {
-      const g = strukGroupData(contractId);
-      if (!g) { toast('Struk tidak ditemukan.'); return; }
-      const built = buildStrukLinesFrom(g.c, g.batch, g.opts);
-      const pdf = built ? renderStrukPDF(built) : null;
-      if (!pdf) { toast('Library PDF belum termuat (butuh internet). Mengirim versi teks.'); sendStrukWATextFrom(g.c, g.batch, g.opts); return; }
-      deliverStrukPDF(pdf);
-    }
-    function sendStrukImageWAGroup(contractId) {
-      const g = strukGroupData(contractId);
-      if (!g) { toast('Struk tidak ditemukan.'); return; }
-      const built = buildStrukLinesFrom(g.c, g.batch, g.opts);
-      const img = built ? renderStrukImage(built) : null;
-      if (!img) { toast('Struk tidak ditemukan.'); return; }
-      deliverStrukImage(img);
     }
 
 
@@ -2998,399 +2553,9 @@
         if (ok && document.getElementById('appRoot').classList.contains('active')) { loadData(); renderAll(); }
       } catch (e) {}
     }
-    setInterval(sbSoftPull, 45000); // auto-sync panel 45 dtk (keputusan zgg 9 Nov malam)
+    setInterval(sbSoftPull, 45000);
     window.addEventListener('focus', sbSoftPull);
     document.addEventListener('visibilitychange', function () { if (!document.hidden) sbSoftPull(); });
-
-    // ===== INBOX BOOKING WEBSITE (tabel bookings, di luar sinkron cermin) =====
-    let bkRowsCache = [];
-    let bkTableMissing = false;
-    function bkGroups() {
-      const map = new Map();
-      bkRowsCache.forEach(r => {
-        if (!map.has(r.code)) map.set(r.code, []);
-        map.get(r.code).push(r);
-      });
-      return [...map.entries()].map(([code, rows]) => ({ code, rows, first: rows[0].data, status: rows[0].status, created: rows[0].created_at }));
-    }
-    function bkTotal(g) {
-      return g.rows.reduce((a, r) => a + (r.data.type === 'rental' ? (r.data.price || 0) * (r.data.qty || 1) * (r.data.days || 1) : (r.data.price || 0) * (r.data.qty || 1)), 0);
-    }
-    function bkRp(n) { return 'Rp ' + Number(n || 0).toLocaleString('id-ID'); }
-    function bkStatusLabel(st) {
-      return { pending: 'MENUNGGU KONFIRMASI', confirmed: 'TERKONFIRMASI', cancelled: 'DIBATALKAN', converted: 'SUDAH DISPATCH' }[st] || st;
-    }
-    async function bkLoadBookings(manual) {
-      if (!window.sbSession && typeof sbSession === 'undefined') return;
-      try {
-        if (!sbSession) return;
-      } catch (e) { return; }
-      const tid = await sbResolveTenant();
-      if (!tid) return;
-      try {
-        const rows = await sbRest('bookings?tenant_id=eq.' + tid + '&select=code,item_id,size,status,data,created_at&order=created_at.desc&limit=200');
-        bkRowsCache = rows || [];
-        bkTableMissing = false;
-        bkRenderBookings();
-      } catch (e) {
-        if (!bkTableMissing) {
-          bkTableMissing = true;
-          const el = document.getElementById('bkList');
-          if (el) el.innerHTML = '<p style="font-size:13px;color:var(--text-subtle);">Fitur booking website belum aktif di server. Terapkan berkas <strong>booking-migration.sql</strong> di SQL Editor Supabase untuk mengaktifkannya.</p>';
-        }
-        if (manual) toast('Booking website belum aktif di server (migrasi SQL belum diterapkan).');
-      }
-    }
-    function bkRenderBookings() {
-      const el = document.getElementById('bkList');
-      if (!el) return;
-      const groups = bkGroups();
-      const pending = groups.filter(g => g.status === 'pending').length;
-      const badge = document.getElementById('bkPendingBadge');
-      if (badge) { badge.style.display = pending ? '' : 'none'; badge.textContent = pending + ' MENUNGGU'; }
-      if (!groups.length) {
-        el.innerHTML = '<p style="font-size:13px;color:var(--text-subtle);">Belum ada booking dari website. Booking pelanggan akan muncul di sini otomatis.</p>';
-        return;
-      }
-      el.innerHTML = groups.map(g => {
-        const f = g.first;
-        const items = g.rows.map(r => '<div style="display:flex;justify-content:space-between;font-size:13px;"><span>' + escHtml(r.data.itemName || r.item_id) + ' x' + (r.data.qty || 1) + '</span><span>' + bkRp((r.data.price || 0) * (r.data.qty || 1)) + (r.data.type === 'rental' ? '/hari' : '') + '</span></div>').join('');
-        let actions = '';
-        if (g.status === 'pending') {
-          actions = '<button type="button" class="btn btn-primary" style="font-size:11px;padding:6px 12px;" data-bk="confirm" data-code="' + g.code + '">KONFIRMASI</button>' +
-                    '<button type="button" class="btn btn-danger" style="font-size:11px;padding:6px 12px;" data-bk="cancel" data-code="' + g.code + '">TOLAK</button>';
-        } else if (g.status === 'confirmed') {
-          actions = '<button type="button" class="btn btn-primary" style="font-size:11px;padding:6px 12px;" data-bk="convert" data-code="' + g.code + '">PROSES DISPATCH (SUDAH AMBIL)</button>' +
-                    '<button type="button" class="btn btn-danger" style="font-size:11px;padding:6px 12px;" data-bk="cancel" data-code="' + g.code + '">BATALKAN</button>';
-        }
-        const wa = normalizePhone(f.renterPhone || '', '');
-        const memberHtml = f.memberEmail ? '<div style="font-size:13px;margin-top:7px;">Member: <strong>' + escHtml(f.memberEmail) + '</strong> &middot; ' + (f.memberVerified === true ? '<span style="color:#1C7A3D;font-weight:700;">Member (terverifikasi Google)</span>' : '<span style="color:#C9551B;font-weight:700;">Klaim member — belum terverifikasi</span>') + '</div>' : '';
-        const pay = f.payment || null;
-        const payHtml = pay ? '<div style="font-size:13px;margin-top:9px;background:#F8F5EE;border:1px solid var(--border,#ddd);border-radius:8px;padding:9px 11px;">Pembayaran: <strong>' + escHtml(pay.method || '') + '</strong> dari <strong>' + escHtml(pay.sender || '') + '</strong> &middot; ' + bkRp(pay.amount || 0) +
-          ' &middot; ' + (pay.verified ? '<span style="color:#1C7A3D;font-weight:700;">TERVERIFIKASI</span>' : '<span style="color:#C9551B;font-weight:700;">MENUNGGU VERIFIKASI</span>') +
-          ' <button type="button" class="btn btn-secondary" style="font-size:11px;padding:4px 9px;" data-bk="proof" data-code="' + g.code + '">LIHAT BUKTI</button>' +
-          (pay.verified ? '' : ' <button type="button" class="btn btn-primary" style="font-size:11px;padding:4px 9px;" data-bk="verifypay" data-code="' + g.code + '">VERIFIKASI PEMBAYARAN</button>') + '</div>' : '';
-        return '<div style="border:1px solid var(--border,#ddd);border-radius:10px;padding:13px 15px;margin-bottom:11px;">' +
-          '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;align-items:center;">' +
-            '<strong style="font-size:15px;">' + escHtml(g.code) + '</strong>' +
-            '<span class="badge-tag">' + bkStatusLabel(g.status) + '</span></div>' +
-          '<div style="font-size:13px;margin:7px 0;">' + escHtml(f.renterName || '') +
-            (wa ? ' &middot; <a href="https://wa.me/' + wa + '" target="_blank" rel="noopener">' + escHtml(f.renterPhone || '') + '</a>' : '') +
-            '<br>Mulai: <strong>' + escHtml(f.startDate || '') + '</strong> &middot; Kembali: <strong>' + escHtml(f.returnDate || '') + '</strong> (' + (f.days || 1) + ' hari)' +
-            (f.notes ? '<br>Catatan: ' + escHtml(f.notes) : '') + '</div>' +
-          items +
-          '<div style="display:flex;justify-content:space-between;font-size:13.5px;border-top:1px dashed var(--border,#ddd);margin-top:8px;padding-top:8px;"><span>Perkiraan total</span><strong>' + bkRp(bkTotal(g)) + '</strong></div>' +
-          memberHtml +
-          payHtml +
-          (actions ? '<div style="display:flex;gap:8px;margin-top:11px;flex-wrap:wrap;">' + actions + '</div>' : '') +
-        '</div>';
-      }).join('');
-    }
-    document.addEventListener('click', function (e) {
-      const b = e.target.closest('[data-bk]');
-      if (!b) return;
-      const code = b.getAttribute('data-code');
-      const act = b.getAttribute('data-bk');
-      if (act === 'confirm') bkSetStatus(code, 'confirmed');
-      else if (act === 'cancel') bkSetStatus(code, 'cancelled');
-      else if (act === 'convert') bkConvert(code);
-      else if (act === 'proof') bkProof(code);
-      else if (act === 'verifypay') bkVerifyPay(code);
-    });
-    async function bkSetStatus(code, status, silent) {
-      const tid = await sbResolveTenant();
-      if (!tid) return false;
-      try {
-        await sbRest('bookings?tenant_id=eq.' + tid + '&code=eq.' + encodeURIComponent(code), { method: 'PATCH', body: { status } });
-        bkRowsCache.forEach(r => { if (r.code === code) r.status = status; });
-        bkRenderBookings();
-        if (typeof refreshLiveHeld === 'function') refreshLiveHeld(true);
-        if (!silent) toast('Booking ' + code + ' -> ' + bkStatusLabel(status));
-        return true;
-      } catch (e) { toast('Gagal mengubah status booking: ' + e.message); return false; }
-    }
-    // ===== MODAL BUKTI PEMBAYARAN (lightbox di halaman yang sama) =====
-    let bkProofObjUrl = '';
-    let bkProofSeq = 0;
-    let bkProofInitDone = false;
-    let bkProofCode = '';
-    function bkProofIsPdf(path) { return /\.pdf($|\?)/i.test(path || ''); }
-    function bkProofEnsureInit() {
-      if (bkProofInitDone) return;
-      bkProofInitDone = true;
-      const modal = document.getElementById('bkProofModal');
-      if (!modal) return;
-      modal.addEventListener('click', function (e) { if (e.target === modal) bkProofClose(); });
-      const btn = document.getElementById('bkProofClose');
-      if (btn) btn.addEventListener('click', function () { bkProofClose(); });
-      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') bkProofClose(); });
-    }
-    function bkProofClose() {
-      bkProofSeq++;
-      const modal = document.getElementById('bkProofModal');
-      if (!modal || modal.style.display === 'none') return;
-      modal.style.display = 'none';
-      const body = document.getElementById('bkProofBody');
-      if (body) body.innerHTML = '';
-      if (bkProofObjUrl) { try { URL.revokeObjectURL(bkProofObjUrl); } catch (e) {} bkProofObjUrl = ''; }
-    }
-    function bkProofRender(url, isPdf, onErr) {
-      const body = document.getElementById('bkProofBody');
-      if (!body) return;
-      body.innerHTML = '';
-      let el;
-      if (isPdf) {
-        el = document.createElement('iframe');
-        el.title = 'Bukti pembayaran (PDF)';
-        el.style.cssText = 'width:min(92vw,900px);height:84vh;border:0;border-radius:10px;background:#fff;';
-      } else {
-        el = document.createElement('img');
-        el.alt = 'Bukti pembayaran';
-        el.style.cssText = 'max-width:92vw;max-height:84vh;border-radius:10px;background:#fff;';
-      }
-      if (typeof onErr === 'function') el.onerror = onErr;
-      el.src = url;
-      body.appendChild(el);
-    }
-    function bkProofShowError(notes) {
-      const body = document.getElementById('bkProofBody');
-      if (!body) return;
-      body.innerHTML = '';
-      const wrap = document.createElement('div');
-      wrap.id = 'bkProofError';
-      wrap.style.cssText = 'background:#fff;border-radius:10px;padding:20px 22px;max-width:min(92vw,520px);text-align:center;color:#222;';
-      const p = document.createElement('p');
-      p.style.cssText = 'margin:0;font-size:14.5px;line-height:1.55;';
-      p.textContent = 'Bukti belum bisa ditampilkan (' + notes.join(' · ') + '). Berkasnya ada di server — coba tombol Muat Ulang.';
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.id = 'bkProofRetry';
-      btn.textContent = 'Muat Ulang';
-      btn.style.cssText = 'margin-top:12px;padding:9px 22px;border:0;border-radius:8px;background:#1d4ed8;color:#fff;font-size:14px;cursor:pointer;';
-      btn.addEventListener('click', function () { if (bkProofCode) bkProof(bkProofCode); });
-      wrap.appendChild(p);
-      wrap.appendChild(btn);
-      body.appendChild(wrap);
-    }
-    async function bkProof(code) {
-      const row = bkRowsCache.find(r => r.code === code);
-      const path = row && row.data.payment ? row.data.payment.proofPath : '';
-      if (!path) { toast('Booking ini tidak punya berkas bukti pembayaran.'); return; }
-      bkProofEnsureInit();
-      const modal = document.getElementById('bkProofModal');
-      const body = document.getElementById('bkProofBody');
-      if (!modal || !body) { toast('Gagal membuka bukti: panel tampilan tidak ditemukan.'); return; }
-      bkProofCode = code;
-      const isPdf = bkProofIsPdf(path);
-      const seq = ++bkProofSeq;
-      modal.style.display = 'flex';
-      body.innerHTML = '<span style="color:#fff;font-size:14px;">Memuat bukti…</span>';
-      const notes = [];
-      // Render blob dari sebuah response ke modal. Hasil: 'ok' | 'stale' | 'err'.
-      const renderFromBlob = async (resp) => {
-        let objUrl = '';
-        try {
-          const blob = await resp.blob();
-          objUrl = URL.createObjectURL(blob);
-        } catch (e) { return 'err'; }
-        if (seq !== bkProofSeq) { try { URL.revokeObjectURL(objUrl); } catch (e) {} return 'stale'; }
-        if (bkProofObjUrl) { try { URL.revokeObjectURL(bkProofObjUrl); } catch (e) {} bkProofObjUrl = ''; }
-        bkProofObjUrl = objUrl;
-        bkProofRender(objUrl, isPdf, function () {
-          if (seq !== bkProofSeq) return;
-          bkProofShowError(notes.concat(['media: gagal dimuat']));
-        });
-        return 'ok';
-      };
-      // TAHAP 1: unduh terautentikasi langsung memakai sesi panel — izin baca
-      // pemilik yang sama seperti sign, tanpa mekanisme signed URL sama sekali.
-      try {
-        const r1 = await fetch(KONFIG.SUPABASE_URL + '/storage/v1/object/payment-proofs/' + path, { headers: sbHeaders() });
-        if (seq !== bkProofSeq) return;
-        if (r1.ok) {
-          const rr = await renderFromBlob(r1);
-          if (rr !== 'err') return;
-          notes.push('unduh langsung: berkas tidak terbaca');
-        } else notes.push('unduh langsung: HTTP ' + r1.status);
-      } catch (e) {
-        if (seq !== bkProofSeq) return;
-        notes.push('unduh langsung: ' + ((e && e.message) || 'gagal jaringan'));
-      }
-      // TAHAP 2: signed URL -> unduh sebagai blob -> object URL.
-      let signedUrl = '';
-      try {
-        const rs = await fetch(KONFIG.SUPABASE_URL + '/storage/v1/object/sign/payment-proofs/' + path, { method: 'POST', headers: sbHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify({ expiresIn: 3600 }) });
-        if (seq !== bkProofSeq) return;
-        if (rs.ok) {
-          const j = await rs.json();
-          if (j && j.signedURL) signedUrl = /^https?:\/\//i.test(j.signedURL) ? j.signedURL : KONFIG.SUPABASE_URL + j.signedURL;
-          else notes.push('tautan aman: respons tanpa tautan');
-        } else notes.push('tautan aman: HTTP ' + rs.status);
-      } catch (e) {
-        if (seq !== bkProofSeq) return;
-        notes.push('tautan aman: ' + ((e && e.message) || 'gagal jaringan'));
-      }
-      if (signedUrl) {
-        try {
-          const r2 = await fetch(signedUrl);
-          if (seq !== bkProofSeq) return;
-          if (r2.ok) {
-            const rr = await renderFromBlob(r2);
-            if (rr !== 'err') return;
-            notes.push('tautan aman: berkas tidak terbaca');
-          } else notes.push('tautan aman: HTTP ' + r2.status);
-        } catch (e) {
-          if (seq !== bkProofSeq) return;
-          notes.push('tautan aman: ' + ((e && e.message) || 'gagal jaringan'));
-        }
-        // TAHAP 3: signed URL langsung sebagai src media — kegagalan termuat
-        // kini terpantau lewat onerror dan dijelaskan di modal (tidak diam).
-        if (seq !== bkProofSeq) return;
-        bkProofRender(signedUrl, isPdf, function () {
-          if (seq !== bkProofSeq) return;
-          bkProofShowError(notes.concat(['tautan aman (langsung): gagal dimuat']));
-        });
-        return;
-      }
-      // Semua tahap pengambilan gagal: pesan jelas tampil DI DALAM modal.
-      bkProofShowError(notes.length ? notes : ['unduh langsung: gagal']);
-    }
-    async function bkVerifyPay(code) {
-      const tid = await sbResolveTenant();
-      if (!tid) return;
-      const rows = bkRowsCache.filter(r => r.code === code);
-      try {
-        for (const row of rows) {
-          const nd = Object.assign({}, row.data, { payment: Object.assign({}, row.data.payment || {}, { verified: true }) });
-          const rowSize = (row.size != null ? row.size : (row.data.size || ''));
-          await sbRest('bookings?tenant_id=eq.' + tid + '&code=eq.' + encodeURIComponent(code) + '&item_id=eq.' + encodeURIComponent(row.item_id) + '&size=eq.' + encodeURIComponent(rowSize), { method: 'PATCH', body: { data: nd } });
-          row.data = nd;
-        }
-        bkRenderBookings();
-        if (typeof refreshLiveHeld === 'function') refreshLiveHeld(true);
-        toast('Pembayaran booking ' + code + ' terverifikasi.');
-      } catch (e) { toast('Gagal verifikasi: ' + e.message); }
-    }
-    async function bkConvert(code) {
-      const g = bkGroups().find(x => x.code === code);
-      if (!g) return;
-      if (g.rows.some(r => r.data.type === 'package')) {
-        alert('Booking ini berisi PAKET. Paket di-dispatch manual lewat form Catat Sewa Keluar (isi komponen paketnya), lalu booking ini bisa ditandai selesai dari daftar setelahnya.');
-        return;
-      }
-      const f = g.first;
-      for (const r of g.rows) {
-        const item = inventory.find(i => i.id === r.item_id);
-        if (!item) { alert('Item tidak ditemukan di inventaris: ' + r.item_id); return; }
-        if (item.sizes && item.sizes.length) {
-          const se = item.sizes.find(s => s.label === r.data.size);
-          if (!se || (se.ready || 0) < (r.data.qty || 1)) { alert('Stok ukuran ' + (r.data.size || '') + ' tidak mencukupi untuk ' + item.name); return; }
-        } else if ((item.stockReady || 0) < (r.data.qty || 1)) {
-          alert('Stok tidak mencukupi untuk ' + item.name); return;
-        }
-      }
-      // Identitas dicatat di depot saat barang diambil. Modal Tangkap
-      // Identitas (fasilitas panel di admin) menggantikan prompt NIK
-      // lama: nomor identitas ATAU foto kartu (KTP/KTM/SIM/Paspor/dll).
-      // Batal di modal = dispatch berhenti tanpa sisa.
-      openIdentityCapture({
-        name: f.renterName || '',
-        code: code,
-        onConfirm: function (ident) { bkDoConvert(code, g, ident); },
-        onCancel: function () {}
-      });
-    }
-    // Cetak struk booking MURNI-JUAL: tidak ada kontrak jangkar, jadi
-    // struk dibangun dari jangkar sintetis (baris BELI dibaca pembangkit
-    // struk dari field saleLines jangkar). Jalur Bluetooth meniru
-    // printStruk: byte thermal dulu, gagal -> dialog print HTML.
-    async function printSaleStruk(anchor) {
-      if (typeof btReady === 'function' && btReady()) {
-        try {
-          const b = btStrukBytesFrom(anchor, [], null);
-          if (b) { await btWriteAll(b); toast('Struk penjualan terkirim ke printer Bluetooth.'); return; }
-        } catch (e) { /* jatuh ke dialog print di bawah */ }
-      }
-      printStrukHtmlFrom(anchor, [], null);
-    }
-    async function bkDoConvert(code, g, ident) {
-      const f = g.first;
-      const batchTs = Date.now();
-      const firstCid = [];
-      const rentContracts = [];
-      const saleLines = [];
-      g.rows.forEach((r, ri) => {
-        const item = inventory.find(i => i.id === r.item_id);
-        const qty = r.data.qty || 1;
-        if (item.type === 'sale') {
-          // PENJUALAN: BUKAN kontrak aktif. Stok ready & total turun
-          // PERMANEN (ukuran: ready ukuran turun, rented TIDAK naik,
-          // agregat total ikut turun), tercatat sebagai event JUAL di
-          // riwayat barang ber-ref kode booking, dan barisnya masuk
-          // struk sebagai baris BELI (B3). Mutasi stok + saveData
-          // terjadi SEBELUM status booking diubah (bkSetStatus di
-          // bawah): jendela balapan mengarah under-sell, aman.
-          if (item.sizes && item.sizes.length && r.data.size) {
-            const se = item.sizes.find(s => s.label === r.data.size);
-            if (se) se.ready -= qty;
-            syncSizeAggregates(item);
-          } else {
-            item.stockReady -= qty;
-            item.stockTotal -= qty;
-          }
-          saleLines.push({ itemName: r.data.itemName || item.name, size: r.data.size || '', qty, price: (r.data.price != null ? r.data.price : (item.priceSale || 0)) });
-          pushLog('JUAL', { itemId: r.item_id, itemName: item.name, size: r.data.size || '', qty, ref: code, note: 'Penjualan dari booking website ' + code + ' ke ' + (f.renterName || ''), source: 'Booking Website' });
-          return;
-        }
-        if (item.sizes && item.sizes.length && r.data.size) {
-          const se = item.sizes.find(s => s.label === r.data.size);
-          if (se) { se.ready -= qty; se.rented = (se.rented || 0) + qty; }
-          syncSizeAggregates(item);
-        } else {
-          item.stockReady -= qty;
-          item.stockRented = (item.stockRented || 0) + qty;
-        }
-        const cid = 'CTR-' + Date.now().toString().slice(-6) + '-' + Math.random().toString(36).substr(2, 3).toUpperCase();
-        firstCid.push(cid);
-        const contract = {
-          contractId: cid, itemId: item.id, itemName: r.data.itemName || item.name,
-          size: r.data.size || '', renterName: f.renterName || '', renterPhone: f.renterPhone || '',
-          renterNIK: ident.idType === 'KTP' ? ident.idNumber : '',
-          idType: ident.idType, idNumber: ident.idNumber,
-          payMethod: (f.payment && f.payment.method) || '', paySender: (f.payment && f.payment.sender) || '',
-          qty, days: r.data.days || 1, returnDate: r.data.returnDate || '',
-          dispatchTimestamp: batchTs, dispatchDate: new Date().toISOString().split('T')[0],
-          dispatchTime: new Date().toTimeString().split(' ')[0].substring(0, 5)
-        };
-        // Foto identitas hanya menumpang kontrak rental PERTAMA batch
-        // (bukan baris indeks 0: baris pertama bisa baris penjualan).
-        if (!rentContracts.length && ident.idPhoto) contract.idPhoto = ident.idPhoto;
-        rentContracts.push(contract);
-        activeRentals.unshift(contract);
-        pushLog('KELUAR', { itemId: r.item_id, itemName: item.name, size: r.data.size || '', qty, ref: cid, note: 'Dispatch dari booking website ' + code + ' ke ' + (f.renterName || ''), source: 'Booking Website' });
-      });
-      // Baris BELI menumpang SEMUA kontrak rental batch ini (pola
-      // payMethod) supaya struk batch & struk grup menemukannya lewat
-      // collectSaleLines; dedupe per dispatchTimestamp di sana menjaga
-      // tidak dobel.
-      if (saleLines.length) rentContracts.forEach(c => { c.saleLines = saleLines; });
-      saveData();
-      renderAll();
-      await bkSetStatus(code, 'converted', true);
-      toast(saleLines.length && !firstCid.length
-        ? 'Booking ' + code + ' terjual: penjualan tercatat & stok berkurang permanen.'
-        : 'Booking ' + code + ' berhasil di-dispatch. Struk siap dari daftar sewa.');
-      if (firstCid[0]) setTimeout(() => printStruk(firstCid[0]), 350);
-      else if (saleLines.length) setTimeout(() => printSaleStruk({
-        contractId: code, itemId: '', itemName: '', size: '', qty: 0, days: 0,
-        renterName: f.renterName || '', renterPhone: f.renterPhone || '',
-        payMethod: (f.payment && f.payment.method) || '', paySender: (f.payment && f.payment.sender) || '',
-        returnDate: '', dispatchTimestamp: batchTs, saleLines: saleLines
-      }), 350);
-    }
-    setInterval(() => { bkLoadBookings(); }, 60000);
-    window.addEventListener('focus', () => bkLoadBookings());
-    setTimeout(() => bkLoadBookings(), 5000);
 
     function loadData() {
       let si = localStorage.getItem('kontur_catalog_v2');
@@ -3491,7 +2656,7 @@
 
       const titles = {
         dashboard: ['Dashboard Overview', 'ADMIN CONSOLE'],
-        identity: ['Pengaturan', 'SITE CONFIG'],
+        identity: ['Identitas & Hero Editor', 'SITE CONFIG'],
         catalog: ['Header Katalog Editor', 'CATALOG CONTENT'],
         inventory: ['Inventaris Barang', 'STOCK MANAGEMENT'],
         rentals: ['Sewa & Kontrak', 'RENTAL OPERATIONS'],
@@ -3516,10 +2681,9 @@
     }
 
     function renderMetrics() {
-      refreshLiveHeld();
       let total=0, ready=0, rented=0, sale=0, saleSKU=0;
       inventory.forEach(i => {
-        total += i.stockTotal; ready += Math.max(0, i.stockReady - heldOf(i.id));
+        total += i.stockTotal; ready += i.stockReady;
         rented += (i.type==='rental' ? (i.stockRented||0) : 0);
         if (i.type==='sale') { sale += i.stockReady; saleSKU++; }
       });
@@ -3538,29 +2702,7 @@
       }
     }
 
-    // ===== STOK LIVE (agregat booking terkonfirmasi — RPC live_stock) =====
-    // Angka SIAP di panel = stok server dikurangi unit terikat booking yang
-    // sudah terkonfirmasi, sama seperti yang dilihat pelanggan di website.
-    let invLiveHeld = null, invLiveHeldAt = 0;
-    function heldOf(id, size) {
-      if (!invLiveHeld) return 0;
-      if (size) return invLiveHeld[id + '|' + size] || 0;
-      let n = 0;
-      for (const k in invLiveHeld) if (k.startsWith(id + '|')) n += invLiveHeld[k] || 0;
-      return n;
-    }
-    async function refreshLiveHeld(force) {
-      if (typeof sbRest !== 'function') return;
-      if (!force && invLiveHeld && Date.now() - invLiveHeldAt < 30000) return;
-      try {
-        invLiveHeld = await sbRest('rpc/live_stock', { method: 'POST', body: { s: KONFIG.TENANT_SLUG } }) || {};
-        invLiveHeldAt = Date.now();
-      } catch (e) { if (!invLiveHeld) invLiveHeld = {}; return; }
-      renderInvTable(); renderMetrics();
-    }
-
     function renderInvTable() {
-      refreshLiveHeld();
       const search = (document.getElementById('invSearch') ? document.getElementById('invSearch').value : '').toLowerCase().trim();
       let filtered = inventory;
       if (search) filtered = inventory.filter(i => i.name.toLowerCase().includes(search) || i.sku.toLowerCase().includes(search));
@@ -3575,9 +2717,9 @@
         return '<tr>' +
           '<td><img src="' + escHtml(i.image) + '" style="width:48px;height:36px;object-fit:cover;border:1px solid var(--border);"></td>' +
           '<td class="mono" style="font-weight:600;">' + escHtml(i.sku) + '</td>' +
-          '<td><div style="font-weight:600;">' + escHtml(i.name) + '</div><div class="mono" style="font-size:10px;color:var(--text-subtle);">' + escHtml(i.category) + '</div>' + ((i.sizes && i.sizes.length) ? '<div class="mono" style="font-size:10px;color:#9A6E1F;font-weight:700;">' + i.sizes.map(s => { const sr = Math.max(0, (s.ready || 0) - heldOf(i.id, s.label)); return escHtml(s.label) + ': ' + (sr > 0 ? sr : 'HABIS'); }).join(' &middot; ') + '</div>' : (i.size ? '<div class="mono" style="font-size:10px;color:#9A6E1F;font-weight:700;">UKURAN: ' + escHtml(i.size) + '</div>' : '')) + '</td>' +
-          '<td><span class="badge-tag ' + (isR?'badge-rental':'badge-sale') + '">' + (isR?'SEWA':'DIJUAL') + '</span></td>' +
-          '<td class="mono" style="color:var(--green-ok);font-weight:700;">' + Math.max(0, i.stockReady - heldOf(i.id)) + (heldOf(i.id) > 0 ? '<div style="font-size:10px;color:#C9551B;font-weight:600;">&minus;' + heldOf(i.id) + ' terkonfirmasi</div>' : '') + '</td>' +
+          '<td><div style="font-weight:600;">' + escHtml(i.name) + '</div><div class="mono" style="font-size:10px;color:var(--text-subtle);">' + escHtml(i.category) + '</div>' + ((i.sizes && i.sizes.length) ? '<div class="mono" style="font-size:10px;color:#9A6E1F;font-weight:700;">' + i.sizes.map(s => escHtml(s.label) + ': ' + ((s.ready || 0) > 0 ? s.ready : 'HABIS')).join(' &middot; ') + '</div>' : (i.size ? '<div class="mono" style="font-size:10px;color:#9A6E1F;font-weight:700;">UKURAN: ' + escHtml(i.size) + '</div>' : '')) + '</td>' +
+          '<td><span class="badge-tag ' + (isR?'badge-rental':'badge-sale') + '">' + (isR?'RENTAL':'RETAIL') + '</span></td>' +
+          '<td class="mono" style="color:var(--green-ok);font-weight:700;">' + i.stockReady + '</td>' +
           '<td class="mono">' + (isR ? (i.stockRented||0) : '&mdash;') + '</td>' +
           '<td class="mono" style="font-weight:700;">' + i.stockTotal + '</td>' +
           '<td class="mono">' + (isR ? fmtRupiah(i.priceRental)+'/hr' : fmtRupiah(i.priceSale)) + '</td>' +
@@ -3613,188 +2755,27 @@
       window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(msg), '_blank');
     }
 
-    function rentalRenterKey(c) {
-      // Kunci pengelompokan penyewa: nomor WA ternormalisasi lewat
-      // normalizePhone (fungsi yang sama dengan jalur struk/WA). WA tak
-      // terbaca -> cadangan nama+NIK (huruf kecil).
-      const p = normalizePhone(c.renterPhone, c.renterName);
-      if (p) return 'wa:' + p;
-      return 'id:' + String(c.renterName || '').trim().toLowerCase() + '|' + String(c.renterNIK || '').trim().toLowerCase();
-    }
-
-    // ===== Folder per penyewa + pencarian kontrak aktif (v4) =====
-    // Keadaan buka/tutup folder disimpan per kunci penyewa (rentalRenterKey)
-    // supaya render ulang dari sinkron tidak menutup folder yang sedang
-    // dibuka admin; penyewa baru mulai tertutup. Teks kueri juga disimpan
-    // di variabel ini dan diterapkan kembali sesudah tiap render.
-    let rentalFolderOpen = {};
-    let rentalFolderKeys = [];
-    let rentalFolderPhotos = [];
-    let rentalSearchQuery = '';
-
-    function toggleRentalFolder(idx) {
-      const k = rentalFolderKeys[idx];
-      if (k == null) return;
-      rentalFolderOpen[k] = rentalFolderOpen[k] !== true;
-      renderRentalTable();
-    }
-
-    // ===== Folder lipat tab Pengaturan (pola folder penyewa) =====
-    // Semua folder mulai tertutup. Keadaan terbuka disimpan di variabel
-    // ini dan diterapkan dari peta ini, supaya pengisian ulang formulir
-    // (populateConfigForms) dari data sinkron tidak menutup folder yang
-    // sedang dibuka admin.
-    let cfgFolderOpen = {};
-    function applyCfgFolderStates() {
-      document.querySelectorAll('[data-cfg-folder]').forEach(el => {
-        const open = cfgFolderOpen[el.getAttribute('data-cfg-folder')] === true;
-        el.classList.toggle('open', open);
-        const h = el.querySelector('.renter-folder-head');
-        if (h) h.setAttribute('aria-expanded', open ? 'true' : 'false');
-      });
-    }
-    function toggleCfgFolder(key) {
-      cfgFolderOpen[key] = cfgFolderOpen[key] !== true;
-      applyCfgFolderStates();
-    }
-    function cfgFolderKey(e, key) {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleCfgFolder(key); }
-    }
-    function cfgNavGo(key) {
-      cfgFolderOpen[key] = true;
-      applyCfgFolderStates();
-    }
-
-    function onRentalSearchInput(el) {
-      rentalSearchQuery = el.value;
-      renderRentalTable();
-    }
-
-    function clearRentalSearch() {
-      rentalSearchQuery = '';
-      const inp = document.getElementById('rentalSearchInput');
-      if (inp) inp.value = '';
-      renderRentalTable();
-      if (inp) inp.focus();
-    }
-
-    // Padanan pencarian: teks dibandingkan huruf-kecil; bila kueri berangka,
-    // versi hanya-digit kedua pihak juga dibandingkan (WA/NIK/kode) SESUDAH
-    // awalan nomor dikanonisasi di kedua sisi memakai logika normalizePhone
-    // (0 -> 62, 8 -> 62...) — supaya kueri "0813" menemukan nomor tersimpan
-    // "62813..." dan kueri "62813" menemukan nomor tersimpan "0813...".
-    function rentalSearchHit(text, q, qd) {
-      const t = String(text || '').toLowerCase();
-      if (q && t.includes(q)) return true;
-      if (qd) {
-        const td = t.replace(/\D/g, '');
-        if (td && normalizePhone(td).includes(normalizePhone(qd))) return true;
-      }
-      return false;
-    }
-
     function renderRentalTable() {
       const body = document.getElementById('rentalTableBody');
-      const countEl = document.getElementById('activeCount');
       const lateTotal = activeRentals.filter(x => daysLate(x) > 0).length;
-      // Kelompokkan per penyewa (urutan grup = kemunculan pertama; urutan
-      // kontrak di dalam grup tidak berubah) supaya satu orang = satu folder.
-      const groups = [];
-      const byKey = {};
-      activeRentals.forEach(c => {
-        const k = rentalRenterKey(c);
-        if (!byKey[k]) { byKey[k] = { key: k, first: c, items: [] }; groups.push(byKey[k]); }
-        byKey[k].items.push(c);
-      });
-      rentalFolderKeys = groups.map(g => g.key);
-      // Foto identitas per folder (dari kontrak pertama batch di grup;
-      // batchIdPhoto menelusur batch-nya) untuk tombol FOTO ID di kepala.
-      rentalFolderPhotos = groups.map(g => g.items.map(c => batchIdPhoto(c)).find(p => !!p) || '');
-
-      const q = rentalSearchQuery.trim().toLowerCase();
-      const qd = q.replace(/\D/g, '');
-      const searching = q !== '';
-      // Field pencarian berada di luar wadah yang digambar ulang: samakan
-      // nilainya dengan keadaan tersimpan agar kueri bertahan lintas render.
-      const inp = document.getElementById('rentalSearchInput');
-      if (inp && inp.value !== rentalSearchQuery) inp.value = rentalSearchQuery;
-      const clr = document.getElementById('rentalSearchClear');
-      if (clr) clr.classList.toggle('show', searching);
-
+      document.getElementById('activeCount').textContent = activeRentals.length + ' KONTRAK' + (lateTotal ? ' \u00B7 ' + lateTotal + ' TELAT' : '');
       if (activeRentals.length === 0) {
-        countEl.textContent = '0 KONTRAK \u00B7 0 PENYEWA';
-        body.innerHTML = '<div class="empty-state"><div class="title">Tidak ada sewa aktif</div></div>';
+        body.innerHTML = '<tr><td colspan="9" class="empty-state"><div class="title">Tidak ada sewa aktif</div></td></tr>';
         return;
       }
-
-      let visibleGroups = 0, visibleItems = 0;
-      let html = '';
-      groups.forEach((g, gi) => {
-        const f = g.first;
-        const identityHit = !searching || g.items.some(c =>
-          rentalSearchHit(c.renterName, q, '') ||
-          rentalSearchHit(c.renterPhone, q, qd) ||
-          rentalSearchHit(c.renterNIK, q, qd) ||
-          rentalSearchHit(c.idNumber, q, qd));
-        const items = (searching && !identityHit)
-          ? g.items.filter(c => rentalSearchHit(String(c.itemName || '') + ' ' + (c.size || ''), q, qd) || rentalSearchHit(c.contractId, q, qd))
-          : g.items;
-        if (searching && !identityHit && items.length === 0) return;
-        visibleGroups++; visibleItems += items.length;
-        // Selama pencarian, folder yang tampil otomatis terbuka; di luar
-        // pencarian keadaan manual admin yang berlaku.
-        const open = searching ? true : rentalFolderOpen[g.key] === true;
-        const totalUnits = g.items.reduce((s, x) => s + (x.qty || 0), 0);
-        const nearest = g.items.map(x => x.returnDate || '').filter(Boolean).sort()[0] || '-';
-        const lateItems = g.items.filter(x => daysLate(x) > 0);
-        const lateMax = lateItems.reduce((m, x) => Math.max(m, daysLate(x)), 0);
-        const idLabel = renterIdLabel(f);
-        const gPhoto = rentalFolderPhotos[gi] || '';
-        html += '<div class="renter-folder' + (open ? ' open' : '') + '">' +
-          '<div class="renter-folder-head" role="button" tabindex="0" aria-expanded="' + (open ? 'true' : 'false') + '" onclick="toggleRentalFolder(' + gi + ')">' +
-            '<span class="folder-ic"><svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></span>' +
-            '<span class="folder-main">' +
-              '<span class="folder-name">' + escHtml(f.renterName || '') + '</span>' +
-              (f.renterPhone ? '<span class="mono" style="font-size:11px;color:var(--text-muted);">' + escHtml(f.renterPhone) + '</span>' : '') +
-              (idLabel ? '<span class="mono" style="font-size:11px;color:var(--text-muted);">' + escHtml(idLabel) + '</span>' : '') +
-              '<span class="mono" style="font-size:11px;font-weight:700;color:var(--forest);">' + g.items.length + ' barang &middot; total ' + totalUnits + ' unit &middot; kembali terdekat ' + nearest + '</span>' +
-              (lateItems.length ? '<span class="badge-tag" style="background:var(--terracotta);color:#fff;border-color:var(--terracotta);">' + lateItems.length + ' TELAT &middot; MAKS ' + lateMax + ' HARI</span>' : '') +
-            '</span>' +
-            '<span class="folder-actions">' +
-              '<button class="btn btn-secondary btn-xs" onclick="event.stopPropagation();printStrukGroup(\'' + f.contractId + '\')">STRUK</button>' +
-              '<button class="btn btn-secondary btn-xs" onclick="event.stopPropagation();sendStrukWAGroup(\'' + f.contractId + '\')">KIRIM PDF</button>' +
-              '<button class="btn btn-secondary btn-xs" onclick="event.stopPropagation();sendStrukImageWAGroup(\'' + f.contractId + '\')">GAMBAR WA</button>' +
-              (gPhoto ? '<button class="btn btn-secondary btn-xs" onclick="event.stopPropagation();showRenterIdPhoto(' + gi + ')">FOTO ID</button>' : '') +
-            '</span>' +
-            '<span class="folder-chevron"><svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span>' +
-          '</div>' +
-          '<div class="renter-folder-body"><div class="folder-scroll"><table class="folder-table">' +
-            '<thead><tr><th>KONTRAK</th><th>ALAT</th><th>QTY</th><th>DURASI</th><th>TGL KEMBALI</th><th style="text-align:right;">AKSI</th></tr></thead>' +
-            '<tbody>' +
-            items.map(c => {
-              const late = daysLate(c);
-              return '<tr' + (late > 0 ? ' style="background:#FDF2F0;"' : '') + '>' +
-              '<td class="mono" style="font-weight:600;">' + c.contractId + '</td>' +
-              '<td style="font-weight:600;">' + escHtml(c.itemName) + '</td>' +
-              '<td class="mono">' + c.qty + '</td>' +
-              '<td class="mono">' + c.days + ' hari</td>' +
-              '<td class="mono" style="color:' + (late > 0 ? 'var(--terracotta)' : 'var(--amber-warn)') + ';font-weight:600;">' + c.returnDate + (late > 0 ? ' <span class="badge-tag" style="background:var(--terracotta);color:#fff;border-color:var(--terracotta);">TELAT ' + late + ' HARI</span>' : '') + '</td>' +
-              '<td style="text-align:right; white-space:nowrap;">' + (late > 0 ? '<button class="btn btn-xs" style="background:var(--terracotta);color:#fff;border-color:var(--terracotta);" onclick="remindLate(\'' + c.contractId + '\')">INGATKAN WA</button> ' : '') + '<button class="btn btn-primary btn-xs" onclick="returnItem(\'' + c.contractId + '\')">BARANG KEMBALI</button></td>' +
-            '</tr>'; }).join('') +
-            '</tbody></table></div></div>' +
-        '</div>';
-      });
-
-      if (searching) {
-        countEl.textContent = visibleItems + ' DARI ' + activeRentals.length + ' BARANG \u00B7 ' + visibleGroups + ' PENYEWA COCOK';
-        if (visibleGroups === 0) {
-          body.innerHTML = '<div class="empty-state"><div class="title">Tidak ada hasil untuk \'' + escHtml(rentalSearchQuery.trim()) + '\'.</div></div>';
-          return;
-        }
-      } else {
-        countEl.textContent = activeRentals.length + ' KONTRAK \u00B7 ' + groups.length + ' PENYEWA' + (lateTotal ? ' \u00B7 ' + lateTotal + ' TELAT' : '');
-      }
-      body.innerHTML = html;
+      body.innerHTML = activeRentals.map(c => {
+        const late = daysLate(c);
+        return '<tr' + (late > 0 ? ' style="background:#FDF2F0;"' : '') + '>' +
+        '<td class="mono" style="font-weight:600;">' + c.contractId + '</td>' +
+        '<td>' + escHtml(c.renterName || '') + '</td>' +
+        '<td class="mono">' + escHtml(c.renterPhone || '') + '</td>' +
+        '<td class="mono" style="font-size:11px;">' + escHtml(c.renterNIK || '') + '</td>' +
+        '<td style="font-weight:600;">' + escHtml(c.itemName) + '</td>' +
+        '<td class="mono">' + c.qty + '</td>' +
+        '<td class="mono">' + c.days + ' hari</td>' +
+        '<td class="mono" style="color:' + (late > 0 ? 'var(--terracotta)' : 'var(--amber-warn)') + ';font-weight:600;">' + c.returnDate + (late > 0 ? ' <span class="badge-tag" style="background:var(--terracotta);color:#fff;border-color:var(--terracotta);">TELAT ' + late + ' HARI</span>' : '') + '</td>' +
+        '<td style="text-align:right; white-space:nowrap;">' + (late > 0 ? '<button class="btn" style="font-size:10px;padding:4px 10px;margin-right:4px;background:var(--terracotta);color:#fff;border:none;cursor:pointer;" onclick="remindLate(\'' + c.contractId + '\')">INGATKAN WA</button>' : '') + '<button class="btn btn-secondary" style="font-size:10px;padding:4px 10px;margin-right:4px;" onclick="printStruk(\'' + c.contractId + '\')">STRUK</button><button class="btn btn-secondary" style="font-size:10px;padding:4px 10px;margin-right:4px;" onclick="sendStrukWA(\'' + c.contractId + '\')">KIRIM PDF</button><button class="btn btn-secondary" style="font-size:10px;padding:4px 10px;margin-right:4px;" onclick="sendStrukImageWA(\'' + c.contractId + '\')">GAMBAR WA</button><button class="btn btn-primary" style="font-size:10px;padding:4px 10px;" onclick="returnItem(\'' + c.contractId + '\')">BARANG KEMBALI</button></td>' +
+      '</tr>'; }).join('');
     }
 
     function renderRecentRentals() {
@@ -3811,7 +2792,7 @@
           '<span class="badge-tag badge-rented">' + c.returnDate + '</span>' + (daysLate(c) > 0 ? '<span class="badge-tag" style="background:var(--terracotta);color:#fff;border-color:var(--terracotta);margin-left:4px;">TELAT ' + daysLate(c) + ' HARI</span>' : '') +
         '</div>' +
         '<div style="font-weight:600;font-size:12px;">' + escHtml(c.itemName) + '</div>' +
-        '<div class="mono" style="font-size:10px;color:var(--text-subtle);">' + escHtml(c.renterName||'') + ' (' + escHtml(c.renterPhone||'') + ') &bull; ' + c.qty + ' unit &bull; ' + c.days + ' hari' + (c.idType ? ' &bull; ' + escHtml(renterIdLabel(c)) : '') + '</div>' +
+        '<div class="mono" style="font-size:10px;color:var(--text-subtle);">' + escHtml(c.renterName||'') + ' (' + escHtml(c.renterPhone||'') + ') &bull; ' + c.qty + ' unit &bull; ' + c.days + ' hari</div>' +
         '</div>'
       ).join('');
     }
@@ -3936,14 +2917,11 @@
     }
 
     // ===== CONFIG FORMS =====
-    const PAY_METHODS_CFG = [['bri', 'Bri'], ['mandiri', 'Mandiri'], ['bca', 'Bca'], ['bni', 'Bni'], ['dana', 'Dana'], ['ovo', 'Ovo'], ['gopay', 'Gopay']];
     function populateConfigForms() {
       const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
       set('cfgBrandName', siteConfig.brandName);
       set('cfgBrandSubtitle', siteConfig.brandSubtitle);
       set('cfgLogoUrl', siteConfig.logoUrl);
-      set('cfgAnnounceLeft', siteConfig.announceLeft);
-      set('cfgAnnounceRight', siteConfig.announceRight);
       previewLogo(siteConfig.logoUrl);
       set('cfgHeroImage', siteConfig.heroImage);
       set('cfgHeroHeading', siteConfig.heroHeading);
@@ -3962,8 +2940,6 @@
       set('cfgFooterTagline', siteConfig.footerTagline);
       set('cfgFooterCopyright', siteConfig.footerCopyright);
       set('cfgAddress', siteConfig.address);
-      set('cfgAboutText', siteConfig.aboutText);
-      set('cfgOpeningHours', siteConfig.openingHours);
       set('cfgMapsUrl', siteConfig.mapsUrl);
       set('cfgReceiptPaper', siteConfig.receiptPaper || '80');
       document.getElementById('cfgPickupOnly').checked = siteConfig.pickupOnly !== false;
@@ -3971,10 +2947,6 @@
       document.getElementById('cfgReceiptShowAddress').checked = siteConfig.receiptShowAddress !== false;
       document.getElementById('cfgReceiptShowPhone').checked = siteConfig.receiptShowPhone !== false;
       set('cfgDepotPhone', siteConfig.depotPhone || '');
-      set('cfgPaymentInfo', siteConfig.paymentInfo || '');
-      previewPaymentQr(siteConfig.paymentQr || '');
-      const pmSeed = siteConfig.paymentMethods || {};
-      PAY_METHODS_CFG.forEach(([key, cap]) => { const m = pmSeed[key] || {}; set('cfgPm' + cap + 'No', m.no || ''); set('cfgPm' + cap + 'An', m.an || ''); });
       set('cfgReceiptNote', siteConfig.receiptNote || '');
       set('cfgReceiptFooter', siteConfig.receiptFooter || 'Barang harap kembali tepat waktu dalam kondisi baik. Terima kasih!');
       set('cfgCatalogEyebrow', siteConfig.catalogEyebrow);
@@ -3989,8 +2961,6 @@
       siteConfig.brandName = v('cfgBrandName') || siteConfig.brandName;
       siteConfig.brandSubtitle = v('cfgBrandSubtitle') || siteConfig.brandSubtitle;
       siteConfig.logoUrl = v('cfgLogoUrl') || siteConfig.logoUrl;
-      siteConfig.announceLeft = v('cfgAnnounceLeft') || siteConfig.announceLeft;
-      siteConfig.announceRight = v('cfgAnnounceRight') || siteConfig.announceRight;
       siteConfig.heroImage = v('cfgHeroImage') || siteConfig.heroImage;
       siteConfig.heroHeading = v('cfgHeroHeading') || siteConfig.heroHeading;
       siteConfig.heroDescription = v('cfgHeroDescription') || siteConfig.heroDescription;
@@ -4010,8 +2980,6 @@
       siteConfig.footerTagline = v('cfgFooterTagline') || siteConfig.footerTagline;
       siteConfig.footerCopyright = v('cfgFooterCopyright') || siteConfig.footerCopyright;
       siteConfig.address = v('cfgAddress') || siteConfig.address;
-      siteConfig.aboutText = v('cfgAboutText');
-      siteConfig.openingHours = v('cfgOpeningHours');
       siteConfig.mapsUrl = v('cfgMapsUrl') || siteConfig.mapsUrl;
       siteConfig.receiptPaper = v('cfgReceiptPaper') || '80';
       siteConfig.pickupOnly = document.getElementById('cfgPickupOnly').checked;
@@ -4019,16 +2987,11 @@
       siteConfig.receiptShowAddress = document.getElementById('cfgReceiptShowAddress').checked;
       siteConfig.receiptShowPhone = document.getElementById('cfgReceiptShowPhone').checked;
       siteConfig.depotPhone = v('cfgDepotPhone');
-      siteConfig.paymentInfo = v('cfgPaymentInfo');
-      siteConfig.paymentQr = document.getElementById('cfgPaymentQrData').value || '';
-      const pmNew = {};
-      PAY_METHODS_CFG.forEach(([key, cap]) => { pmNew[key] = { no: v('cfgPm' + cap + 'No'), an: v('cfgPm' + cap + 'An') }; });
-      siteConfig.paymentMethods = pmNew;
       siteConfig.receiptNote = v('cfgReceiptNote');
       siteConfig.receiptFooter = v('cfgReceiptFooter') || 'Barang harap kembali tepat waktu dalam kondisi baik. Terima kasih!';
       saveData();
       updateAdminBranding();
-      toast('Pengaturan tersimpan — index akan memakai perubahan ini.');
+      toast('Identitas & hero tersimpan — index akan memakai perubahan ini.');
     }
 
     function saveCatalog(e) {
@@ -4046,15 +3009,6 @@
       const img = document.getElementById('heroImgPreview');
       if (url && url.trim()) { img.src = fixImageUrl(url); bindImgPreviewError(img); img.classList.add('show'); }
       else img.classList.remove('show');
-    }
-    function previewPaymentQr(url) {
-      const dataEl = document.getElementById('cfgPaymentQrData');
-      if (dataEl) dataEl.value = url || '';
-      const wrap = document.getElementById('paymentQrPreviewWrap');
-      const img = document.getElementById('paymentQrPreview');
-      if (!wrap || !img) return;
-      if (url && url.trim()) { img.src = url; wrap.style.display = 'flex'; }
-      else { img.removeAttribute('src'); wrap.style.display = 'none'; }
     }
     function previewCardImg(url, imgId, emptyId) {
       const ci = document.getElementById(imgId);
@@ -4255,248 +3209,16 @@
       addDispatchItem();
     }
 
-    // ===== TANGKAP IDENTITAS (dispatch booking & form manual) =====
-    // Identitas penyewa dicatat di depot saat barang diambil. Dua jalur
-    // dispatch (bkConvert dari booking website & form Catat Sewa Keluar)
-    // memakai fasilitas yang sama: jenis identitas (KTP/KTM/SIM/Paspor/
-    // Kartu Pelajar/Lainnya) + nomor dan/atau FOTO kartu. Aturan sah:
-    // minimal salah satu terisi — nomor ATAU foto.
-    // Foto: aspek asli dipertahankan, sisi terpanjang maks 1280px,
-    // WebP q0.8 (mundur ke JPEG q0.8); hasil akhir di atas 600KB DITOLAK
-    // karena foto hanya menumpang JSON kontrak tersinkron (idPhoto,
-    // kontrak pertama batch saja) — harus kecil.
-    const ID_PHOTO_MAX_BYTES = 600 * 1024;
-    function idPhotoBytes(dataUrl) {
-      const s = String(dataUrl || '');
-      const i = s.indexOf(',');
-      if (i < 0) return 0;
-      return Math.floor((s.length - i - 1) * 3 / 4);
-    }
-    function processIdPhotoFile(file, cb) {
-      const tooBig = () => cb(null, 'Foto identitas terlalu besar (maks 600KB sesudah diproses). Coba foto ulang dengan resolusi lebih rendah.');
-      const rawFallback = () => {
-        const r = new FileReader();
-        r.onload = () => { const du = r.result; if (du && idPhotoBytes(du) <= ID_PHOTO_MAX_BYTES) cb(du); else tooBig(); };
-        r.onerror = () => cb(null, 'Foto identitas gagal dibaca. Coba berkas lain.');
-        r.readAsDataURL(file);
-      };
-      let url;
-      try { url = URL.createObjectURL(file); } catch (e) { rawFallback(); return; }
-      let settled = false;
-      const settle = fn => { if (settled) return; settled = true; clearTimeout(timer); try { URL.revokeObjectURL(url); } catch (e) {} fn(); };
-      const timer = setTimeout(() => settle(rawFallback), 4000);
-      const img = new Image();
-      img.onload = () => settle(() => {
-        try {
-          const sw = img.naturalWidth || img.width, sh = img.naturalHeight || img.height;
-          if (!sw || !sh) { rawFallback(); return; }
-          const scale = Math.min(1, 1280 / Math.max(sw, sh));
-          const w = Math.max(1, Math.round(sw * scale)), h = Math.max(1, Math.round(sh * scale));
-          const canvas = document.createElement('canvas');
-          canvas.width = w; canvas.height = h;
-          const ctx = canvas.getContext('2d');
-          if (!ctx) { cb(null, 'Foto identitas gagal diproses di perangkat ini.'); return; }
-          ctx.fillStyle = '#FFFFFF';
-          ctx.fillRect(0, 0, w, h);
-          ctx.drawImage(img, 0, 0, sw, sh, 0, 0, w, h);
-          let out = '';
-          try { out = canvas.toDataURL('image/webp', 0.8); } catch (e) { out = ''; }
-          if (!out || out.indexOf('data:image/webp') !== 0) out = canvas.toDataURL('image/jpeg', 0.8);
-          if (idPhotoBytes(out) > ID_PHOTO_MAX_BYTES) { tooBig(); return; }
-          cb(out);
-        } catch (err) { rawFallback(); }
-      });
-      img.onerror = () => settle(rawFallback);
-      img.src = url;
-    }
-
-    // Validator bersama modal & form manual. Mengembalikan pesan galat
-    // (string) atau '' bila sah.
-    function validateIdentity(idType, idNumber, hasPhoto) {
-      const num = String(idNumber || '').trim();
-      if (!num && !hasPhoto) return 'Isi nomor identitas atau lampirkan foto identitas.';
-      if (num) {
-        if (idType === 'KTP') {
-          if (!/^\d{16}$/.test(num)) return 'NIK KTP harus tepat 16 digit angka (atau kosongkan nomornya dan pakai foto KTP).';
-        } else if (num.length < 5) {
-          return 'Nomor identitas minimal 5 karakter (atau kosongkan nomornya dan pakai foto kartu).';
-        }
-      }
-      return '';
-    }
-
-    // Label identitas generik untuk tampilan: kontrak baru membawa
-    // idType+idNumber ("KTM 12345", atau jenisnya saja bila foto-saja);
-    // kontrak lama tanpa idType tetap "NIK <renterNIK>".
-    function renterIdLabel(c) {
-      if (!c) return '';
-      if (c.idType) return c.idNumber ? (c.idType + ' ' + c.idNumber) : c.idType;
-      return c.renterNIK ? ('NIK ' + c.renterNIK) : '';
-    }
-
-    // Foto identitas disimpan HANYA di kontrak pertama batch; helper ini
-    // menelusur foto batch (pola strukBatch: dispatchTimestamp sama +
-    // kunci penyewa sama) di kontrak aktif maupun selesai.
-    function batchIdPhoto(contract) {
-      if (!contract) return '';
-      if (contract.idPhoto) return contract.idPhoto;
-      if (!contract.dispatchTimestamp) return '';
-      const key = rentalRenterKey(contract);
-      const all = activeRentals.concat(completedRentals);
-      const hit = all.find(x => x.dispatchTimestamp === contract.dispatchTimestamp && rentalRenterKey(x) === key && x.idPhoto);
-      return hit ? hit.idPhoto : '';
-    }
-
-    // ----- Modal Tangkap Identitas (dipakai bkConvert) -----
-    // openIdentityCapture({ name, code, onConfirm, onCancel })
-    // onConfirm({ idType, idNumber, idPhoto }) — idPhoto '' bila tanpa foto.
-    // Batal (tombol/✕/latar/Escape) -> onCancel, tanpa sisa apa pun.
-    let idCapCtx = null;
-    let idCapPhoto = '';
-    let idCapInitDone = false;
-    function idCapInit() {
-      if (idCapInitDone) return;
-      idCapInitDone = true;
-      const modal = document.getElementById('idCaptureModal');
-      if (modal) modal.addEventListener('click', function (e) { if (e.target === modal) cancelIdentityCapture(); });
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && modal && modal.classList.contains('open')) cancelIdentityCapture();
-      });
-    }
-    function idCapShowError(msg) {
-      const e = document.getElementById('idCapError');
-      if (!e) return;
-      e.textContent = msg || '';
-      e.style.display = msg ? '' : 'none';
-    }
-    function idCapRefresh() {
-      const num = document.getElementById('idCapNumber').value.trim();
-      const btn = document.getElementById('idCapConfirm');
-      if (!btn) return;
-      btn.disabled = !num && !idCapPhoto;
-      btn.style.opacity = btn.disabled ? '0.55' : '';
-    }
-    function idCapSetPhoto(dataUrl) {
-      idCapPhoto = dataUrl || '';
-      const wrap = document.getElementById('idCapPhotoWrap');
-      const img = document.getElementById('idCapPhotoPreview');
-      if (idCapPhoto) { img.src = idCapPhoto; wrap.style.display = 'inline-flex'; }
-      else { img.removeAttribute('src'); wrap.style.display = 'none'; }
-      idCapRefresh();
-    }
-    function handleIdCapPhoto(input) {
-      const file = input.files && input.files[0];
-      input.value = '';
-      if (!file) return;
-      if (!/^image\//.test(file.type || '')) { idCapShowError('Berkas harus berupa gambar (JPG/PNG/WebP).'); return; }
-      toast('Memproses foto identitas…');
-      processIdPhotoFile(file, (dataUrl, err) => {
-        if (!dataUrl) { idCapShowError(err || 'Foto identitas gagal diproses. Coba foto lain.'); return; }
-        idCapShowError('');
-        idCapSetPhoto(dataUrl);
-      });
-    }
-    function openIdentityCapture(opts) {
-      opts = opts || {};
-      idCapCtx = { onConfirm: opts.onConfirm || null, onCancel: opts.onCancel || null };
-      document.getElementById('idCapSub').textContent = 'Penyewa sudah di depot. Catat identitas untuk dispatch ' + (opts.code || '') + ' atas nama ' + (opts.name || '') + '. Cukup nomor identitas ATAU foto kartunya.';
-      document.getElementById('idCapType').value = 'KTP';
-      document.getElementById('idCapNumber').value = '';
-      idCapShowError('');
-      idCapSetPhoto('');
-      idCapInit();
-      document.getElementById('idCaptureModal').classList.add('open');
-      idCapRefresh();
-    }
-    function confirmIdentityCapture() {
-      if (!idCapCtx) return;
-      const idType = document.getElementById('idCapType').value;
-      const idNumber = document.getElementById('idCapNumber').value.trim();
-      const err = validateIdentity(idType, idNumber, !!idCapPhoto);
-      if (err) { idCapShowError(err); return; }
-      const ctx = idCapCtx;
-      const ident = { idType: idType, idNumber: idNumber, idPhoto: idCapPhoto };
-      idCapCtx = null;
-      document.getElementById('idCaptureModal').classList.remove('open');
-      if (ctx.onConfirm) ctx.onConfirm(ident);
-    }
-    function cancelIdentityCapture() {
-      const modal = document.getElementById('idCaptureModal');
-      if (!modal || !modal.classList.contains('open')) return;
-      const ctx = idCapCtx;
-      idCapCtx = null;
-      modal.classList.remove('open');
-      if (ctx && ctx.onCancel) ctx.onCancel();
-    }
-
-    // ----- Blok identitas form manual (Catat Sewa Keluar) -----
-    let dispatchIdPhoto = '';
-    function handleDispatchIdPhoto(input) {
-      const file = input.files && input.files[0];
-      input.value = '';
-      if (!file) return;
-      if (!/^image\//.test(file.type || '')) { toast('Berkas harus berupa gambar (JPG/PNG/WebP).'); return; }
-      toast('Memproses foto identitas…');
-      processIdPhotoFile(file, (dataUrl, err) => {
-        if (!dataUrl) { toast(err || 'Foto identitas gagal diproses. Coba foto lain.'); return; }
-        dispatchIdPhoto = dataUrl;
-        const img = document.getElementById('dispatchIdPhotoPreview');
-        img.src = dataUrl;
-        document.getElementById('dispatchIdPhotoWrap').style.display = 'inline-flex';
-      });
-    }
-    function removeDispatchIdPhoto() {
-      dispatchIdPhoto = '';
-      const img = document.getElementById('dispatchIdPhotoPreview');
-      if (img) img.removeAttribute('src');
-      const wrap = document.getElementById('dispatchIdPhotoWrap');
-      if (wrap) wrap.style.display = 'none';
-    }
-
-    // ----- Lightbox Foto Identitas (dari kepala folder penyewa) -----
-    let idPhotoInitDone = false;
-    function idPhotoEnsureInit() {
-      if (idPhotoInitDone) return;
-      idPhotoInitDone = true;
-      const modal = document.getElementById('idPhotoModal');
-      if (!modal) return;
-      modal.addEventListener('click', function (e) { if (e.target === modal) closeIdPhoto(); });
-      const btn = document.getElementById('idPhotoClose');
-      if (btn) btn.addEventListener('click', closeIdPhoto);
-      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeIdPhoto(); });
-    }
-    function showRenterIdPhoto(idx) {
-      const photo = rentalFolderPhotos[idx];
-      if (!photo) { toast('Folder ini tidak punya foto identitas.'); return; }
-      idPhotoEnsureInit();
-      const body = document.getElementById('idPhotoBody');
-      body.innerHTML = '';
-      const img = document.createElement('img');
-      img.alt = 'Foto identitas penyewa';
-      img.style.cssText = 'max-width:92vw;max-height:84vh;border-radius:10px;background:#fff;';
-      img.src = photo;
-      body.appendChild(img);
-      document.getElementById('idPhotoModal').style.display = 'flex';
-    }
-    function closeIdPhoto() {
-      const modal = document.getElementById('idPhotoModal');
-      if (!modal || modal.style.display === 'none') return;
-      modal.style.display = 'none';
-      document.getElementById('idPhotoBody').innerHTML = '';
-    }
-
     // ===== DISPATCH =====
     function dispatchRental(e) {
       e.preventDefault();
       const days = parseInt(document.getElementById('dispatchDays').value, 10);
       const name = document.getElementById('dispatchName').value.trim();
       const phone = document.getElementById('dispatchPhone').value.trim();
-      const idType = (document.getElementById('dispatchIdType') || {}).value || 'KTP';
-      const idNumber = document.getElementById('dispatchNIK').value.trim();
+      const nik = document.getElementById('dispatchNIK').value.trim();
 
-      const idErr = validateIdentity(idType, idNumber, !!dispatchIdPhoto);
-      if (idErr) {
-        alert(idErr);
+      if (nik.length !== 16 || !/^\d{16}$/.test(nik)) {
+        alert('NIK harus 16 digit angka.');
         return;
       }
 
@@ -4526,7 +3248,7 @@
       const returnDate = ret.toISOString().split('T')[0];
 
       const batchTs = Date.now();
-      dispatchItems.forEach((di, diIdx) => {
+      dispatchItems.forEach(di => {
         const item = inventory.find(i => i.id === di.itemId);
         di._cid = 'CTR-' + Date.now().toString().slice(-6) + '-' + Math.random().toString(36).substr(2, 3).toUpperCase();
         di._batchTs = batchTs;
@@ -4539,26 +3261,21 @@
           item.stockRented = (item.stockRented || 0) + di.qty;
         }
 
-        const contract = {
+        activeRentals.unshift({
           contractId: di._cid,
           itemId: item.id,
           itemName: item.name + (di.size ? ' (Uk: ' + di.size + ')' : ''),
           size: di.size || '',
           renterName: name,
           renterPhone: phone,
-          renterNIK: idType === 'KTP' ? idNumber : '',
-          idType: idType,
-          idNumber: idNumber,
+          renterNIK: nik,
           qty: di.qty,
           days: days,
           returnDate: returnDate,
           dispatchTimestamp: di._batchTs,
           dispatchDate: new Date().toISOString().split('T')[0],
           dispatchTime: new Date().toTimeString().split(' ')[0].substring(0,5)
-        };
-        // Foto identitas hanya menumpang kontrak pertama batch.
-        if (diIdx === 0 && dispatchIdPhoto) contract.idPhoto = dispatchIdPhoto;
-        activeRentals.unshift(contract);
+        });
       });
 
       dispatchItems.forEach(di => {
@@ -4569,7 +3286,6 @@
       saveData();
       renderAll();
       document.getElementById('formDispatch').reset();
-      removeDispatchIdPhoto();
       populateDispatch();
       toast('Dispatch berhasil: ' + name + ' — struk siap dicetak.');
       if (firstCid) setTimeout(() => printStruk(firstCid), 350);
@@ -4980,59 +3696,6 @@
         if (!dataUrl) { toast('Foto gagal diproses. Coba foto JPG/PNG lain.'); return; }
         storeUploadedDataUrl(dataUrl, setValue);
       });
-    }
-    // ===== UNGGAH KODE QR PEMBAYARAN (QRIS) =====
-    // Berbeda dari foto katalog: QR TIDAK dipotong dan TIDAK dipaksa masuk
-    // bingkai — aspek asli dipertahankan, sisi terpanjang dibatasi 800px,
-    // latar diisi putih (zona tenang QR), lalu disimpan PNG/WebP kualitas
-    // tinggi supaya modul QR tetap tajam & bisa dipindai. Hasil disimpan
-    // sebagai data URL di config (siteConfig.paymentQr), bukan Storage.
-    function processQrImageFile(file, cb) {
-      const rawFallback = () => { const r = new FileReader(); r.onload = () => cb(r.result); r.onerror = () => cb(null); r.readAsDataURL(file); };
-      let url;
-      try { url = URL.createObjectURL(file); } catch (e) { rawFallback(); return; }
-      let settled = false;
-      const settle = fn => { if (settled) return; settled = true; clearTimeout(timer); try { URL.revokeObjectURL(url); } catch (e) {} fn(); };
-      const timer = setTimeout(() => settle(rawFallback), 4000);
-      const img = new Image();
-      img.onload = () => settle(() => {
-        try {
-          const sw = img.naturalWidth || img.width, sh = img.naturalHeight || img.height;
-          if (!sw || !sh) { rawFallback(); return; }
-          const scale = Math.min(1, 800 / Math.max(sw, sh));
-          const w = Math.max(1, Math.round(sw * scale)), h = Math.max(1, Math.round(sh * scale));
-          const canvas = document.createElement('canvas');
-          canvas.width = w; canvas.height = h;
-          const ctx = canvas.getContext('2d');
-          if (!ctx) { cb(null); return; }
-          ctx.fillStyle = '#FFFFFF';
-          ctx.fillRect(0, 0, w, h);
-          ctx.drawImage(img, 0, 0, sw, sh, 0, 0, w, h);
-          let out = '';
-          try { out = canvas.toDataURL('image/webp', 0.92); } catch (e) { out = ''; }
-          if (!out || out.indexOf('data:image/webp') !== 0) out = canvas.toDataURL('image/png');
-          cb(out);
-        } catch (err) { rawFallback(); }
-      });
-      img.onerror = () => settle(rawFallback);
-      img.src = url;
-    }
-    function handlePaymentQrUpload(e) {
-      const file = e.target.files && e.target.files[0];
-      e.target.value = '';
-      if (!file) return;
-      if (file.size > 3 * 1024 * 1024) { toast('Berkas QR terlalu besar — maksimal 3 MB. Kecilkan dulu, lalu unggah lagi.'); return; }
-      if (!/^image\//.test(file.type || '')) { toast('Berkas QR harus berupa gambar (PNG/JPG/WebP).'); return; }
-      toast('Memproses kode QR…');
-      processQrImageFile(file, dataUrl => {
-        if (!dataUrl) { toast('Kode QR gagal diproses. Coba gambar PNG/JPG lain.'); return; }
-        previewPaymentQr(dataUrl);
-        toast('Kode QR terpasang — klik SIMPAN untuk terapkan.');
-      });
-    }
-    function removePaymentQr() {
-      previewPaymentQr('');
-      toast('Kode QR dihapus — klik SIMPAN untuk terapkan.');
     }
     // ===== PEMOTONG FOTO GENERIK (Cropper.js) =====
     // Dipakai upload hero/barang/paket: cubit utk zoom (layar sentuh), seret
@@ -5469,32 +4132,5 @@
     checkSession();
   </script>
   <div id="printArea"></div>
-<div id="imgCropperModal" style="display:none; position:fixed; inset:0; background:rgba(10,15,12,0.88); z-index:9999; padding:18px; overflow:auto;">
-                  <div style="max-width:860px; margin:0 auto; background:white; padding:20px; border-radius:6px;">
-                    <h3 style="margin-bottom:6px; font-family:var(--serif);">Sesuaikan Foto</h3>
-                    <p style="font-size:12px; color:#666; margin:0 0 12px;">Di layar sentuh: <b>cubit</b> untuk zoom, seret untuk menggeser. Di komputer: roda mouse untuk zoom. Pilih template bingkai sesuai pemakaian foto:</p>
-                    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
-                      <button type="button" class="btn crop-tpl" data-tpl="hero" onclick="setCropTemplate('hero')">Hero 16:9</button>
-                      <button type="button" class="btn crop-tpl" data-tpl="produk" onclick="setCropTemplate('produk')">Produk 4:3</button>
-                      <button type="button" class="btn crop-tpl" data-tpl="kotak" onclick="setCropTemplate('kotak')">Kotak 1:1</button>
-                      <button type="button" class="btn crop-tpl" data-tpl="potret" onclick="setCropTemplate('potret')">Potret 3:4</button>
-                      <button type="button" class="btn crop-tpl" data-tpl="bebas" onclick="setCropTemplate('bebas')">Bebas</button>
-                    </div>
-                    <div style="max-height:54vh; overflow:hidden; background:#141414;">
-                      <img id="imgCropperImage" style="max-width:100%; display:block;">
-                    </div>
-                    <div style="margin-top:14px; display:flex; gap:10px; justify-content:space-between; align-items:center; flex-wrap:wrap;">
-                      <div style="display:flex; gap:8px;">
-                        <button type="button" class="btn" onclick="imgCropZoom(0.12)">Zoom +</button>
-                        <button type="button" class="btn" onclick="imgCropZoom(-0.12)">Zoom -</button>
-                        <button type="button" class="btn" onclick="imgCropRotate()">Putar 90&deg;</button>
-                      </div>
-                      <div style="display:flex; gap:10px;">
-                        <button type="button" class="btn" onclick="closeImageCropper()" style="background:var(--border); color:var(--text);">Batal</button>
-                        <button type="button" class="btn btn-primary" onclick="applyImageCrop()">Pakai Foto Ini</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
 </body>
 </html>
