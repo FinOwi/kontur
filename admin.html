@@ -468,7 +468,78 @@
       .btn { padding: 9px 12px; }
       .topbar-title { font-size: 16px; }
     }
-  </style>
+  
+  /* porting fitur platform: Pengaturan + Kontrak Aktif */
+  .btn-sm { font-size: 11px; padding: 6px 12px; min-height: 32px; }
+  .btn-xs { font-size: 10px; padding: 5px 10px; min-height: 30px; }
+  /* ===== KONTRAK AKTIF: folder per penyewa + pencarian (v4) ===== */
+    .rentals-box {
+      background: var(--surface); border: 1px solid var(--border);
+      margin-bottom: var(--sp-gap);
+    }
+  .rentals-head { padding: 12px 16px; background: var(--surface-2); border-bottom: 1px solid var(--border); }
+  .rentals-head-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .rental-search {
+      display: flex; align-items: center; gap: 8px; margin-top: 10px;
+      background: var(--surface); border: 1px solid var(--border);
+      padding: 0 10px; min-height: 42px;
+    }
+  .rental-search:focus-within { border-color: var(--forest); }
+  .rental-search .icon { color: var(--text-subtle); flex-shrink: 0; }
+  .rental-search input {
+      flex: 1; min-width: 0; border: none; outline: none; background: transparent;
+      font-family: var(--sans); font-size: 13px; color: var(--text); padding: 10px 0;
+    }
+  .rental-search-clear {
+      background: none; border: none; cursor: pointer; color: var(--text-muted);
+      display: none; align-items: center; justify-content: center;
+      width: 32px; height: 32px; flex-shrink: 0; padding: 0;
+    }
+  .rental-search-clear.show { display: inline-flex; }
+  .folder-list { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+  .folder-list .empty-state { padding: 28px 20px; }
+  .renter-folder { border: 1px solid var(--border); background: var(--surface); }
+  .renter-folder-head {
+      display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+      cursor: pointer; background: var(--surface-2); flex-wrap: wrap;
+    }
+  .renter-folder-head:hover { background: #E9E7DF; }
+  .renter-folder-head .folder-ic { color: var(--forest); display: inline-flex; flex-shrink: 0; }
+  .renter-folder-head .folder-main {
+      flex: 1; min-width: 200px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+  .renter-folder-head .folder-name { font-weight: 700; font-size: 13px; }
+  .folder-actions { display: inline-flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .folder-chevron { display: inline-flex; color: var(--text-muted); transition: transform 0.15s; flex-shrink: 0; }
+  .renter-folder.open .folder-chevron { transform: rotate(180deg); }
+  .renter-folder-body { display: none; border-top: 1px solid var(--border); }
+  .renter-folder.open .renter-folder-body { display: block; }
+  .folder-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .folder-table { min-width: 640px; }
+  /* ===== TAB PENGATURAN: folder lipat konfigurasi (pola folder penyewa) ===== */
+    .cfg-form > .cfg-folder { margin-bottom: 0; scroll-margin-top: 78px; }
+  .cfg-folder-in { padding: var(--sp-panel); }
+  .cfg-folder-in { padding: 18px 16px; }
+  .cfg-subblock { scroll-margin-top: 120px; }
+  .cfg-subblock + .cfg-subblock { margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--border); }
+  .cfg-subhead { font-family: var(--serif); font-size: 17px; font-weight: 700; color: var(--forest); margin-bottom: 14px; }
+  .btn-sm, .btn-xs { min-height: 40px; padding: 8px 12px; font-size: 11px; }
+  .rental-search-clear { width: 40px; height: 40px; }
+  .renter-folder-head .folder-main { min-width: 0; }
+  .folder-actions { width: 100%; margin-top: 2px; }
+  .folder-list { padding: 10px; }
+  /* Tabel mini folder menumpuk di HP (port mockup v4): baris jadi
+         blok penuh, kepala tabel hilang, tombol aksi tidak lagi jatuh
+         di luar tepi kanan layar sempit. Sel aksi = td terakhir. */
+      .folder-scroll { overflow-x: visible; }
+  .folder-table { min-width: 0; }
+  .folder-table thead { display: none; }
+  .folder-table, .folder-table tbody, .folder-table tr, .folder-table td { display: block; width: 100%; }
+  .folder-table tr { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  .folder-table tr:last-child { border-bottom: none; }
+  .folder-table td { border-bottom: none; padding: 2px 0; }
+  .folder-table td:last-child { padding-top: 8px; }
+</style>
 </head>
 <body>
 
@@ -521,7 +592,7 @@
         <div class="nav-section-label">Konten Situs</div>
         <div class="nav-item" onclick="switchTab('identity', this)">
           <svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 2 22 22 22"></polygon><line x1="12" y1="2" x2="12" y2="22"></line></svg>
-          <span>Identitas & Hero</span>
+          <span>Pengaturan</span>
         </div>
         <div class="nav-item" onclick="switchTab('catalog', this)">
           <svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
@@ -661,17 +732,22 @@
         <div class="tab-panel" id="tab-identity">
       <form id="formIdentity" onsubmit="saveIdentity(event)" class="cfg-form">
         <div class="cfg-nav">
-        <a href="#sec-brand">Brand &amp; Logo</a>
-        <a href="#sec-hero">Hero</a>
-        <a href="#sec-paket">Paket</a>
-        <a href="#sec-ketentuan">Ketentuan</a>
-        <a href="#sec-lokasi">Lokasi</a>
-        <a href="#sec-struk">Struk</a>
-        <a href="#sec-footer">Footer</a>
+        <a href="#sec-brand" onclick="cfgNavGo('tampilan')">Brand &amp; Logo</a>
+        <a href="#sec-announce" onclick="cfgNavGo('tampilan')">Announcement</a>
+        <a href="#sec-hero" onclick="cfgNavGo('tampilan')">Hero</a>
+        <a href="#sec-paket" onclick="cfgNavGo('paket')">Paket</a>
+        <a href="#sec-pembayaran" onclick="cfgNavGo('pembayaran')">Pembayaran</a>
+        <a href="#sec-ketentuan" onclick="cfgNavGo('ketentuan')">Ketentuan</a>
+        <a href="#sec-lokasi" onclick="cfgNavGo('lokasi')">Lokasi</a>
+        <a href="#sec-titik" onclick="cfgNavGo('titikberangkat')">Titik Berangkat</a>
+        <a href="#sec-struk" onclick="cfgNavGo('struk')">Struk</a>
+        <a href="#sec-footer" onclick="cfgNavGo('tampilan')">Footer</a>
         </div>
-        <div class="panel" id="sec-brand">
-          <div class="panel-head"><h3>Identitas Brand & Announcement Bar</h3>
-              <span class="badge-tag" style="color:var(--text-subtle); border-color:var(--border);">SITE CONFIG</span></div>
+        <div class="renter-folder cfg-folder" id="sec-tampilan" data-cfg-folder="tampilan">
+          <div class="renter-folder-head" role="button" tabindex="0" aria-expanded="false" onclick="toggleCfgFolder('tampilan')" onkeydown="cfgFolderKey(event,'tampilan')"><span class="folder-ic"><svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></span><span class="folder-main"><span class="folder-name">Tampilan Website</span></span><span class="folder-chevron"><svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span></div>
+          <div class="renter-folder-body"><div class="cfg-folder-in">
+            <div class="cfg-subblock" id="sec-brand">
+              <div class="cfg-subhead">Ganti Identitas Brand</div>
 <div style="background:#EEF5F0; border:1px solid var(--border); border-left:4px solid var(--forest); padding:12px 14px; margin-bottom:18px; font-size:12px; line-height:1.6; color:var(--text-muted);">
                 <strong style="color:var(--forest);">Terhubung ke Index:</strong>
                 perubahan yang disimpan di sini memakai konfigurasi storefront yang sama. Index v25 yang sedang terbuka di tab lain akan memperbarui tampilannya otomatis; index yang baru dibuka akan langsung memakai data terbaru.
@@ -693,66 +769,31 @@
                 <input type="file" class="form-input" id="cfgLogoFile" accept="image/*" onchange="openLogoCropper(event)" style="padding:6px 12px;">
                 <input type="text" class="form-input" id="cfgLogoUrl" placeholder="atau paste URL logo" oninput="previewLogo(this.value)" style="margin-top:8px;">
                 <img class="img-preview" id="logoPreview" style="max-height:80px; object-fit:contain;">
-                <div id="logoCropperModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999; padding:40px;">
-                  <div style="max-width:800px; margin:0 auto; background:white; padding:24px; border-radius:4px;">
-                    <h3 style="margin-bottom:16px; font-family:var(--serif);">Crop & Resize Logo</h3>
-                    <div style="max-height:500px; overflow:hidden;">
-                      <img id="logoCropperImage" style="max-width:100%;">
-                    </div>
-                    <div style="margin-top:16px; display:flex; gap:12px; justify-content:flex-end;">
-                      <button type="button" class="btn" onclick="closeLogoCropper()" style="background:var(--border); color:var(--text);">Batal</button>
-                      <button type="button" class="btn btn-primary" onclick="applyLogoCrop()">Terapkan Crop</button>
-                    </div>
-                  </div>
-                </div>
-                <div id="imgCropperModal" style="display:none; position:fixed; inset:0; background:rgba(10,15,12,0.88); z-index:9999; padding:18px; overflow:auto;">
-                  <div style="max-width:860px; margin:0 auto; background:white; padding:20px; border-radius:6px;">
-                    <h3 style="margin-bottom:6px; font-family:var(--serif);">Sesuaikan Foto</h3>
-                    <p style="font-size:12px; color:#666; margin:0 0 12px;">Di layar sentuh: <b>cubit</b> untuk zoom, seret untuk menggeser. Di komputer: roda mouse untuk zoom. Pilih template bingkai sesuai pemakaian foto:</p>
-                    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
-                      <button type="button" class="btn crop-tpl" data-tpl="hero" onclick="setCropTemplate('hero')">Hero 16:9</button>
-                      <button type="button" class="btn crop-tpl" data-tpl="produk" onclick="setCropTemplate('produk')">Produk 4:3</button>
-                      <button type="button" class="btn crop-tpl" data-tpl="kotak" onclick="setCropTemplate('kotak')">Kotak 1:1</button>
-                      <button type="button" class="btn crop-tpl" data-tpl="potret" onclick="setCropTemplate('potret')">Potret 3:4</button>
-                      <button type="button" class="btn crop-tpl" data-tpl="bebas" onclick="setCropTemplate('bebas')">Bebas</button>
-                    </div>
-                    <div style="max-height:54vh; overflow:hidden; background:#141414;">
-                      <img id="imgCropperImage" style="max-width:100%; display:block;">
-                    </div>
-                    <div style="margin-top:14px; display:flex; gap:10px; justify-content:space-between; align-items:center; flex-wrap:wrap;">
-                      <div style="display:flex; gap:8px;">
-                        <button type="button" class="btn" onclick="imgCropZoom(0.12)">Zoom +</button>
-                        <button type="button" class="btn" onclick="imgCropZoom(-0.12)">Zoom -</button>
-                        <button type="button" class="btn" onclick="imgCropRotate()">Putar 90&deg;</button>
-                      </div>
-                      <div style="display:flex; gap:10px;">
-                        <button type="button" class="btn" onclick="closeImageCropper()" style="background:var(--border); color:var(--text);">Batal</button>
-                        <button type="button" class="btn btn-primary" onclick="applyImageCrop()">Pakai Foto Ini</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                
               </div>
               
-              <div class="cfg-grid-3"><div class="form-group">
-                <label class="form-label">Trust Badge 1</label>
-                <input type="text" class="form-input" id="cfgTrust1" placeholder="Contoh: 100% Inspeksi Fisik">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Trust Badge 2</label>
-                <input type="text" class="form-input" id="cfgTrust2" placeholder="Contoh: Garansi Tukar Unit">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Trust Badge 3</label>
-                <input type="text" class="form-input" id="cfgTrust3" placeholder="Contoh: Pengambilan Langsung di Basecamp">
-              </div></div>
+              
 
               <div style="height:1px; background:var(--border); margin:20px 0;"></div>
-        </div>
-        <div class="panel" id="sec-hero">
-          <div class="panel-head"><h3>Konten Hero Section</h3></div>
-
-
+        
+            </div>
+            <div class="cfg-subblock" id="sec-announce">
+              <div class="cfg-subhead">Announcement Bar</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Teks Kiri Announcement Bar</label>
+                  <input type="text" class="form-input" id="cfgAnnounceLeft" placeholder="Contoh: HYGIENE GRADE-A · REAL-TIME TRACKING">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Teks Kanan Announcement Bar</label>
+                  <input type="text" class="form-input" id="cfgAnnounceRight" placeholder="Contoh: EST. 2026 // SEWA & RETAIL">
+                </div>
+              </div>
+              <div style="font-size:11px; color:var(--text-subtle);">Announcement bar adalah strip teks tipis di paling atas storefront &mdash; teks kiri tampil di awal bar, teks kanan di ujungnya.</div>
+            
+            </div>
+            <div class="cfg-subblock" id="sec-hero">
+              <div class="cfg-subhead">Konten Hero Section</div>
               <div class="form-group">
                 <label class="form-label">Foto Hero Background (lebar minimal 1920px)</label>
                 <input type="file" class="form-input" id="cfgHeroImageFile" accept="image/*" onchange="handleHeroImageUpload(event)" style="padding:6px 12px;">
@@ -778,10 +819,48 @@
                   <input type="text" class="form-input" id="cfgHeroCtaSecondary">
                 </div></div>
               </div>
+              
+              <div class="cfg-grid-3"><div class="form-group">
+                <label class="form-label">Trust Badge 1</label>
+                <input type="text" class="form-input" id="cfgTrust1" placeholder="Contoh: 100% Inspeksi Fisik">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Trust Badge 2</label>
+                <input type="text" class="form-input" id="cfgTrust2" placeholder="Contoh: Garansi Tukar Unit">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Trust Badge 3</label>
+                <input type="text" class="form-input" id="cfgTrust3" placeholder="Contoh: Pengambilan Langsung di Basecamp">
+              </div></div>
+
               <div style="height:1px; background:var(--border); margin:20px 0;"></div>
+        
+            </div>
+            <div class="cfg-subblock" id="sec-footer">
+              <div class="cfg-subhead">Footer Website</div>
+              <div class="form-row">
+                <div class="form-row"><div class="form-group">
+                  <label class="form-label">Nama Brand Footer</label>
+                  <input type="text" class="form-input" id="cfgFooterBrand">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Tagline Footer</label>
+                  <input type="text" class="form-input" id="cfgFooterTagline">
+                </div></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Teks Copyright Footer</label>
+                <input type="text" class="form-input" id="cfgFooterCopyright">
+              </div>
+
+              <div style="height:1px; background:var(--border); margin:20px 0;"></div>
+        
+            </div>
+        </div></div>
         </div>
-        <div class="panel" id="sec-paket">
-          <div class="panel-head"><h3>Paket Sewa Tenda</h3></div>
+        <div class="renter-folder cfg-folder" id="sec-paket" data-cfg-folder="paket">
+          <div class="renter-folder-head" role="button" tabindex="0" aria-expanded="false" onclick="toggleCfgFolder('paket')" onkeydown="cfgFolderKey(event,'paket')"><span class="folder-ic"><svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></span><span class="folder-main"><span class="folder-name">Paket Sewa Tenda</span></span><span class="folder-chevron"><svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span></div>
+          <div class="renter-folder-body"><div class="cfg-folder-in">
 
               
               <div class="form-row"><div class="form-group">
@@ -803,20 +882,100 @@
               </div></div></details>
 
               <div style="height:1px; background:var(--border); margin:20px 0;"></div>
+        </div></div>
         </div>
-        <div class="panel" id="sec-ketentuan">
-          <div class="panel-head"><h3>Ketentuan Sewa (Terms of Service)</h3></div>
+        <div class="renter-folder cfg-folder" id="sec-pembayaran" data-cfg-folder="pembayaran">
+          <div class="renter-folder-head" role="button" tabindex="0" aria-expanded="false" onclick="toggleCfgFolder('pembayaran')" onkeydown="cfgFolderKey(event,'pembayaran')"><span class="folder-ic"><svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></span><span class="folder-main"><span class="folder-name">Metode Pembayaran</span></span><span class="folder-chevron"><svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span></div>
+          <div class="renter-folder-body"><div class="cfg-folder-in">
+<div class="form-group">
+                <label class="form-label">Metode Pembayaran (tampil di formulir booking web)</label>
+                <div style="display:grid; gap:12px;">
+                  <div>
+                    <div style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em; color:var(--text-muted); margin-bottom:4px;">BRI</div>
+                    <div class="form-row">
+                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmBriNo" placeholder="Nomor Rekening / No. HP E-Wallet"></div>
+                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmBriAn" placeholder="Atas Nama (opsional)"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em; color:var(--text-muted); margin-bottom:4px;">MANDIRI</div>
+                    <div class="form-row">
+                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmMandiriNo" placeholder="Nomor Rekening / No. HP E-Wallet"></div>
+                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmMandiriAn" placeholder="Atas Nama (opsional)"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em; color:var(--text-muted); margin-bottom:4px;">BCA</div>
+                    <div class="form-row">
+                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmBcaNo" placeholder="Nomor Rekening / No. HP E-Wallet"></div>
+                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmBcaAn" placeholder="Atas Nama (opsional)"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em; color:var(--text-muted); margin-bottom:4px;">BNI</div>
+                    <div class="form-row">
+                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmBniNo" placeholder="Nomor Rekening / No. HP E-Wallet"></div>
+                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmBniAn" placeholder="Atas Nama (opsional)"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em; color:var(--text-muted); margin-bottom:4px;">DANA</div>
+                    <div class="form-row">
+                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmDanaNo" placeholder="Nomor Rekening / No. HP E-Wallet"></div>
+                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmDanaAn" placeholder="Atas Nama (opsional)"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em; color:var(--text-muted); margin-bottom:4px;">OVO</div>
+                    <div class="form-row">
+                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmOvoNo" placeholder="Nomor Rekening / No. HP E-Wallet"></div>
+                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmOvoAn" placeholder="Atas Nama (opsional)"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em; color:var(--text-muted); margin-bottom:4px;">GOPAY</div>
+                    <div class="form-row">
+                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmGopayNo" placeholder="Nomor Rekening / No. HP E-Wallet"></div>
+                      <div class="form-group" style="margin:0;"><input type="text" class="form-input" id="cfgPmGopayAn" placeholder="Atas Nama (opsional)"></div>
+                    </div>
+                  </div>
+                </div>
+                <div style="font-size:11px; color:var(--text-subtle); margin-top:6px;">Hanya metode yang nomornya diisi yang tampil ke pelanggan di formulir booking web, lengkap dengan logo resmi metode itu dan tombol salin nomor. Kosongkan nomor untuk menyembunyikan metode.</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Catatan Pembayaran (opsional)</label>
+                <textarea class="form-textarea" id="cfgPaymentInfo" rows="3" placeholder="Contoh: Sesudah transfer, konfirmasi ke admin lewat WhatsApp agar booking cepat diverifikasi."></textarea>
+                <div style="font-size:11px; color:var(--text-subtle); margin-top:4px;">Catatan bebas yang tampil di bawah daftar metode pembayaran pada formulir booking web. Boleh dikosongkan.</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Kode QR Pembayaran (QRIS)</label>
+                <input type="file" class="form-input" id="cfgPaymentQrFile" accept="image/png,image/jpeg,image/webp" onchange="handlePaymentQrUpload(event)" style="padding:6px 12px;">
+                <input type="hidden" id="cfgPaymentQrData">
+                <div id="paymentQrPreviewWrap" style="display:none; margin-top:10px; align-items:center; gap:12px;">
+                  <img id="paymentQrPreview" alt="Pratinjau kode QR pembayaran" style="width:120px; height:120px; object-fit:contain; background:#fff; border:1px solid var(--border); border-radius:8px; padding:6px;">
+                  <button type="button" class="btn btn-secondary" id="btnRemovePaymentQr" onclick="removePaymentQr()">Hapus QR</button>
+                </div>
+                <div style="font-size:11px; color:var(--text-subtle); margin-top:4px;">Unggah gambar kode QR (QRIS) toko — tampil otomatis di formulir booking web hanya saat pelanggan memilih metode QRIS. Gambar tidak dipotong; otomatis diperkecil ke maks 800px dan disimpan sebagai PNG/WebP kualitas tinggi agar tetap tajam saat dipindai. Berkas asli maks 3 MB.</div>
+              </div>
+            </div></div>
+        </div>
+        <div class="renter-folder cfg-folder" id="sec-ketentuan" data-cfg-folder="ketentuan">
+          <div class="renter-folder-head" role="button" tabindex="0" aria-expanded="false" onclick="toggleCfgFolder('ketentuan')" onkeydown="cfgFolderKey(event,'ketentuan')"><span class="folder-ic"><svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></span><span class="folder-main"><span class="folder-name">Ketentuan Sewa</span></span><span class="folder-chevron"><svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span></div>
+          <div class="renter-folder-body"><div class="cfg-folder-in">
 
               
               <div class="form-group">
                 <label class="form-label">Ketentuan Sewa & Deposit (HTML atau plain text, tampil di modal)</label>
                 <textarea class="form-textarea" id="cfgRentalTerms" rows="10" placeholder="Ketik ketentuan sewa Anda di sini...&#10;&#10;Contoh:&#10;1. Deposit wajib 50% dari nilai barang&#10;2. Pembayaran via transfer bank&#10;3. Barang wajib dikembalikan dalam kondisi bersih"></textarea>
               </div>
+              
 
               <div style="height:1px; background:var(--border); margin:20px 0;"></div>
+        </div></div>
         </div>
-        <div class="panel" id="sec-lokasi">
-          <div class="panel-head"><h3>Lokasi Basecamp &amp; Google Maps</h3></div>
+        <div class="renter-folder cfg-folder" id="sec-lokasi" data-cfg-folder="lokasi">
+          <div class="renter-folder-head" role="button" tabindex="0" aria-expanded="false" onclick="toggleCfgFolder('lokasi')" onkeydown="cfgFolderKey(event,'lokasi')"><span class="folder-ic"><svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></span><span class="folder-main"><span class="folder-name">Lokasi Basecamp &amp; Google Maps</span></span><span class="folder-chevron"><svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span></div>
+          <div class="renter-folder-body"><div class="cfg-folder-in">
 
               <div class="form-group">
                 <label class="form-label">Alamat Lengkap Basecamp (tampil di web + jadi titik peta)</label>
@@ -833,9 +992,29 @@
               
 
               <div style="border-top:1px dashed var(--border); margin:18px 0 14px;"></div>
+        </div></div>
         </div>
-        <div class="panel" id="sec-struk">
-          <div class="panel-head"><h3>Kustomisasi Struk</h3></div>
+        <div class="renter-folder cfg-folder" id="sec-titik" data-cfg-folder="titikberangkat">
+          <div class="renter-folder-head" role="button" tabindex="0" aria-expanded="false" onclick="toggleCfgFolder('titikberangkat')" onkeydown="cfgFolderKey(event,'titikberangkat')"><span class="folder-ic"><svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1 2-2V5a2 2 0 0 1 2 2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></span><span class="folder-main"><span class="folder-name">Titik Berangkat</span></span><span class="folder-chevron"><svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span></div>
+          <div class="renter-folder-body"><div class="cfg-folder-in">
+
+              <div style="font-size:11px; color:var(--text-subtle); margin-bottom:14px;">Konten halaman Tentang Kami (Titik Berangkat) di storefront — tampil sesudah pengaturan disimpan.</div>
+              <div class="form-group">
+                <label class="form-label">Teks Tentang Kami (pisahkan paragraf dengan baris kosong)</label>
+                <textarea class="form-textarea" id="cfgAboutText" rows="9"></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Jam Buka (teks tampil di web)</label>
+                <input type="text" class="form-input" id="cfgOpeningHours" placeholder="Contoh: Setiap hari 08.00–21.00 WIB">
+              </div>
+              <div style="font-size:11px; color:var(--text-subtle);">Alamat basecamp diisi di folder <a href="#sec-lokasi" onclick="cfgNavGo('lokasi')">Lokasi Basecamp &amp; Google Maps</a> — alamat yang sama tampil di halaman Titik Berangkat. Bila alamat kosong, halaman menampilkan teks &quot;Alamat basecamp — hubungi via WhatsApp&quot;.</div>
+
+              <div style="border-top:1px dashed var(--border); margin:18px 0 14px;"></div>
+        </div></div>
+        </div>
+        <div class="renter-folder cfg-folder" id="sec-struk" data-cfg-folder="struk">
+          <div class="renter-folder-head" role="button" tabindex="0" aria-expanded="false" onclick="toggleCfgFolder('struk')" onkeydown="cfgFolderKey(event,'struk')"><span class="folder-ic"><svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></span><span class="folder-main"><span class="folder-name">Kustomisasi Struk</span></span><span class="folder-chevron"><svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span></div>
+          <div class="renter-folder-body"><div class="cfg-folder-in">
 
 <div class="form-group">
                 <label class="form-label">Ukuran Kertas Struk (Printer Thermal)</label>
@@ -880,26 +1059,7 @@
                 </div>
                 <div id="btUnsupported" style="display:none; font-size:12px; color:var(--text-subtle);">Browser ini tidak mendukung Web Bluetooth (perlu Chrome di Android). Cetak tetap bisa lewat tombol STRUK (dialog print) atau PDF.</div>
               </div>
-        </div>
-        <div class="panel" id="sec-footer">
-          <div class="panel-head"><h3>Footer Website</h3></div>
-
-              <div class="form-row">
-                <div class="form-row"><div class="form-group">
-                  <label class="form-label">Nama Brand Footer</label>
-                  <input type="text" class="form-input" id="cfgFooterBrand">
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Tagline Footer</label>
-                  <input type="text" class="form-input" id="cfgFooterTagline">
-                </div></div>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Teks Copyright Footer</label>
-                <input type="text" class="form-input" id="cfgFooterCopyright">
-              </div>
-
-              <div style="height:1px; background:var(--border); margin:20px 0;"></div>
+        </div></div>
         </div>
         <div class="cfg-savebar">
           <button type="submit" class="btn btn-primary btn-full" style="margin-top:8px;">
@@ -909,6 +1069,19 @@
               <a href="index.html" target="_blank" rel="noopener" class="btn btn-secondary btn-full" style="margin-top:10px; text-decoration:none;">BUKA INDEX UNTUK CEK HASIL</a>
         </div>
       </form>
+        <div id="logoCropperModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999; padding:40px;">
+                  <div style="max-width:800px; margin:0 auto; background:white; padding:24px; border-radius:4px;">
+                    <h3 style="margin-bottom:16px; font-family:var(--serif);">Crop & Resize Logo</h3>
+                    <div style="max-height:500px; overflow:hidden;">
+                      <img id="logoCropperImage" style="max-width:100%;">
+                    </div>
+                    <div style="margin-top:16px; display:flex; gap:12px; justify-content:flex-end;">
+                      <button type="button" class="btn" onclick="closeLogoCropper()" style="background:var(--border); color:var(--text);">Batal</button>
+                      <button type="button" class="btn btn-primary" onclick="applyLogoCrop()">Terapkan Crop</button>
+                    </div>
+                  </div>
+                </div>
+        
     </div>
 
 <!-- ===== TAB: CATALOG HEADER ===== -->
@@ -1150,28 +1323,20 @@
             </div>
           </div>
 
-          <!-- Active Rentals Table -->
-          <div class="table-wrap">
-            <div style="padding:12px 16px; background:var(--surface-2); border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-              <span class="mono" style="font-size:11px; font-weight:700;">KONTRAK SEWA AKTIF DI LAPANGAN</span>
-              <span class="mono" style="font-size:11px;" id="activeCount">0 KONTRAK</span>
+          <!-- Active Rentals: folder per penyewa + pencarian -->
+          <div class="rentals-box">
+            <div class="rentals-head">
+              <div class="rentals-head-row">
+                <span class="mono" style="font-size:11px; font-weight:700;">KONTRAK SEWA AKTIF DI LAPANGAN</span>
+                <span class="mono" style="font-size:11px;" id="activeCount">0 KONTRAK</span>
+              </div>
+              <div class="rental-search">
+                <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.5" y2="16.5"></line></svg>
+                <input type="text" id="rentalSearchInput" placeholder="Cari penyewa, barang, kode kontrak, No. WA&hellip;" autocomplete="off" oninput="onRentalSearchInput(this)">
+                <button type="button" class="rental-search-clear" id="rentalSearchClear" aria-label="Bersihkan pencarian" onclick="clearRentalSearch()"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+              </div>
             </div>
-            <table>
-              <thead>
-                <tr>
-                  <th>KONTRAK</th>
-                  <th>NAMA PENYEWA</th>
-                  <th>NO. WA</th>
-                  <th>NIK / KTP</th>
-                  <th>ALAT</th>
-                  <th>QTY</th>
-                  <th>DURASI</th>
-                  <th>TGL KEMBALI</th>
-                  <th style="text-align:right;">AKSI</th>
-                </tr>
-              </thead>
-              <tbody id="rentalTableBody"></tbody>
-            </table>
+            <div id="rentalTableBody" class="folder-list"></div>
           </div>
         </div>
 
@@ -2656,7 +2821,7 @@
 
       const titles = {
         dashboard: ['Dashboard Overview', 'ADMIN CONSOLE'],
-        identity: ['Identitas & Hero Editor', 'SITE CONFIG'],
+        identity: ['Pengaturan Editor', 'SITE CONFIG'],
         catalog: ['Header Katalog Editor', 'CATALOG CONTENT'],
         inventory: ['Inventaris Barang', 'STOCK MANAGEMENT'],
         rentals: ['Sewa & Kontrak', 'RENTAL OPERATIONS'],
@@ -2757,25 +2922,106 @@
 
     function renderRentalTable() {
       const body = document.getElementById('rentalTableBody');
+      const countEl = document.getElementById('activeCount');
       const lateTotal = activeRentals.filter(x => daysLate(x) > 0).length;
-      document.getElementById('activeCount').textContent = activeRentals.length + ' KONTRAK' + (lateTotal ? ' \u00B7 ' + lateTotal + ' TELAT' : '');
+      // Kelompokkan per penyewa (urutan grup = kemunculan pertama; urutan
+      // kontrak di dalam grup tidak berubah) supaya satu orang = satu folder.
+      const groups = [];
+      const byKey = {};
+      activeRentals.forEach(c => {
+        const k = rentalRenterKey(c);
+        if (!byKey[k]) { byKey[k] = { key: k, first: c, items: [] }; groups.push(byKey[k]); }
+        byKey[k].items.push(c);
+      });
+      rentalFolderKeys = groups.map(g => g.key);
+      // Foto identitas per folder (dari kontrak pertama batch di grup;
+      // batchIdPhoto menelusur batch-nya) untuk tombol FOTO ID di kepala.
+      rentalFolderPhotos = groups.map(g => g.items.map(c => batchIdPhoto(c)).find(p => !!p) || '');
+
+      const q = rentalSearchQuery.trim().toLowerCase();
+      const qd = q.replace(/\D/g, '');
+      const searching = q !== '';
+      // Field pencarian berada di luar wadah yang digambar ulang: samakan
+      // nilainya dengan keadaan tersimpan agar kueri bertahan lintas render.
+      const inp = document.getElementById('rentalSearchInput');
+      if (inp && inp.value !== rentalSearchQuery) inp.value = rentalSearchQuery;
+      const clr = document.getElementById('rentalSearchClear');
+      if (clr) clr.classList.toggle('show', searching);
+
       if (activeRentals.length === 0) {
-        body.innerHTML = '<tr><td colspan="9" class="empty-state"><div class="title">Tidak ada sewa aktif</div></td></tr>';
+        countEl.textContent = '0 KONTRAK \u00B7 0 PENYEWA';
+        body.innerHTML = '<div class="empty-state"><div class="title">Tidak ada sewa aktif</div></div>';
         return;
       }
-      body.innerHTML = activeRentals.map(c => {
-        const late = daysLate(c);
-        return '<tr' + (late > 0 ? ' style="background:#FDF2F0;"' : '') + '>' +
-        '<td class="mono" style="font-weight:600;">' + c.contractId + '</td>' +
-        '<td>' + escHtml(c.renterName || '') + '</td>' +
-        '<td class="mono">' + escHtml(c.renterPhone || '') + '</td>' +
-        '<td class="mono" style="font-size:11px;">' + escHtml(c.renterNIK || '') + '</td>' +
-        '<td style="font-weight:600;">' + escHtml(c.itemName) + '</td>' +
-        '<td class="mono">' + c.qty + '</td>' +
-        '<td class="mono">' + c.days + ' hari</td>' +
-        '<td class="mono" style="color:' + (late > 0 ? 'var(--terracotta)' : 'var(--amber-warn)') + ';font-weight:600;">' + c.returnDate + (late > 0 ? ' <span class="badge-tag" style="background:var(--terracotta);color:#fff;border-color:var(--terracotta);">TELAT ' + late + ' HARI</span>' : '') + '</td>' +
-        '<td style="text-align:right; white-space:nowrap;">' + (late > 0 ? '<button class="btn" style="font-size:10px;padding:4px 10px;margin-right:4px;background:var(--terracotta);color:#fff;border:none;cursor:pointer;" onclick="remindLate(\'' + c.contractId + '\')">INGATKAN WA</button>' : '') + '<button class="btn btn-secondary" style="font-size:10px;padding:4px 10px;margin-right:4px;" onclick="printStruk(\'' + c.contractId + '\')">STRUK</button><button class="btn btn-secondary" style="font-size:10px;padding:4px 10px;margin-right:4px;" onclick="sendStrukWA(\'' + c.contractId + '\')">KIRIM PDF</button><button class="btn btn-secondary" style="font-size:10px;padding:4px 10px;margin-right:4px;" onclick="sendStrukImageWA(\'' + c.contractId + '\')">GAMBAR WA</button><button class="btn btn-primary" style="font-size:10px;padding:4px 10px;" onclick="returnItem(\'' + c.contractId + '\')">BARANG KEMBALI</button></td>' +
-      '</tr>'; }).join('');
+
+      let visibleGroups = 0, visibleItems = 0;
+      let html = '';
+      groups.forEach((g, gi) => {
+        const f = g.first;
+        const identityHit = !searching || g.items.some(c =>
+          rentalSearchHit(c.renterName, q, '') ||
+          rentalSearchHit(c.renterPhone, q, qd) ||
+          rentalSearchHit(c.renterNIK, q, qd) ||
+          rentalSearchHit(c.idNumber, q, qd));
+        const items = (searching && !identityHit)
+          ? g.items.filter(c => rentalSearchHit(String(c.itemName || '') + ' ' + (c.size || ''), q, qd) || rentalSearchHit(c.contractId, q, qd))
+          : g.items;
+        if (searching && !identityHit && items.length === 0) return;
+        visibleGroups++; visibleItems += items.length;
+        // Selama pencarian, folder yang tampil otomatis terbuka; di luar
+        // pencarian keadaan manual admin yang berlaku.
+        const open = searching ? true : rentalFolderOpen[g.key] === true;
+        const totalUnits = g.items.reduce((s, x) => s + (x.qty || 0), 0);
+        const nearest = g.items.map(x => x.returnDate || '').filter(Boolean).sort()[0] || '-';
+        const lateItems = g.items.filter(x => daysLate(x) > 0);
+        const lateMax = lateItems.reduce((m, x) => Math.max(m, daysLate(x)), 0);
+        const idLabel = renterIdLabel(f);
+        const gPhoto = rentalFolderPhotos[gi] || '';
+        html += '<div class="renter-folder' + (open ? ' open' : '') + '">' +
+          '<div class="renter-folder-head" role="button" tabindex="0" aria-expanded="' + (open ? 'true' : 'false') + '" onclick="toggleRentalFolder(' + gi + ')">' +
+            '<span class="folder-ic"><svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></span>' +
+            '<span class="folder-main">' +
+              '<span class="folder-name">' + escHtml(f.renterName || '') + '</span>' +
+              (f.renterPhone ? '<span class="mono" style="font-size:11px;color:var(--text-muted);">' + escHtml(f.renterPhone) + '</span>' : '') +
+              (idLabel ? '<span class="mono" style="font-size:11px;color:var(--text-muted);">' + escHtml(idLabel) + '</span>' : '') +
+              '<span class="mono" style="font-size:11px;font-weight:700;color:var(--forest);">' + g.items.length + ' barang &middot; total ' + totalUnits + ' unit &middot; kembali terdekat ' + nearest + '</span>' +
+              (lateItems.length ? '<span class="badge-tag" style="background:var(--terracotta);color:#fff;border-color:var(--terracotta);">' + lateItems.length + ' TELAT &middot; MAKS ' + lateMax + ' HARI</span>' : '') +
+            '</span>' +
+            '<span class="folder-actions">' +
+              '<button class="btn btn-secondary btn-xs" onclick="event.stopPropagation();printStrukGroup(\'' + f.contractId + '\')">STRUK</button>' +
+              '<button class="btn btn-secondary btn-xs" onclick="event.stopPropagation();sendStrukWAGroup(\'' + f.contractId + '\')">KIRIM PDF</button>' +
+              '<button class="btn btn-secondary btn-xs" onclick="event.stopPropagation();sendStrukImageWAGroup(\'' + f.contractId + '\')">GAMBAR WA</button>' +
+              (gPhoto ? '<button class="btn btn-secondary btn-xs" onclick="event.stopPropagation();showRenterIdPhoto(' + gi + ')">FOTO ID</button>' : '') +
+            '</span>' +
+            '<span class="folder-chevron"><svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span>' +
+          '</div>' +
+          '<div class="renter-folder-body"><div class="folder-scroll"><table class="folder-table">' +
+            '<thead><tr><th>KONTRAK</th><th>ALAT</th><th>QTY</th><th>DURASI</th><th>TGL KEMBALI</th><th style="text-align:right;">AKSI</th></tr></thead>' +
+            '<tbody>' +
+            items.map(c => {
+              const late = daysLate(c);
+              return '<tr' + (late > 0 ? ' style="background:#FDF2F0;"' : '') + '>' +
+              '<td class="mono" style="font-weight:600;">' + c.contractId + '</td>' +
+              '<td style="font-weight:600;">' + escHtml(c.itemName) + '</td>' +
+              '<td class="mono">' + c.qty + '</td>' +
+              '<td class="mono">' + c.days + ' hari</td>' +
+              '<td class="mono" style="color:' + (late > 0 ? 'var(--terracotta)' : 'var(--amber-warn)') + ';font-weight:600;">' + c.returnDate + (late > 0 ? ' <span class="badge-tag" style="background:var(--terracotta);color:#fff;border-color:var(--terracotta);">TELAT ' + late + ' HARI</span>' : '') + '</td>' +
+              '<td style="text-align:right; white-space:nowrap;">' + (late > 0 ? '<button class="btn btn-xs" style="background:var(--terracotta);color:#fff;border-color:var(--terracotta);" onclick="remindLate(\'' + c.contractId + '\')">INGATKAN WA</button> ' : '') + '<button class="btn btn-primary btn-xs" onclick="returnItem(\'' + c.contractId + '\')">BARANG KEMBALI</button></td>' +
+            '</tr>'; }).join('') +
+            '</tbody></table></div></div>' +
+        '</div>';
+      });
+
+      if (searching) {
+        countEl.textContent = visibleItems + ' DARI ' + activeRentals.length + ' BARANG \u00B7 ' + visibleGroups + ' PENYEWA COCOK';
+        if (visibleGroups === 0) {
+          body.innerHTML = '<div class="empty-state"><div class="title">Tidak ada hasil untuk \'' + escHtml(rentalSearchQuery.trim()) + '\'.</div></div>';
+          return;
+        }
+      } else {
+        countEl.textContent = activeRentals.length + ' KONTRAK \u00B7 ' + groups.length + ' PENYEWA' + (lateTotal ? ' \u00B7 ' + lateTotal + ' TELAT' : '');
+      }
+      body.innerHTML = html;
     }
 
     function renderRecentRentals() {
@@ -2922,6 +3168,8 @@
       set('cfgBrandName', siteConfig.brandName);
       set('cfgBrandSubtitle', siteConfig.brandSubtitle);
       set('cfgLogoUrl', siteConfig.logoUrl);
+      set('cfgAnnounceLeft', siteConfig.announceLeft);
+      set('cfgAnnounceRight', siteConfig.announceRight);
       previewLogo(siteConfig.logoUrl);
       set('cfgHeroImage', siteConfig.heroImage);
       set('cfgHeroHeading', siteConfig.heroHeading);
@@ -2940,6 +3188,8 @@
       set('cfgFooterTagline', siteConfig.footerTagline);
       set('cfgFooterCopyright', siteConfig.footerCopyright);
       set('cfgAddress', siteConfig.address);
+      set('cfgAboutText', siteConfig.aboutText);
+      set('cfgOpeningHours', siteConfig.openingHours);
       set('cfgMapsUrl', siteConfig.mapsUrl);
       set('cfgReceiptPaper', siteConfig.receiptPaper || '80');
       document.getElementById('cfgPickupOnly').checked = siteConfig.pickupOnly !== false;
@@ -2947,6 +3197,10 @@
       document.getElementById('cfgReceiptShowAddress').checked = siteConfig.receiptShowAddress !== false;
       document.getElementById('cfgReceiptShowPhone').checked = siteConfig.receiptShowPhone !== false;
       set('cfgDepotPhone', siteConfig.depotPhone || '');
+      set('cfgPaymentInfo', siteConfig.paymentInfo || '');
+      previewPaymentQr(siteConfig.paymentQr || '');
+      const pmSeed = siteConfig.paymentMethods || {};
+      PAY_METHODS_CFG.forEach(([key, cap]) => { const m = pmSeed[key] || {}; set('cfgPm' + cap + 'No', m.no || ''); set('cfgPm' + cap + 'An', m.an || ''); });
       set('cfgReceiptNote', siteConfig.receiptNote || '');
       set('cfgReceiptFooter', siteConfig.receiptFooter || 'Barang harap kembali tepat waktu dalam kondisi baik. Terima kasih!');
       set('cfgCatalogEyebrow', siteConfig.catalogEyebrow);
@@ -2961,6 +3215,8 @@
       siteConfig.brandName = v('cfgBrandName') || siteConfig.brandName;
       siteConfig.brandSubtitle = v('cfgBrandSubtitle') || siteConfig.brandSubtitle;
       siteConfig.logoUrl = v('cfgLogoUrl') || siteConfig.logoUrl;
+      siteConfig.announceLeft = v('cfgAnnounceLeft') || siteConfig.announceLeft;
+      siteConfig.announceRight = v('cfgAnnounceRight') || siteConfig.announceRight;
       siteConfig.heroImage = v('cfgHeroImage') || siteConfig.heroImage;
       siteConfig.heroHeading = v('cfgHeroHeading') || siteConfig.heroHeading;
       siteConfig.heroDescription = v('cfgHeroDescription') || siteConfig.heroDescription;
@@ -2980,6 +3236,8 @@
       siteConfig.footerTagline = v('cfgFooterTagline') || siteConfig.footerTagline;
       siteConfig.footerCopyright = v('cfgFooterCopyright') || siteConfig.footerCopyright;
       siteConfig.address = v('cfgAddress') || siteConfig.address;
+      siteConfig.aboutText = v('cfgAboutText');
+      siteConfig.openingHours = v('cfgOpeningHours');
       siteConfig.mapsUrl = v('cfgMapsUrl') || siteConfig.mapsUrl;
       siteConfig.receiptPaper = v('cfgReceiptPaper') || '80';
       siteConfig.pickupOnly = document.getElementById('cfgPickupOnly').checked;
@@ -2987,11 +3245,16 @@
       siteConfig.receiptShowAddress = document.getElementById('cfgReceiptShowAddress').checked;
       siteConfig.receiptShowPhone = document.getElementById('cfgReceiptShowPhone').checked;
       siteConfig.depotPhone = v('cfgDepotPhone');
+      siteConfig.paymentInfo = v('cfgPaymentInfo');
+      siteConfig.paymentQr = document.getElementById('cfgPaymentQrData').value || '';
+      const pmNew = {};
+      PAY_METHODS_CFG.forEach(([key, cap]) => { pmNew[key] = { no: v('cfgPm' + cap + 'No'), an: v('cfgPm' + cap + 'An') }; });
+      siteConfig.paymentMethods = pmNew;
       siteConfig.receiptNote = v('cfgReceiptNote');
       siteConfig.receiptFooter = v('cfgReceiptFooter') || 'Barang harap kembali tepat waktu dalam kondisi baik. Terima kasih!';
       saveData();
       updateAdminBranding();
-      toast('Identitas & hero tersimpan — index akan memakai perubahan ini.');
+      toast('Pengaturan tersimpan — index akan memakai perubahan ini.');
     }
 
     function saveCatalog(e) {
@@ -4132,5 +4395,578 @@
     checkSession();
   </script>
   <div id="printArea"></div>
+
+  <div id="idPhotoModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(12,14,12,.88);align-items:center;justify-content:center;padding:18px;">
+    <button type="button" id="idPhotoClose" aria-label="Tutup foto identitas" style="position:absolute;top:14px;right:16px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.4);background:rgba(0,0,0,.55);color:#fff;font-size:19px;line-height:1;cursor:pointer;">&#10005;</button>
+    <div id="idPhotoBody" style="display:flex;align-items:center;justify-content:center;max-width:92vw;max-height:84vh;"></div>
+  </div>
+  <div id="imgCropperModal" style="display:none; position:fixed; inset:0; background:rgba(10,15,12,0.88); z-index:9999; padding:18px; overflow:auto;">
+                  <div style="max-width:860px; margin:0 auto; background:white; padding:20px; border-radius:6px;">
+                    <h3 style="margin-bottom:6px; font-family:var(--serif);">Sesuaikan Foto</h3>
+                    <p style="font-size:12px; color:#666; margin:0 0 12px;">Di layar sentuh: <b>cubit</b> untuk zoom, seret untuk menggeser. Di komputer: roda mouse untuk zoom. Pilih template bingkai sesuai pemakaian foto:</p>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+                      <button type="button" class="btn crop-tpl" data-tpl="hero" onclick="setCropTemplate('hero')">Hero 16:9</button>
+                      <button type="button" class="btn crop-tpl" data-tpl="produk" onclick="setCropTemplate('produk')">Produk 4:3</button>
+                      <button type="button" class="btn crop-tpl" data-tpl="kotak" onclick="setCropTemplate('kotak')">Kotak 1:1</button>
+                      <button type="button" class="btn crop-tpl" data-tpl="potret" onclick="setCropTemplate('potret')">Potret 3:4</button>
+                      <button type="button" class="btn crop-tpl" data-tpl="bebas" onclick="setCropTemplate('bebas')">Bebas</button>
+                    </div>
+                    <div style="max-height:54vh; overflow:hidden; background:#141414;">
+                      <img id="imgCropperImage" style="max-width:100%; display:block;">
+                    </div>
+                    <div style="margin-top:14px; display:flex; gap:10px; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+                      <div style="display:flex; gap:8px;">
+                        <button type="button" class="btn" onclick="imgCropZoom(0.12)">Zoom +</button>
+                        <button type="button" class="btn" onclick="imgCropZoom(-0.12)">Zoom -</button>
+                        <button type="button" class="btn" onclick="imgCropRotate()">Putar 90&deg;</button>
+                      </div>
+                      <div style="display:flex; gap:10px;">
+                        <button type="button" class="btn" onclick="closeImageCropper()" style="background:var(--border); color:var(--text);">Batal</button>
+                        <button type="button" class="btn btn-primary" onclick="applyImageCrop()">Pakai Foto Ini</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+<script>
+/* ===== Porting fitur platform: Pengaturan (folder) + Kontrak Aktif (folder per penyewa, pencarian, struk grup, foto identitas) ===== */
+let invLiveHeld = null, invLiveHeldAt = 0;
+let rentalFolderOpen = {};
+let rentalFolderKeys = [];
+let rentalFolderPhotos = [];
+let rentalSearchQuery = '';
+let cfgFolderOpen = {};
+const PAY_METHODS_CFG = [['bri', 'Bri'], ['mandiri', 'Mandiri'], ['bca', 'Bca'], ['bni', 'Bni'], ['dana', 'Dana'], ['ovo', 'Ovo'], ['gopay', 'Gopay']];
+let idCapPhoto = '';
+let idPhotoInitDone = false;
+function applyCfgFolderStates() {
+      document.querySelectorAll('[data-cfg-folder]').forEach(el => {
+        const open = cfgFolderOpen[el.getAttribute('data-cfg-folder')] === true;
+        el.classList.toggle('open', open);
+        const h = el.querySelector('.renter-folder-head');
+        if (h) h.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    }
+function batchIdPhoto(contract) {
+      if (!contract) return '';
+      if (contract.idPhoto) return contract.idPhoto;
+      if (!contract.dispatchTimestamp) return '';
+      const key = rentalRenterKey(contract);
+      const all = activeRentals.concat(completedRentals);
+      const hit = all.find(x => x.dispatchTimestamp === contract.dispatchTimestamp && rentalRenterKey(x) === key && x.idPhoto);
+      return hit ? hit.idPhoto : '';
+    }
+async function btPrintStrukGroup(contractId) {
+      const g = strukGroupData(contractId);
+      if (!g) return;
+      const bytes = btStrukBytesFrom(g.c, g.batch, g.opts);
+      if (!bytes) return;
+      try {
+        await btWriteAll(bytes);
+        toast('Struk terkirim ke printer Bluetooth.');
+      } catch (e) {
+        toast('Gagal mencetak via Bluetooth — membuka dialog print.');
+        btFallbackOnce = true;
+        printStrukGroup(contractId);
+      }
+    }
+function btStrukBytesFrom(c, batch, opts) {
+      const cols = (siteConfig.receiptPaper === '58') ? 32 : 48;
+      const dt = (opts && opts.timestamp != null) ? new Date(opts.timestamp) : (c.dispatchTimestamp ? new Date(c.dispatchTimestamp) : new Date());
+      let total = 0;
+      const items = [];
+      batch.forEach(x => {
+        const item = inventory.find(i => i.id === x.itemId);
+        const price = item ? (item.priceRental || 0) : 0;
+        const sub = price * x.qty * (x.days || 1);
+        total += sub;
+        items.push({ name: x.itemName + (x.size ? ' (Uk: ' + x.size + ')' : ''), detail: x.qty + ' unit x ' + (x.days || 1) + ' hari @ ' + fmtRupiah(price), sub: fmtRupiah(sub) });
+      });
+      collectSaleLines(batch, c).forEach(l => {
+        const sub = (l.price || 0) * (l.qty || 1);
+        total += sub;
+        items.push({ name: l.itemName + (l.size ? ' (Uk: ' + l.size + ')' : '') + ' (BELI)', detail: l.qty + ' unit @ ' + fmtRupiah(l.price || 0), sub: fmtRupiah(sub) });
+      });
+      const B = [];
+      const raw = function() { for (let i = 0; i < arguments.length; i++) B.push(arguments[i]); };
+      const line = function(s) { const enc = btEncodeText(s); for (let i = 0; i < enc.length; i++) B.push(enc[i]); B.push(0x0A); };
+      const center = function(s, bold, dblH) {
+        raw(0x1B, 0x61, 1);
+        if (bold) raw(0x1B, 0x45, 1);
+        if (dblH) raw(0x1D, 0x21, 0x01);
+        wrapTextLines(btNormalize(s), cols).forEach(w => line(w));
+        if (dblH) raw(0x1D, 0x21, 0x00);
+        if (bold) raw(0x1B, 0x45, 0);
+        raw(0x1B, 0x61, 0);
+      };
+      const two = function(l, r, bold) {
+        if (bold) raw(0x1B, 0x45, 1);
+        const ln = btNormalize(l), rn = btNormalize(r);
+        if (ln.length + 1 + rn.length <= cols) line(ln + ' '.repeat(cols - ln.length - rn.length) + rn);
+        else { line(ln); line(' '.repeat(Math.max(0, cols - rn.length)) + rn); }
+        if (bold) raw(0x1B, 0x45, 0);
+      };
+      raw(0x1B, 0x40);
+      center(siteConfig.brandName || 'BK ADVENTURE', true, true);
+      if (siteConfig.brandSubtitle) center(siteConfig.brandSubtitle);
+      if (siteConfig.receiptNote) center(siteConfig.receiptNote);
+      if (siteConfig.receiptShowAddress !== false && siteConfig.address) center(siteConfig.address);
+      if (siteConfig.receiptShowPhone !== false && siteConfig.depotPhone) center('WA: ' + siteConfig.depotPhone);
+      line('-'.repeat(cols));
+      two('STRUK SEWA', c.contractId + (batch.length > 1 ? ' (+' + (batch.length - 1) + ')' : ''));
+      if (opts && opts.contractIds && opts.contractIds.length > 1) wrapTextLines('Kontrak: ' + opts.contractIds.join(', '), cols).forEach(w => line(w));
+      line('Tgl: ' + dt.toLocaleDateString('id-ID') + ' ' + dt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }));
+      wrapTextLines('Penyewa: ' + (c.renterName || ''), cols).forEach(w => line(w));
+      if (c.renterPhone) line('WA: ' + c.renterPhone);
+      line('-'.repeat(cols));
+      items.forEach(it => { wrapTextLines(it.name, cols).forEach(w => line(w)); two('  ' + it.detail, it.sub); });
+      line('-'.repeat(cols));
+      two('TOTAL', fmtRupiah(total), true);
+      if (c.payMethod) two('PEMBAYARAN:', c.payMethod);
+      if (c.paySender) two('PENGIRIM:', c.paySender);
+      line('Tgl Kembali: ' + (c.returnDate || '-'));
+      line('-'.repeat(cols));
+      center(siteConfig.receiptFooter || 'Barang harap kembali tepat waktu dalam kondisi baik. Terima kasih!');
+      raw(0x1B, 0x64, 3);
+      raw(0x1D, 0x56, 0x42, 0x00);
+      return new Uint8Array(B);
+    }
+function buildStrukLinesFrom(c, batch, opts) {
+      const paper = siteConfig.receiptPaper === '58' ? 58 : 80;
+      // Lebar teks dihitung dari metrik font Courier jsPDF (monospace,
+      // persis 0,6 em per karakter) terhadap lebar kertas — bukan tebakan
+      // jumlah karakter. Versi lama: 42 karakter @9,5pt = 84,5mm di kertas
+      // 80mm -> teks meluber keluar halaman, nominal terpotong (kejadian
+      // struk CTR-297257, 8 Nov 2026). Kini semua baris dijamin muat:
+      // dibungkus per lebar, dan nominal digambar rata kanan di tepi kertas.
+      const margin = 4;
+      const usable = paper - margin * 2;
+      const charW = fs => fs * 0.6 * 25.4 / 72;
+      const maxChars = Math.max(16, Math.floor(usable / charW(9.5)));
+      const bigChars = Math.max(10, Math.floor(usable / charW(13)));
+      const clean = t => String(t).replace(/\u00A0/g, ' ');
+      const dt = (opts && opts.timestamp != null) ? new Date(opts.timestamp) : (c.dispatchTimestamp ? new Date(c.dispatchTimestamp) : new Date());
+      let total = 0;
+      const items = [];
+      batch.forEach(x => {
+        const item = inventory.find(i => i.id === x.itemId);
+        const price = item ? (item.priceRental || 0) : 0;
+        const sub = price * x.qty * (x.days || 1);
+        total += sub;
+        items.push({
+          name: '- ' + x.itemName + (x.size ? ' (Uk: ' + x.size + ')' : ''),
+          detail: '  ' + x.qty + ' unit x ' + (x.days || 1) + ' hari @ ' + clean(fmtRupiah(price)),
+          amount: clean(fmtRupiah(sub))
+        });
+      });
+      // Baris BELI: harga jual tersimpan di barisnya (harga saat booking
+      // dibuat), TANPA durasi/hari; ikut menambah TOTAL.
+      collectSaleLines(batch, c).forEach(l => {
+        const sub = (l.price || 0) * (l.qty || 1);
+        total += sub;
+        items.push({
+          name: '- ' + l.itemName + (l.size ? ' (Uk: ' + l.size + ')' : '') + ' [BELI]',
+          detail: '  ' + l.qty + ' unit @ ' + clean(fmtRupiah(l.price || 0)),
+          amount: clean(fmtRupiah(sub))
+        });
+      });
+      const L = [];
+      const add = (t, o) => { wrapTextLines(clean(t), maxChars).forEach(x => L.push(Object.assign({ t: x }, o || {}))); };
+      const addBig = (t, o) => { wrapTextLines(clean(t), bigChars).forEach(x => L.push(Object.assign({ t: x, big: 1 }, o || {}))); };
+      addBig(siteConfig.brandName || 'BK ADVENTURE', { c: 1, b: 1 });
+      if (siteConfig.receiptNote) add(siteConfig.receiptNote, { c: 1 });
+      if (siteConfig.receiptShowAddress !== false && siteConfig.address) add(siteConfig.address, { c: 1 });
+      if (siteConfig.receiptShowPhone !== false && siteConfig.depotPhone) add('WA Toko: ' + siteConfig.depotPhone, { c: 1 });
+      add('-'.repeat(maxChars), {});
+      add('No. Kontrak: ' + (opts && opts.contractLabel ? opts.contractLabel : c.contractId), {});
+      add('Tanggal: ' + dt.toLocaleDateString('id-ID') + ' ' + dt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }), {});
+      add('Penyewa: ' + (c.renterName || ''), {});
+      add('-'.repeat(maxChars), {});
+      items.forEach(it => {
+        add(it.name, {});
+        if (it.detail.length + 1 + it.amount.length <= maxChars) L.push({ l: it.detail, r: it.amount });
+        else { add(it.detail, {}); L.push({ r: it.amount }); }
+      });
+      add('-'.repeat(maxChars), {});
+      L.push({ l: 'TOTAL:', r: clean(fmtRupiah(total)), b: 1 });
+      if (c.payMethod) L.push({ l: 'PEMBAYARAN:', r: clean(c.payMethod) });
+      if (c.paySender) L.push({ l: 'PENGIRIM:', r: clean(c.paySender) });
+      add('Tanggal Kembali: ' + (c.returnDate || '-'), {});
+      add('-'.repeat(maxChars), {});
+      add(siteConfig.receiptFooter || 'Barang harap kembali tepat waktu dalam kondisi baik. Terima kasih!', { c: 1 });
+      return { L: L, paper: paper, margin: margin, c: c };
+    }
+function cfgFolderKey(e, key) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleCfgFolder(key); }
+    }
+function cfgNavGo(key) {
+      cfgFolderOpen[key] = true;
+      applyCfgFolderStates();
+    }
+function closeIdPhoto() {
+      const modal = document.getElementById('idPhotoModal');
+      if (!modal || modal.style.display === 'none') return;
+      modal.style.display = 'none';
+      document.getElementById('idPhotoBody').innerHTML = '';
+    }
+function collectSaleLines(batch, c) {
+      const seen = {}, out = [];
+      const take = x => {
+        if (!x || !Array.isArray(x.saleLines) || !x.saleLines.length) return;
+        const k = String(x.dispatchTimestamp || 0);
+        if (seen[k]) return; seen[k] = 1;
+        x.saleLines.forEach(l => out.push(l));
+      };
+      (batch || []).forEach(take);
+      if (c && (batch || []).indexOf(c) === -1) take(c);
+      return out;
+    }
+function deliverStrukImage(img) {
+      const c = img.contract;
+      img.canvas.toBlob(blob => {
+        if (!blob) { toast('Gagal membuat gambar struk.'); return; }
+        const file = new File([blob], img.filename, { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], title: 'Struk Sewa ' + c.contractId }).catch(() => {});
+          toast('Pilih WhatsApp, lalu kontak penyewa — struk tampil sebagai gambar di chat.');
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = img.filename;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+        const phone = normalizePhone(c.renterPhone, c.renterName);
+        if (phone) {
+          const note = 'Halo ' + (c.renterName || 'kak') + ', ini struk sewa Anda — gambarnya baru saja diunduh di perangkat ini, silakan lampirkan ke chat ini sebagai foto. Terima kasih!';
+          window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(note), '_blank');
+        }
+        toast('Gambar struk diunduh. Lampirkan sebagai foto di chat WhatsApp penyewa.');
+      }, 'image/png');
+    }
+function deliverStrukPDF(pdf) {
+      const c = pdf.contract;
+      const file = new File([pdf.blob], pdf.filename, { type: 'application/pdf' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], title: 'Struk Sewa ' + c.contractId }).catch(() => {});
+        toast('Pilih WhatsApp, lalu kontak penyewa, untuk mengirim PDF struk.');
+        return;
+      }
+      const url = URL.createObjectURL(pdf.blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = pdf.filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+      const phone = normalizePhone(c.renterPhone, c.renterName);
+      if (phone) {
+        const note = 'Halo ' + (c.renterName || 'kak') + ', struk sewa Anda kami lampirkan sebagai PDF (' + pdf.filename + ') - file-nya baru saja diunduh di perangkat ini, silakan lampirkan ke chat ini. Terima kasih!';
+        window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(note), '_blank');
+      }
+      toast('PDF struk diunduh. Lampirkan file-nya di chat WhatsApp penyewa.');
+    }
+function handlePaymentQrUpload(e) {
+      const file = e.target.files && e.target.files[0];
+      e.target.value = '';
+      if (!file) return;
+      if (file.size > 3 * 1024 * 1024) { toast('Berkas QR terlalu besar — maksimal 3 MB. Kecilkan dulu, lalu unggah lagi.'); return; }
+      if (!/^image\//.test(file.type || '')) { toast('Berkas QR harus berupa gambar (PNG/JPG/WebP).'); return; }
+      toast('Memproses kode QR…');
+      processQrImageFile(file, dataUrl => {
+        if (!dataUrl) { toast('Kode QR gagal diproses. Coba gambar PNG/JPG lain.'); return; }
+        previewPaymentQr(dataUrl);
+        toast('Kode QR terpasang — klik SIMPAN untuk terapkan.');
+      });
+    }
+function heldOf(id, size) {
+      if (!invLiveHeld) return 0;
+      if (size) return invLiveHeld[id + '|' + size] || 0;
+      let n = 0;
+      for (const k in invLiveHeld) if (k.startsWith(id + '|')) n += invLiveHeld[k] || 0;
+      return n;
+    }
+function idPhotoEnsureInit() {
+      if (idPhotoInitDone) return;
+      idPhotoInitDone = true;
+      const modal = document.getElementById('idPhotoModal');
+      if (!modal) return;
+      modal.addEventListener('click', function (e) { if (e.target === modal) closeIdPhoto(); });
+      const btn = document.getElementById('idPhotoClose');
+      if (btn) btn.addEventListener('click', closeIdPhoto);
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeIdPhoto(); });
+    }
+function previewPaymentQr(url) {
+      const dataEl = document.getElementById('cfgPaymentQrData');
+      if (dataEl) dataEl.value = url || '';
+      const wrap = document.getElementById('paymentQrPreviewWrap');
+      const img = document.getElementById('paymentQrPreview');
+      if (!wrap || !img) return;
+      if (url && url.trim()) { img.src = url; wrap.style.display = 'flex'; }
+      else { img.removeAttribute('src'); wrap.style.display = 'none'; }
+    }
+function printStrukGroup(contractId) {
+      // Sama seperti printStruk: Bluetooth terhubung -> ESC/POS langsung.
+      if (typeof btReady === 'function' && btReady() && !btFallbackOnce) { btPrintStrukGroup(contractId); return; }
+      btFallbackOnce = false;
+      const g = strukGroupData(contractId);
+      if (!g) return;
+      printStrukHtmlFrom(g.c, g.batch, g.opts);
+    }
+function printStrukHtmlFrom(c, batch, opts) {
+      const dt = (opts && opts.timestamp != null) ? new Date(opts.timestamp) : (c.dispatchTimestamp ? new Date(c.dispatchTimestamp) : new Date());
+      let rows = ''; let total = 0;
+      batch.forEach(x => {
+        const item = inventory.find(i => i.id === x.itemId);
+        const price = item ? (item.priceRental || 0) : 0;
+        const sub = price * x.qty * (x.days || 1);
+        total += sub;
+        rows += '<div style="margin-top:8px;">' + escHtml(x.itemName) + '</div><div style="display:flex;justify-content:space-between;"><span>' + x.qty + ' unit x ' + (x.days || 1) + ' hari @ ' + fmtRupiah(price) + '</span><span>' + fmtRupiah(sub) + '</span></div>';
+      });
+      collectSaleLines(batch, c).forEach(l => {
+        const sub = (l.price || 0) * (l.qty || 1);
+        total += sub;
+        rows += '<div style="margin-top:8px;">' + escHtml(l.itemName) + (l.size ? ' (Uk: ' + escHtml(l.size) + ')' : '') + ' (BELI)</div><div style="display:flex;justify-content:space-between;"><span>' + l.qty + ' unit @ ' + fmtRupiah(l.price || 0) + '</span><span>' + fmtRupiah(sub) + '</span></div>';
+      });
+      const paperCfg = (siteConfig.receiptPaper || '80') === '58' ? { w: '48mm', f: '11px', page: '58mm' } : { w: '72mm', f: '12px', page: '80mm' };
+      let pageStyle = document.getElementById('printPageStyle');
+      if (!pageStyle) { pageStyle = document.createElement('style'); pageStyle.id = 'printPageStyle'; document.head.appendChild(pageStyle); }
+      pageStyle.textContent = '@page { size: ' + paperCfg.page + ' auto; margin: 0; }';
+      document.getElementById('printArea').innerHTML =
+        '<div style="width:' + paperCfg.w + ';margin:0 auto;font-family:\'Courier New\',monospace;font-size:' + paperCfg.f + ';color:#000;">' +
+        '<div style="text-align:center;">' +
+        ((siteConfig.receiptShowLogo !== false && siteConfig.logoUrl) ? '<img src="' + siteConfig.logoUrl + '" style="height:44px;max-width:85%;object-fit:contain;display:block;margin:0 auto 4px;filter:grayscale(1);">' : '') +
+        '<div style="font-size:16px;font-weight:bold;">' + (siteConfig.brandName || 'BK ADVENTURE') + '</div>' +
+        '<div>' + (siteConfig.brandSubtitle || '') + '</div>' +
+        (siteConfig.receiptNote ? '<div>' + siteConfig.receiptNote + '</div>' : '') +
+        ((siteConfig.receiptShowAddress !== false && siteConfig.address) ? '<div>' + siteConfig.address + '</div>' : '') +
+        ((siteConfig.receiptShowPhone !== false && siteConfig.depotPhone) ? '<div>WA: ' + siteConfig.depotPhone + '</div>' : '') +
+        '</div>' +
+        '<div style="border-top:1px dashed #000;margin:8px 0;"></div>' +
+        '<div style="display:flex;justify-content:space-between;"><span>STRUK SEWA</span><span>' + (opts && opts.contractLabel ? escHtml(opts.contractLabel) : c.contractId + (batch.length > 1 ? ' (+' + (batch.length - 1) + ' kontrak lain)' : '')) + '</span></div>' +
+        '<div>Tgl: ' + dt.toLocaleDateString('id-ID') + ' ' + dt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + '</div>' +
+        '<div>Penyewa: ' + escHtml(c.renterName || '') + '</div>' +
+        (c.renterPhone ? '<div>WA: ' + c.renterPhone + '</div>' : '') +
+        '<div style="border-top:1px dashed #000;margin:8px 0;"></div>' + rows +
+        '<div style="border-top:1px dashed #000;margin:8px 0;"></div>' +
+        '<div style="display:flex;justify-content:space-between;font-weight:bold;"><span>TOTAL</span><span>' + fmtRupiah(total) + '</span></div>' +
+        (c.payMethod ? '<div style="display:flex;justify-content:space-between;"><span>PEMBAYARAN:</span><span>' + escHtml(c.payMethod) + '</span></div>' : '') +
+        (c.paySender ? '<div style="display:flex;justify-content:space-between;"><span>PENGIRIM:</span><span>' + escHtml(c.paySender) + '</span></div>' : '') +
+        '<div>Tgl Kembali: ' + (c.returnDate || '-') + '</div>' +
+        '<div style="border-top:1px dashed #000;margin:8px 0;"></div>' +
+        '<div style="text-align:center;">' + String(siteConfig.receiptFooter || 'Barang harap kembali tepat waktu dalam kondisi baik. Terima kasih!').split('\n').join('<br>') + '</div></div>';
+      window.print();
+    }
+function processQrImageFile(file, cb) {
+      const rawFallback = () => { const r = new FileReader(); r.onload = () => cb(r.result); r.onerror = () => cb(null); r.readAsDataURL(file); };
+      let url;
+      try { url = URL.createObjectURL(file); } catch (e) { rawFallback(); return; }
+      let settled = false;
+      const settle = fn => { if (settled) return; settled = true; clearTimeout(timer); try { URL.revokeObjectURL(url); } catch (e) {} fn(); };
+      const timer = setTimeout(() => settle(rawFallback), 4000);
+      const img = new Image();
+      img.onload = () => settle(() => {
+        try {
+          const sw = img.naturalWidth || img.width, sh = img.naturalHeight || img.height;
+          if (!sw || !sh) { rawFallback(); return; }
+          const scale = Math.min(1, 800 / Math.max(sw, sh));
+          const w = Math.max(1, Math.round(sw * scale)), h = Math.max(1, Math.round(sh * scale));
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) { cb(null); return; }
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, w, h);
+          ctx.drawImage(img, 0, 0, sw, sh, 0, 0, w, h);
+          let out = '';
+          try { out = canvas.toDataURL('image/webp', 0.92); } catch (e) { out = ''; }
+          if (!out || out.indexOf('data:image/webp') !== 0) out = canvas.toDataURL('image/png');
+          cb(out);
+        } catch (err) { rawFallback(); }
+      });
+      img.onerror = () => settle(rawFallback);
+      img.src = url;
+    }
+async function refreshLiveHeld(force) {
+      if (typeof sbRest !== 'function') return;
+      if (!force && invLiveHeld && Date.now() - invLiveHeldAt < 30000) return;
+      try {
+        invLiveHeld = await sbRest('rpc/live_stock', { method: 'POST', body: { s: KONFIG.TENANT_SLUG } }) || {};
+        invLiveHeldAt = Date.now();
+      } catch (e) { if (!invLiveHeld) invLiveHeld = {}; return; }
+      renderInvTable(); renderMetrics();
+    }
+function removePaymentQr() {
+      previewPaymentQr('');
+      toast('Kode QR dihapus — klik SIMPAN untuk terapkan.');
+    }
+function renderStrukImage(built) {
+      const L = built.L, paper = built.paper, margin = built.margin, c = built.c;
+      const S = 8;
+      const lhPx = x => (x.big ? 6.4 : 4.7) * S;
+      const Hmm = 10 + L.reduce((s2, x) => s2 + (x.big ? 6.4 : 4.7), 0) + 4;
+      const cv = document.createElement('canvas');
+      cv.width = Math.round(paper * S);
+      cv.height = Math.round(Hmm * S);
+      const g = cv.getContext('2d');
+      if (!g) return null;
+      g.fillStyle = '#ffffff';
+      g.fillRect(0, 0, cv.width, cv.height);
+      g.fillStyle = '#111111';
+      let y = 7 * S;
+      L.forEach(x => {
+        g.font = (x.b ? 'bold ' : '') + Math.round((x.big ? 13 : 9.5) * 25.4 / 72 * S) + 'px "Courier New", Courier, monospace';
+        if (x.l !== undefined || x.r !== undefined) {
+          g.textAlign = 'left';
+          if (x.l) g.fillText(x.l, margin * S, y);
+          g.textAlign = 'right';
+          if (x.r) g.fillText(x.r, (paper - margin) * S, y);
+        }
+        else if (x.c) { g.textAlign = 'center'; g.fillText(x.t, cv.width / 2, y); }
+        else { g.textAlign = 'left'; g.fillText(x.t, margin * S, y); }
+        y += lhPx(x);
+      });
+      return { canvas: cv, filename: 'Struk-' + c.contractId + '.png', contract: c };
+    }
+function renderStrukPDF(built) {
+      if (!window.jspdf || !window.jspdf.jsPDF) return null;
+      const L = built.L, paper = built.paper, margin = built.margin, c = built.c;
+      const lh = x => x.big ? 6.4 : 4.7;
+      const H = 10 + L.reduce((s2, x) => s2 + lh(x), 0) + 4;
+      const doc = new window.jspdf.jsPDF({ unit: 'mm', format: [paper, H], orientation: 'portrait' });
+      let y = 7;
+      L.forEach(x => {
+        doc.setFont('courier', x.b ? 'bold' : 'normal');
+        doc.setFontSize(x.big ? 13 : 9.5);
+        if (x.l !== undefined || x.r !== undefined) {
+          if (x.l) doc.text(x.l, margin, y);
+          if (x.r) doc.text(x.r, paper - margin, y, { align: 'right' });
+        }
+        else if (x.c) doc.text(x.t, paper / 2, y, { align: 'center' });
+        else doc.text(x.t, margin, y);
+        y += lh(x);
+      });
+      return { blob: doc.output('blob'), filename: 'Struk-' + c.contractId + '.pdf', contract: c };
+    }
+function onRentalSearchInput(el) {
+      rentalSearchQuery = el.value;
+      renderRentalTable();
+    }
+function clearRentalSearch() {
+      rentalSearchQuery = '';
+      const inp = document.getElementById('rentalSearchInput');
+      if (inp) inp.value = '';
+      renderRentalTable();
+      if (inp) inp.focus();
+    }
+function rentalRenterKey(c) {
+      // Kunci pengelompokan penyewa: nomor WA ternormalisasi lewat
+      // normalizePhone (fungsi yang sama dengan jalur struk/WA). WA tak
+      // terbaca -> cadangan nama+NIK (huruf kecil).
+      const p = normalizePhone(c.renterPhone, c.renterName);
+      if (p) return 'wa:' + p;
+      return 'id:' + String(c.renterName || '').trim().toLowerCase() + '|' + String(c.renterNIK || '').trim().toLowerCase();
+    }
+function rentalSearchHit(text, q, qd) {
+      const t = String(text || '').toLowerCase();
+      if (q && t.includes(q)) return true;
+      if (qd) {
+        const td = t.replace(/\D/g, '');
+        if (td && normalizePhone(td).includes(normalizePhone(qd))) return true;
+      }
+      return false;
+    }
+function renterIdLabel(c) {
+      if (!c) return '';
+      if (c.idType) return c.idNumber ? (c.idType + ' ' + c.idNumber) : c.idType;
+      return c.renterNIK ? ('NIK ' + c.renterNIK) : '';
+    }
+function sendStrukImageWAGroup(contractId) {
+      const g = strukGroupData(contractId);
+      if (!g) { toast('Struk tidak ditemukan.'); return; }
+      const built = buildStrukLinesFrom(g.c, g.batch, g.opts);
+      const img = built ? renderStrukImage(built) : null;
+      if (!img) { toast('Struk tidak ditemukan.'); return; }
+      deliverStrukImage(img);
+    }
+function sendStrukWAGroup(contractId) {
+      const g = strukGroupData(contractId);
+      if (!g) { toast('Struk tidak ditemukan.'); return; }
+      const built = buildStrukLinesFrom(g.c, g.batch, g.opts);
+      const pdf = built ? renderStrukPDF(built) : null;
+      if (!pdf) { toast('Library PDF belum termuat (butuh internet). Mengirim versi teks.'); sendStrukWATextFrom(g.c, g.batch, g.opts); return; }
+      deliverStrukPDF(pdf);
+    }
+function sendStrukWATextFrom(c, batch, opts) {
+      const phone = normalizePhone(c.renterPhone, c.renterName);
+      if (!phone) { alert('Nomor WhatsApp penyewa tidak tersedia pada kontrak ini.'); return; }
+      const dt = (opts && opts.timestamp != null) ? new Date(opts.timestamp) : (c.dispatchTimestamp ? new Date(c.dispatchTimestamp) : new Date());
+      let total = 0, items = '';
+      batch.forEach(x => {
+        const item = inventory.find(i => i.id === x.itemId);
+        const price = item ? (item.priceRental || 0) : 0;
+        const sub = price * x.qty * (x.days || 1);
+        total += sub;
+        items += '- ' + x.itemName + '\n  ' + x.qty + ' unit x ' + (x.days || 1) + ' hari @ ' + fmtRupiah(price) + ' = ' + fmtRupiah(sub) + '\n';
+      });
+      collectSaleLines(batch, c).forEach(l => {
+        const sub = (l.price || 0) * (l.qty || 1);
+        total += sub;
+        items += '- ' + l.itemName + ' (BELI)\n  ' + l.qty + ' unit @ ' + fmtRupiah(l.price || 0) + ' = ' + fmtRupiah(sub) + '\n';
+      });
+      const msg = '*STRUK SEWA \u2014 ' + (siteConfig.brandName || 'BK ADVENTURE') + '*\n' +
+        (siteConfig.receiptNote ? siteConfig.receiptNote + '\n' : '') +
+        ((siteConfig.receiptShowAddress !== false && siteConfig.address) ? siteConfig.address + '\n' : '') +
+        ((siteConfig.receiptShowPhone !== false && siteConfig.depotPhone) ? 'WA Toko: ' + siteConfig.depotPhone + '\n' : '') +
+        '------------------------------\n' +
+        'No. Kontrak: ' + (opts && opts.contractLabel ? opts.contractLabel : c.contractId) + '\n' +
+        'Tanggal: ' + dt.toLocaleDateString('id-ID') + ' ' + dt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + '\n' +
+        'Penyewa: ' + (c.renterName || '') + '\n' +
+        '------------------------------\n' + items +
+        '------------------------------\n' +
+        '*TOTAL: ' + fmtRupiah(total) + '*\n' +
+        (c.payMethod ? 'Pembayaran: ' + c.payMethod + '\n' : '') +
+        (c.paySender ? 'Pengirim: ' + c.paySender + '\n' : '') +
+        'Tanggal Kembali: ' + (c.returnDate || '-') + '\n' +
+        '------------------------------\n' +
+        (siteConfig.receiptFooter || 'Barang harap kembali tepat waktu dalam kondisi baik. Terima kasih!');
+      window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(msg), '_blank');
+    }
+function showRenterIdPhoto(idx) {
+      const photo = rentalFolderPhotos[idx];
+      if (!photo) { toast('Folder ini tidak punya foto identitas.'); return; }
+      idPhotoEnsureInit();
+      const body = document.getElementById('idPhotoBody');
+      body.innerHTML = '';
+      const img = document.createElement('img');
+      img.alt = 'Foto identitas penyewa';
+      img.style.cssText = 'max-width:92vw;max-height:84vh;border-radius:10px;background:#fff;';
+      img.src = photo;
+      body.appendChild(img);
+      document.getElementById('idPhotoModal').style.display = 'flex';
+    }
+function strukGroup(contractId) {
+      const anchor = activeRentals.find(x => x.contractId === contractId);
+      if (!anchor) return null;
+      const key = rentalRenterKey(anchor);
+      return { c: anchor, batch: activeRentals.filter(x => rentalRenterKey(x) === key) };
+    }
+function strukGroupData(contractId) {
+      const g = strukGroup(contractId);
+      if (!g) return null;
+      const ids = g.batch.map(x => x.contractId);
+      let ts = null;
+      g.batch.forEach(x => { if (x.dispatchTimestamp && (ts === null || x.dispatchTimestamp < ts)) ts = x.dispatchTimestamp; });
+      return { c: g.c, batch: g.batch, opts: { contractLabel: ids.join(', '), contractIds: ids, timestamp: ts } };
+    }
+function toggleCfgFolder(key) {
+      cfgFolderOpen[key] = cfgFolderOpen[key] !== true;
+      applyCfgFolderStates();
+    }
+function toggleRentalFolder(idx) {
+      const k = rentalFolderKeys[idx];
+      if (k == null) return;
+      rentalFolderOpen[k] = rentalFolderOpen[k] !== true;
+      renderRentalTable();
+    }
+</script>
 </body>
 </html>
