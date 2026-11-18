@@ -22,12 +22,12 @@
 <script type="application/ld+json" id="ldBusiness">{}</script>
 <style>
 :root{
-  --ink:#16211B; --ink-2:#1E2B23; --ink-soft:#2A382F;
+  --ink:#152219; --ink-2:#152219; --ink-soft:#2A382F;
   --paper:#F1F3EF; --paper-2:#E7ECE4; --white:#FFFFFF;
-  --survey:#D9A404; --survey-deep:#A87E03;
-  --marker:#C0392B; --marker-soft:#F7E9E6;
+  --survey:#0E5B36; --survey-deep:#083D24;
+  --marker:#152219; --marker-soft:#EFF3F0;
   --line:#D3DAD0; --line-dark:#3A4740;
-  --muted:#5A665E; --ok:#1E6B3C;
+  --muted:#5A665E; --ok:#0E5B36;
   --shadow:0 14px 34px rgba(22,33,27,.13);
   --font-d:'Space Grotesk',sans-serif; --font-b:'Inter',sans-serif; --font-m:'IBM Plex Mono',monospace;
 }
@@ -50,11 +50,11 @@ section{position:relative}
 .btn{display:inline-flex;align-items:center;gap:9px;border:none;border-radius:8px;padding:13px 22px;font-family:var(--font-d);font-weight:600;font-size:15px;text-decoration:none;transition:transform .15s,background .15s,box-shadow .15s}
 .btn:active{transform:translateY(1px)}
 .btn-survey{background:var(--survey);color:var(--ink)}
-.btn-survey:hover{background:#C79503}
+.btn-survey:hover{background:#0E5B36}
 .btn-ink{background:var(--ink);color:var(--paper)}
 .btn-ink:hover{background:var(--ink-soft)}
-.btn-wa{background:#1FA855;color:#fff;border-radius:8px;height:44px}
-.btn-wa:hover{background:#178A45}
+.btn-wa{background:#0E5B36;color:#fff;border-radius:8px;height:44px}
+.btn-wa:hover{background:#083D24}
 .btn-ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
 .btn-ghost:hover{background:var(--ink);color:var(--paper)}
 .btn[disabled]{opacity:.55;cursor:not-allowed}
@@ -169,7 +169,7 @@ nav.main a:hover{color:#fff}
 .add-btn:hover{background:var(--ink-soft)}
 .add-btn svg{width:17px;height:17px}
 .add-btn[disabled]{background:var(--paper-2);color:var(--muted);cursor:not-allowed}
-.prod-card.out-date{border-color:#E3CFC9}
+.prod-card.out-date{border-color:#E7F2EA}
 .prod-card.out-date .prod-media img,.prod-card.out-date .prod-name,.prod-card.out-date .prod-price{opacity:.45}
 .prod-card.out-date .prod-media img{filter:grayscale(.7)}
 .empty-note{grid-column:1/-1;background:var(--white);border:1.5px dashed var(--line);border-radius:12px;padding:34px;text-align:center;color:var(--muted)}
@@ -348,7 +348,7 @@ footer.site .contour-bg{width:700px;height:700px;right:-240px;top:-300px;opacity
 .status-track div.done{color:var(--ink);font-weight:600}
 .status-track div.done::before{border-top:2.5px solid var(--survey)}
 .status-track div.done::after{background:var(--survey);border-color:var(--ink)}
-.ck-err{background:var(--marker-soft);border:1px solid #E3CFC9;color:#7E2A1E;border-radius:10px;padding:13px 15px;font-size:14px}
+.ck-err{background:var(--marker-soft);border:1px solid #E7F2EA;color:#152219;border-radius:10px;padding:13px 15px;font-size:14px}
 .ck-card{border:1.5px solid var(--ink);border-radius:12px;padding:16px}
 .ck-card .ck-code{font-family:var(--font-m);font-size:20px;font-weight:600;letter-spacing:.08em}
 .ck-pill{background:var(--ink);color:var(--survey);font-family:var(--font-m);font-size:10.5px;font-weight:600;letter-spacing:.08em;border-radius:6px;padding:4px 10px}
@@ -384,7 +384,7 @@ footer.site .contour-bg{width:700px;height:700px;right:-240px;top:-300px;opacity
 .g-other{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:10px;padding:11px 13px;cursor:pointer;font:inherit;font-size:14px;font-weight:600;color:var(--ink)}
 .g-other:hover{background:var(--paper);border-color:var(--ink)}
 .g-other svg{width:20px;height:20px;margin:0 9px;color:var(--muted)}
-.sim-tag{font-family:var(--font-m);font-size:10px;font-weight:600;letter-spacing:.1em;color:var(--marker);border:1px dashed #E3CFC9;border-radius:6px;padding:7px 9px;margin-top:16px;text-align:center}
+.sim-tag{font-family:var(--font-m);font-size:10px;font-weight:600;letter-spacing:.1em;color:var(--marker);border:1px dashed #E7F2EA;border-radius:6px;padding:7px 9px;margin-top:16px;text-align:center}
 .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,90px);background:var(--ink);color:var(--paper);padding:13px 22px;border-radius:10px;border-left:5px solid var(--survey);font-size:14px;font-weight:600;z-index:120;transition:transform .3s;box-shadow:var(--shadow);max-width:92vw;text-align:center;pointer-events:none}
 .toast.show{transform:translate(-50%,0)}
 
@@ -447,9 +447,9 @@ footer.site .contour-bg{width:700px;height:700px;right:-240px;top:-300px;opacity
    mengikuti mockup beranda v4 + brief Laras. Komponen lama (drawer, modal,
    keranjang, checkout) mempertahankan kelasnya; nilainya diselaraskan. ===== */
 :root{
-  --ink:#16211B; --ink-2:#1E2B23; --paper:#F1F3EF; --paper-2:#E7ECE4;
-  --survey:#D9A404; --survey-deep:#A87E03; --marker:#C0392B; --terra:#C04E31;
-  --line:#D3DAD0; --line-dark:#3A4740; --muted:#5A665E; --ok:#1E6B3C;
+  --ink:#152219; --ink-2:#152219; --paper:#F1F3EF; --paper-2:#E7ECE4;
+  --survey:#0E5B36; --survey-deep:#083D24; --marker:#152219; --terra:#152219;
+  --line:#D3DAD0; --line-dark:#3A4740; --muted:#5A665E; --ok:#0E5B36;
   --shadow:0 16px 40px rgba(22,33,27,.18);
   --font-b:'Space Grotesk',system-ui,sans-serif;
   --font-serif:'Fraunces',Georgia,serif;
@@ -504,7 +504,7 @@ header.site nav.main a:hover{color:var(--survey)}
 .bbf input,.bbf select{width:100%;height:46px;border:1px solid var(--line);border-radius:8px;background:#fff;padding:0 14px;font-family:var(--font-b);font-size:14px;color:var(--ink)}
 .bbf input:focus,.bbf select:focus{outline:2px solid var(--survey);outline-offset:0;border-color:var(--survey)}
 .btn-check{height:46px;padding:0 24px;border:none;border-radius:8px;background:var(--terra);color:#fff;font-family:var(--font-b);font-weight:600;font-size:13.5px;letter-spacing:.04em;cursor:pointer;white-space:nowrap}
-.btn-check:hover{background:#A93F27}
+.btn-check:hover{background:#152219}
 .book-card .bb-status{margin-top:14px}
 .book-card .bb-status:empty{margin-top:0}
 /* --- strip kepercayaan --- */
@@ -681,7 +681,7 @@ footer.site{padding:48px 0 24px}
   <div class="wrap hero-inner">
     <div class="hero-copy">
       <h1>Udara Segar,<br>Alat Lengkap,<br>Tidur Nyenyak.</h1>
-      <div class="hero-tagline"><svg width="11" height="10" viewBox="0 0 11 10" aria-hidden="true"><path d="M5.5 0 11 10H0Z" fill="#C04E31"/></svg><span>RENTAL ALAT CAMPING &amp; OPEN TRIP — MEDAN</span></div>
+      <div class="hero-tagline"><svg width="11" height="10" viewBox="0 0 11 10" aria-hidden="true"><path d="M5.5 0 11 10H0Z" fill="#152219"/></svg><span>RENTAL ALAT CAMPING &amp; OPEN TRIP — MEDAN</span></div>
       <a class="btn-pill" href="#katalog">Booking Sekarang</a>
     </div>
   </div>
